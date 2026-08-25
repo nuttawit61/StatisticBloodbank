@@ -1,0 +1,2375 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
+  <meta http-equiv="Pragma" content="no-cache" />
+  <meta http-equiv="Expires" content="0" />
+  <title>HLA Laboratory Dashboard | ปีปฏิทิน 2569</title>
+  <meta name="description" content="Dashboard สถิติห้องปฏิบัติการสาขา HLA Laboratory ปีปฏิทิน 2564 - 2569" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.2.0/dist/chartjs-plugin-datalabels.min.js"></script>
+
+  <style>
+    :root {
+      --bg: #f8fafc;
+      --bg-alt: #f1f5f9;
+      --surface: #ffffff;
+      --surface-hover: #f8fafc;
+      --surface-2: #f1f5f9;
+      --border: #e2e8f0;
+      --border-strong: #cbd5e1;
+
+      --red:    #dc2626;
+      --red-lt: #fee2e2;
+      --red-md: #fca5a5;
+
+      --blue:    #2563eb;
+      --blue-lt: #dbeafe;
+      --blue-md: #bfdbfe;
+
+      --teal:    #0d9488;
+      --teal-lt: #ccfbf1;
+      --teal-md: #99f6e4;
+
+      --purple:    #7c3aed;
+      --purple-lt: #f3e8ff;
+      --purple-md: #e9d5ff;
+
+      --amber:    #d97706;
+      --amber-lt: #fef3c7;
+      --amber-md: #fde68a;
+
+      --pink:    #db2777;
+      --pink-lt: #fce7f3;
+
+      --rose:    #db2777;
+      --rose-lt: #fce7f3;
+      --rose-md: #fbcfe8;
+
+      --orange:    #f97316;
+      --orange-lt: #ffedd5;
+      --orange-md: #fed7aa;
+
+      /* HLA Theme: Indigo/Violet */
+      --indigo:    #4f46e5;
+      --indigo-lt: #eef2ff;
+      --indigo-md: #c7d2fe;
+
+      --violet:    #7c3aed;
+      --violet-lt: #f3e8ff;
+      --violet-md: #e9d5ff;
+
+      --text-1: #0f172a;
+      --text-2: #334155;
+      --text-3: #64748b;
+      --text-4: #cbd5e1;
+
+      --shadow-sm: 0 1px 3px rgba(15,23,42,0.06), 0 1px 2px rgba(15,23,42,0.04);
+      --shadow-md: 0 4px 12px rgba(15,23,42,0.08), 0 2px 4px rgba(15,23,42,0.04);
+      --shadow-lg: 0 10px 25px -5px rgba(15,23,42,0.1), 0 8px 10px -6px rgba(15,23,42,0.1);
+      --shadow-focus: 0 0 0 3px rgba(79,70,229,0.18);
+
+      --radius: 16px;
+      --radius-sm: 10px;
+      --radius-xs: 6px;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: 'Sarabun', 'Inter', sans-serif;
+      background: var(--bg);
+      color: var(--text-1);
+      min-height: 100vh;
+      font-size: 14px;
+      line-height: 1.5;
+    }
+
+    /* ===== HEADER ===== */
+    .header {
+      background: var(--surface);
+      border-bottom: 1px solid var(--border);
+      box-shadow: var(--shadow-sm);
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+
+    .header-inner {
+      max-width: 1440px;
+      margin: 0 auto;
+      padding: 0 28px;
+      display: flex;
+      align-items: center;
+      gap: 20px;
+      height: 68px;
+    }
+
+    .logo-wrap {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      flex-shrink: 0;
+    }
+
+    .logo-info h1 {
+      font-size: 16px;
+      font-weight: 700;
+      color: var(--text-1);
+      line-height: 1.2;
+    }
+
+    .logo-info p {
+      font-size: 12px;
+      color: var(--text-3);
+      margin-top: 1px;
+    }
+
+    .header-divider {
+      width: 1px;
+      height: 32px;
+      background: var(--border);
+    }
+
+    .nav-menu {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin: 0 4px;
+      overflow: visible;
+    }
+
+    .nav-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 6px 14px;
+      border-radius: 20px;
+      color: var(--text-2);
+      font-weight: 500;
+      font-size: 12.5px;
+      text-decoration: none;
+      transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .nav-link:hover {
+      background: var(--bg-alt);
+      color: var(--text-1);
+    }
+
+    .nav-link.active {
+      font-weight: 700;
+    }
+
+    .hla-theme .nav-link.active {
+      background: var(--indigo-lt);
+      color: var(--indigo);
+    }
+
+    .header-meta {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex: 1;
+    }
+
+    .pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      padding: 5px 12px;
+      border-radius: 20px;
+      font-size: 12px;
+      font-weight: 600;
+      border: 1.5px solid;
+      white-space: nowrap;
+    }
+
+    .pill-indigo { background: var(--indigo-lt); color: var(--indigo); border-color: var(--indigo-md); }
+    .pill-teal   { background: var(--teal-lt);   color: var(--teal);   border-color: var(--teal-md); }
+    .pill-blue   { background: var(--blue-lt);   color: var(--blue);   border-color: var(--blue-md); }
+
+    .live-dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: var(--teal);
+      animation: blink 1.8s ease-in-out infinite;
+    }
+    @keyframes blink {
+      0%,100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.4; transform: scale(0.7); }
+    }
+
+    /* ===== BUTTONS ===== */
+    .btn-refresh {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      padding: 7px 14px;
+      background: var(--indigo-lt);
+      color: var(--indigo);
+      border: 1.5px solid var(--indigo-md);
+      border-radius: 20px;
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .btn-refresh:hover { background: var(--indigo-md); }
+    .btn-refresh.spinning svg { animation: spin 0.4s linear; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    .btn-export {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      padding: 7px 14px;
+      background: var(--indigo);
+      color: #fff;
+      border: none;
+      border-radius: 20px;
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .btn-export:hover { background: #4338ca; }
+
+    .btn-action {
+      background: var(--surface-2);
+      border: 1px solid var(--border);
+      color: var(--text-2);
+      padding: 6px 14px;
+      border-radius: 20px;
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .btn-action:hover { background: var(--border); color: var(--text-1); }
+
+    .btn-action-secondary {
+      background: var(--surface-2);
+      border: 1px solid var(--border);
+      color: var(--text-2);
+    }
+
+    /* ===== MAIN ===== */
+    .main {
+      max-width: 1440px;
+      margin: 0 auto;
+      padding: 28px 28px 48px;
+    }
+
+    /* ===== MONTH/YEAR SELECTOR BAR ===== */
+    .month-bar {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow-sm);
+      padding: 16px 20px;
+      margin-bottom: 24px;
+    }
+
+    .month-bar-top {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 14px;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    .month-bar-label {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .month-bar-title {
+      font-size: 15px;
+      font-weight: 700;
+      color: var(--text-1);
+    }
+
+    .month-bar-subtitle {
+      font-size: 12px;
+      color: var(--text-3);
+    }
+
+    .month-tabs {
+      display: grid;
+      grid-template-columns: repeat(12, 1fr);
+      gap: 8px;
+    }
+
+    @media (max-width: 1024px) {
+      .month-tabs { grid-template-columns: repeat(6, 1fr); }
+    }
+    @media (max-width: 640px) {
+      .month-tabs { grid-template-columns: repeat(4, 1fr); }
+    }
+
+    .month-tab {
+      background: var(--surface);
+      border: 1.5px solid var(--border);
+      border-radius: var(--radius-sm);
+      padding: 10px 6px;
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+      position: relative;
+      user-select: none;
+    }
+
+    .month-tab:hover:not(.disabled) {
+      border-color: var(--indigo-md);
+      background: var(--surface-hover);
+      transform: translateY(-2px);
+    }
+
+    .month-tab.active {
+      background: var(--indigo-lt);
+      border-color: var(--indigo);
+      color: var(--indigo);
+    }
+
+    .month-tab.disabled {
+      opacity: 0.35;
+      cursor: not-allowed;
+      background: var(--bg-alt);
+    }
+
+    .month-tab-abbr {
+      font-size: 13px;
+      font-weight: 700;
+      line-height: 1.2;
+    }
+
+    .month-tab-num {
+      font-size: 10px;
+      font-weight: 500;
+      opacity: 0.7;
+      margin-top: 1px;
+    }
+
+    .month-tab-dot {
+      width: 5px;
+      height: 5px;
+      border-radius: 50%;
+      background: var(--indigo);
+      position: absolute;
+      bottom: 6px;
+      left: 50%;
+      transform: translateX(-50%);
+      display: none;
+    }
+
+    .month-tab.active .month-tab-dot { display: block; }
+
+    /* ===== MONTH DETAIL PANEL ===== */
+    .mdp {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow-sm);
+      padding: 20px;
+      margin-bottom: 24px;
+      display: flex;
+      align-items: center;
+      gap: 24px;
+      flex-wrap: wrap;
+    }
+
+    .mdp-month-badge {
+      padding: 12px 18px;
+      border-radius: var(--radius-sm);
+      background: var(--indigo-lt);
+      color: var(--indigo);
+      text-align: center;
+      flex-shrink: 0;
+    }
+
+    .mdp-month-name {
+      font-size: 18px;
+      font-weight: 800;
+      line-height: 1.1;
+    }
+
+    .mdp-month-year {
+      font-size: 12px;
+      font-weight: 600;
+      opacity: 0.7;
+      margin-top: 2px;
+    }
+
+    .mdp-divider {
+      width: 1px;
+      height: 48px;
+      background: var(--border);
+      flex-shrink: 0;
+    }
+
+    .mdp-stats {
+      display: flex;
+      gap: 28px;
+      flex-wrap: wrap;
+      flex: 1;
+    }
+
+    .mdp-stat {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+
+    .mdp-stat-val {
+      font-size: 22px;
+      font-weight: 800;
+      color: var(--indigo);
+    }
+
+    .mdp-stat-lbl {
+      font-size: 11px;
+      color: var(--text-3);
+      font-weight: 500;
+    }
+
+    /* ===== KPI SECTION TITLE ===== */
+    .kpi-section-title {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      font-size: 15px;
+      font-weight: 700;
+      color: #ffffff;
+      margin-bottom: 18px;
+      padding: 12px 20px;
+      border-radius: 14px;
+      background: linear-gradient(135deg, var(--indigo) 0%, var(--violet) 100%);
+      box-shadow: 0 6px 20px rgba(79, 70, 229, 0.25);
+      position: relative;
+      overflow: hidden;
+    }
+    
+    .kpi-section-title::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; width: 100%; height: 100%;
+      background: url('data:image/svg+xml;utf8,<svg width="20" height="20" xmlns="http://www.w3.org/2000/svg"><circle cx="2" cy="2" r="1.5" fill="rgba(255,255,255,0.08)"/></svg>') repeat;
+      pointer-events: none;
+    }
+
+    .kpi-section-title-inner {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      position: relative;
+      z-index: 1;
+    }
+
+    .kpi-title-icon {
+      background: rgba(255,255,255,0.25);
+      padding: 6px;
+      border-radius: 50%;
+      font-size: 20px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 38px;
+      height: 38px;
+      backdrop-filter: blur(4px);
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+    
+    .kpi-section-title-2 {
+      background: linear-gradient(135deg, var(--teal) 0%, var(--blue) 100%);
+      box-shadow: 0 6px 20px rgba(13, 148, 136, 0.25);
+      margin-top: 24px;
+    }
+
+    /* ===== KPI GRID ===== */
+    .kpi-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 16px;
+      margin-bottom: 24px;
+    }
+
+    @media (max-width: 1200px) { .kpi-grid { grid-template-columns: repeat(2, 1fr); } }
+    @media (max-width: 640px)  { .kpi-grid { grid-template-columns: 1fr; } }
+
+    .kpi-card {
+      background: linear-gradient(150deg, var(--kpi-bg, var(--indigo-lt)) 0%, #ffffff 60%);
+      border: 1px solid rgba(0,0,0,0.05);
+      border-top: 4px solid var(--kpi-color, var(--indigo));
+      border-radius: var(--radius);
+      padding: 20px 20px 16px;
+      box-shadow: 0 4px 16px rgba(0,0,0,0.04), 0 2px 4px rgba(0,0,0,0.02);
+      transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .kpi-card:hover {
+      box-shadow: 0 16px 32px rgba(0,0,0,0.08), 0 6px 12px rgba(0,0,0,0.04);
+      transform: translateY(-5px);
+      border-color: var(--kpi-color, var(--indigo));
+    }
+
+    .kpi-icon-wrap {
+      width: 46px;
+      height: 46px;
+      border-radius: 50%;
+      background: var(--kpi-bg, var(--indigo-lt));
+      box-shadow: 0 2px 10px rgba(0,0,0,0.09), inset 0 1px 0 rgba(255,255,255,0.8);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 22px;
+      margin-bottom: 13px;
+    }
+
+    .kpi-label {
+      font-size: 11.5px;
+      font-weight: 600;
+      color: var(--text-3);
+      text-transform: uppercase;
+      letter-spacing: 0.045em;
+      margin-bottom: 5px;
+      line-height: 1.45;
+    }
+
+    .kpi-value {
+      font-size: 30px;
+      font-weight: 800;
+      color: var(--kpi-color, var(--indigo));
+      line-height: 1.1;
+      margin-bottom: 3px;
+    }
+
+    .kpi-sub {
+      font-size: 11px;
+      color: var(--text-3);
+      margin-bottom: 13px;
+      line-height: 1.4;
+    }
+
+    .kpi-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 3px;
+      padding: 3px 9px;
+      border-radius: 20px;
+      font-size: 11px;
+      font-weight: 700;
+    }
+
+    .kpi-badge.up   { background: #dcfce7; color: #15803d; box-shadow: 0 1px 4px rgba(21,128,61,0.18); }
+    .kpi-badge.down { background: #fee2e2; color: #dc2626; box-shadow: 0 1px 4px rgba(220,38,38,0.18); }
+    .kpi-badge.same { background: var(--bg-alt); color: var(--text-3); }
+
+    .kpi-split-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px 7px;
+      border-top: 1px dashed rgba(0,0,0,0.1);
+      padding-top: 11px;
+    }
+
+    .kpi-split-col {
+      flex: 1 1 calc(50% - 4px);
+      min-width: 0;
+      display: flex;
+      flex-direction: column;
+      gap: 1px;
+      padding: 5px 8px;
+      background: rgba(255,255,255,0.75);
+      border-radius: 7px;
+      border-left: 2px solid var(--kpi-color, var(--indigo));
+      box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+    }
+
+    .kpi-split-label {
+      font-size: 9.5px;
+      color: var(--text-3);
+      font-weight: 500;
+      line-height: 1.35;
+    }
+
+    .kpi-split-value {
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--kpi-color, var(--indigo));
+    }
+
+    /* ===== CHARTS GRID ===== */
+    .charts-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+      margin-bottom: 24px;
+    }
+
+    @media (max-width: 900px) { .charts-grid { grid-template-columns: 1fr; } }
+
+    .chart-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow-sm);
+      padding: 20px;
+    }
+
+    .chart-header {
+      margin-bottom: 16px;
+    }
+
+    .chart-title h3 {
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--text-1);
+    }
+
+    .chart-title p {
+      font-size: 12px;
+      color: var(--text-3);
+      margin-top: 3px;
+    }
+
+    .chart-wrap {
+      position: relative;
+      height: 300px;
+    }
+
+    /* ===== TABLE ===== */
+    .table-section {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow-sm);
+      margin-bottom: 24px;
+      overflow: hidden;
+    }
+
+    .table-header {
+      padding: 16px 20px;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+
+    .table-title h3 {
+      font-size: 15px;
+      font-weight: 700;
+      color: var(--text-1);
+    }
+
+    .table-title p {
+      font-size: 12px;
+      color: var(--text-3);
+      margin-top: 3px;
+    }
+
+    .table-wrap {
+      overflow-x: auto;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 13px;
+    }
+
+    thead th {
+      background: var(--indigo-lt);
+      color: var(--indigo);
+      font-weight: 700;
+      padding: 10px 12px;
+      text-align: center;
+      border-bottom: 2px solid var(--indigo-md);
+      white-space: nowrap;
+    }
+
+    .text-left { text-align: left !important; }
+
+    .sticky-col-1 {
+      position: sticky;
+      left: 0;
+      background: var(--indigo-lt);
+      z-index: 1;
+      min-width: 40px;
+      max-width: 48px;
+    }
+
+    .sticky-col-2 {
+      position: sticky;
+      left: 48px;
+      background: var(--indigo-lt);
+      z-index: 1;
+      min-width: 220px;
+      border-right: 1.5px solid var(--indigo-md);
+    }
+
+    tbody td {
+      padding: 8px 12px;
+      text-align: center;
+      border-bottom: 1px solid var(--border);
+      color: var(--text-2);
+    }
+
+    tbody td.text-left { text-align: left; }
+
+    tbody tr:hover td { background: var(--bg-alt); }
+
+    .sticky-col-1, .sticky-col-2 { background: var(--surface); }
+    tbody tr:hover .sticky-col-1,
+    tbody tr:hover .sticky-col-2 { background: var(--bg-alt); }
+
+    .col-total {
+      background: var(--indigo-lt) !important;
+      color: var(--indigo) !important;
+      font-weight: 700;
+      border-left: 1px solid var(--indigo-md);
+    }
+
+    .active-month-col {
+      background: rgba(79,70,229,0.05);
+    }
+
+    tr.section-header td {
+      background: var(--bg-alt);
+      color: var(--text-3);
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      padding: 6px 12px;
+      border-bottom: 1px solid var(--border);
+      text-align: left;
+    }
+
+    tr.tr-total td {
+      background: var(--indigo-lt);
+      color: var(--indigo);
+      font-weight: 700;
+    }
+
+    /* ===== ANALYSIS SECTION ===== */
+    .analysis-section {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow-sm);
+      overflow: hidden;
+    }
+
+    .analysis-header {
+      padding: 20px;
+      border-bottom: 1px solid var(--border);
+      background: linear-gradient(135deg, var(--indigo-lt) 0%, var(--violet-lt) 100%);
+    }
+
+    .analysis-title h3 {
+      font-size: 15px;
+      font-weight: 700;
+      color: var(--indigo);
+    }
+
+    .analysis-title p {
+      font-size: 12px;
+      color: var(--text-3);
+      margin-top: 4px;
+    }
+
+    .analysis-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0;
+    }
+
+    @media (max-width: 900px) { .analysis-grid { grid-template-columns: 1fr; } }
+
+    .analysis-card {
+      padding: 20px;
+      border-right: 1px solid var(--border);
+      border-bottom: 1px solid var(--border);
+    }
+
+    .analysis-card:last-child { border-right: none; }
+
+    .analysis-card h4 {
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--text-1);
+      margin-bottom: 12px;
+    }
+
+    .analysis-card ul {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .analysis-card li {
+      font-size: 13px;
+      color: var(--text-2);
+      line-height: 1.6;
+      padding-left: 16px;
+      position: relative;
+    }
+
+    .analysis-card li::before {
+      content: '•';
+      position: absolute;
+      left: 0;
+      color: var(--indigo);
+      font-weight: 700;
+    }
+
+    .recommendations-box {
+      padding: 20px;
+      background: var(--indigo-lt);
+      border-top: 1px solid var(--indigo-md);
+    }
+
+    .recommendations-box h5 {
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--indigo);
+      margin-bottom: 12px;
+    }
+
+    .recommendations-box ol {
+      padding-left: 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .recommendations-box li {
+      font-size: 13px;
+      color: var(--text-2);
+      line-height: 1.6;
+    }
+
+    /* ===== FOOTER ===== */
+    .footer {
+      background: var(--surface);
+      border-top: 1px solid var(--border);
+      padding: 16px 28px;
+      max-width: 1440px;
+      margin: 0 auto;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 8px;
+      font-size: 12px;
+      color: var(--text-3);
+    }
+
+    /* ===== FADE UP ANIMATION ===== */
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(14px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    .fade-up {
+      animation: fadeUp 0.45s ease both;
+    }
+
+    /* ===== NAV DROPDOWN ===== */
+    .nav-item-dropdown {
+      position: relative;
+    }
+
+    .nav-dropdown-content {
+      display: none;
+      position: absolute;
+      top: 100%;
+      left: 0;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      box-shadow: var(--shadow-md);
+      z-index: 200;
+      min-width: 285px;
+      margin-top: 4px;
+      overflow: hidden;
+    }
+
+    .nav-dropdown-content a {
+      display: block;
+      padding: 10px 16px;
+      color: var(--text-2);
+      text-decoration: none;
+      font-size: 12px;
+      font-weight: 500;
+      transition: all 0.2s;
+      text-align: left;
+    }
+
+    .nav-dropdown-content a:hover {
+      background: var(--bg-alt);
+      color: var(--text-1);
+    }
+
+    .nav-dropdown-content.show { display: block !important; }
+
+    /* ── Page size for printing ── */
+    @page { size: A4 landscape; margin: 8mm 10mm 10mm 10mm; }
+
+    @media print {
+      /* ── Force color printing ── */
+      *, *::before, *::after {
+        -webkit-print-color-adjust: exact !important;
+        print-color-adjust: exact !important;
+        color-adjust: exact !important;
+      }
+
+      /* ── Base ── */
+      html, body { background: #ffffff !important; color: #000 !important; font-size: 10px !important; }
+
+      /* ── Hide interactive UI ── */
+      .btn-export, .btn-refresh, .btn-action, .btn-action-secondary,
+      #btnMusic, #btnRefresh, #btn-export-pdf,
+      .nav-menu, .nav-item-dropdown, .header-meta, .header-divider,
+      .month-bar, #monthDetailPanel, .mdp, .footer, .live-dot { display: none !important; }
+
+      /* ── Header compact ── */
+      .header { position: relative !important; box-shadow: none !important;
+        border-bottom: 2px solid #333 !important; height: auto !important; padding: 6px 0 8px !important; }
+      .header-inner { max-width: 100% !important; height: auto !important; padding: 0 10mm !important; }
+      .logo-info h1 { font-size: 13px !important; }
+      .logo-info p  { font-size: 9px !important; }
+
+      /* ── Main ── */
+      .main { max-width: 100% !important; width: 100% !important; padding: 0 !important; }
+
+      /* ── KPI ── */
+      .kpi-section-title { font-size: 10px !important; margin-bottom: 6px !important; break-after: avoid !important; }
+      .kpi-grid { display: grid !important; grid-template-columns: repeat(4, 1fr) !important; gap: 6px !important; margin-bottom: 8px !important; break-inside: avoid !important; }
+      #donorCatGrid { grid-template-columns: repeat(5, 1fr) !important; }
+      #kpiGrid2    { grid-template-columns: repeat(4, 1fr) !important; }
+      .kpi-card { break-inside: avoid !important; box-shadow: none !important; background: white !important; border: 1px solid #d1d5db !important; border-top: 2px solid var(--kpi-color, var(--indigo)) !important; padding: 7px 9px !important; }
+      .kpi-split-col { background: #f9fafb !important; box-shadow: none !important; }
+      .kpi-value { font-size: 18px !important; }
+      .kpi-label, .kpi-sub, .kpi-split-label { font-size: 8px !important; }
+      .kpi-split-value { font-size: 10px !important; }
+      .kpi-badge { font-size: 8px !important; }
+      .kpi-icon-wrap { width: 26px !important; height: 26px !important; font-size: 14px !important; margin-bottom: 6px !important; }
+
+      /* ── Charts 2-col ── */
+      .charts-grid { display: grid !important; grid-template-columns: 1fr 1fr !important; gap: 8px !important; margin-bottom: 8px !important; break-inside: avoid !important; }
+      .chart-card { box-shadow: none !important; border: 1px solid #d1d5db !important; padding: 10px !important; break-inside: avoid !important; }
+      .chart-title h3 { font-size: 10px !important; }
+      .chart-title p  { font-size: 8.5px !important; }
+      .chart-wrap { height: 160px !important; max-height: 160px !important; overflow: hidden !important; }
+
+      /* ── Table new page ── */
+      .table-section { break-before: page !important; box-shadow: none !important; border: 1px solid #d1d5db !important; }
+      .table-header { padding: 10px 14px !important; }
+      .table-title h3 { font-size: 11px !important; }
+      table { font-size: 8px !important; }
+      thead th { padding: 5px 7px !important; font-size: 8px !important; }
+      tbody td { padding: 3px 7px !important; }
+      .sticky-col-1, .sticky-col-2 { position: relative !important; left: auto !important; }
+
+      /* ── Analysis new page ── */
+      .analysis-section { break-before: page !important; box-shadow: none !important; border: 1px solid #d1d5db !important; }
+      .analysis-grid { display: grid !important; grid-template-columns: 1fr 1fr !important; }
+      .analysis-card { padding: 12px !important; }
+      .analysis-card h4 { font-size: 10px !important; }
+      .analysis-card li { font-size: 8.5px !important; }
+      .recommendations-box { padding: 12px !important; }
+      .recommendations-box h5 { font-size: 10px !important; }
+      .recommendations-box li { font-size: 8.5px !important; }
+    }
+  </style>
+</head>
+<body>
+<script>
+if (sessionStorage.getItem('auth') !== 'ok') { location.replace('login.html'); }
+</script>
+
+
+<!-- ===== HEADER ===== -->
+<header class="header hla-theme">
+  <div class="header-inner">
+    <div class="logo-wrap">
+      <img src="F_01_png_v-logo_si_th.png" alt="Siriraj Logo" style="height: 54px; width: auto; object-fit: contain; margin-right: 2px;">
+      <div class="header-divider" style="height: 32px; margin: 0 10px;"></div>
+      <div class="logo-info">
+        <h1>HLA Laboratory</h1>
+        <p>ห้องปฏิบัติการสาขา HLA · ภาควิชาเวชศาสตร์การธนาคารเลือด</p>
+      </div>
+    </div>
+
+    <div class="header-divider"></div>
+
+    <nav class="nav-menu">
+      <div class="nav-item-dropdown">
+        <a href="#" class="nav-link active" onclick="toggleNavDropdown(event)">
+          🧬 Lab: HLA Laboratory ▾
+        </a>
+        <div class="nav-dropdown-content">
+          <a href="Dashboard Blood Collection.html">Blood Collection</a>
+          <a href="Dashboard Hemapheresis.html">Hemapheresis</a>
+          <a href="Dashboard Blood Processing.html">Blood Processing</a>
+          <a href="Dashboard Infection.html">Infectious Serology</a>
+          <a href="Dashboard Blood Component.html">Blood Component Preparation</a>
+            <a href="Dashboard QC Blood Components.html">QC Blood Components</a>
+          <a href="Dashboard Immunohematology.html">Immunohematology</a>
+          <a href="Dashboard Blood Prep Disp.html">ผลิต &amp; จ่ายเลือด</a>
+          <a href="Dashboard Standard Laboratory.html">Standard Laboratory</a>
+        <a href="Dashboard Reference Laboratory.html">Reference Laboratory</a>
+          <a href="Dashboard HLA Laboratory.html" style="font-weight:700; background:var(--bg-alt); color:var(--text-1);">HLA Laboratory</a>
+            <a href="Dashboard DNA Laboratory.html">DNA Laboratory</a>
+        
+        </div>
+      </div>
+    </nav>
+
+    <div class="header-divider"></div>
+
+    <div class="header-meta">
+      <div class="pill pill-indigo" id="headerYearPill">📅 ปี 2569</div>
+      <div class="pill pill-teal" id="headerMonthsPill"><span class="live-dot"></span> ข้อมูล ม.ค.–มี.ค. 2569</div>
+      <div class="pill pill-blue" id="headerFilePill">📄 สถิติ 69.xlsx</div>
+    </div>
+
+    <div style="display: inline-flex; gap: 8px;">
+      <a href="index.html" class="btn-refresh" style="text-decoration:none;">🏠 หน้าแรก</a>
+      <button class="btn-refresh" id="btnRefresh" onclick="triggerSoftRefresh()">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"/></svg>
+        รีเฟรชข้อมูล
+      </button>
+      <button class="btn-action btn-action-secondary" id="btnMusic" onclick="toggleMusic()">
+        <span class="music-icon" style="font-size:14px; line-height:1;">🎵</span> <span id="musicText">BGM</span>
+      </button>
+      <button class="btn-export" onclick="exportToPDF()">📥 Export PDF</button>
+    </div>
+  </div>
+</header>
+
+<!-- ===== MAIN ===== -->
+<main class="main">
+
+  <!-- ===== YEAR SELECTOR ===== -->
+  <div class="month-bar fade-up" style="animation-delay:0.05s;">
+    <div class="month-bar-top">
+      <div class="month-bar-label">
+        <span class="month-bar-title">เลือกปีปฏิทิน</span>
+        <span class="month-bar-subtitle" id="selectedYearTag">ปี 2569</span>
+      </div>
+    </div>
+    <div class="month-tabs" id="yearTabs" style="grid-template-columns: repeat(6, 1fr);">
+    </div>
+  </div>
+
+  <!-- ===== MONTH SELECTOR ===== -->
+  <div class="month-bar fade-up" style="animation-delay:0.1s;">
+    <div class="month-bar-top">
+      <div class="month-bar-label">
+        <span class="month-bar-title">เลือกเดือนเปรียบเทียบสถิติ</span>
+        <span class="month-bar-subtitle" id="selectedMonthTag">รวมทุกเดือน</span>
+      </div>
+      <div style="display:flex; gap:8px;">
+        <button class="btn-action" onclick="selectAll()">รวมทุกเดือน</button>
+      </div>
+    </div>
+    <div class="month-tabs" id="monthTabs"></div>
+  </div>
+
+  <!-- ===== MONTH DETAIL PANEL ===== -->
+  <div class="mdp fade-up" id="monthDetailPanel" style="animation-delay:0.15s; display:none;"></div>
+
+  <!-- ===== KPI GRID 1 ===== -->
+  <div class="kpi-section-title fade-up" style="animation-delay:0.2s;">
+    <div class="kpi-section-title-inner">
+      <div class="kpi-title-icon">🧬</div>
+      <span style="letter-spacing: 0.3px;">ดัชนีชี้วัดหลัก — งานหลักห้อง HLA Laboratory</span>
+    </div>
+    <span style="background: rgba(0,0,0,0.25); padding: 5px 12px; border-radius: 20px; font-size: 12px; font-weight: 600; border: 1px solid rgba(255,255,255,0.15); z-index: 1;" id="kpiPeriodNote">รวม 3 เดือน</span>
+  </div>
+  <div class="kpi-grid" id="kpiGrid"></div>
+
+  <!-- ===== KPI GRID 2 ===== -->
+  <div class="kpi-section-title kpi-section-title-2 fade-up" style="animation-delay:0.22s;">
+    <div class="kpi-section-title-inner">
+      <div class="kpi-title-icon">🔬</div>
+      <span style="letter-spacing: 0.3px;">ดัชนีงานเฉพาะทาง — Crossmatch & Genotyping</span>
+    </div>
+  </div>
+  <div class="kpi-grid" id="kpiGrid2" style="margin-bottom:32px;"></div>
+
+  <!-- ===== CHARTS ROW 1: KPI #1 Lymphocyte Separation / KPI #2 HLA Class I ===== -->
+  <div class="charts-grid">
+    <div class="chart-card fade-up" style="animation-delay:0.25s;">
+      <div class="chart-header">
+        <div class="chart-title">
+          <h3>Lymphocyte Separation รายเดือน</h3>
+          <p>Patient / Donor / Panel Cell / Granulocyte (ราย)</p>
+        </div>
+      </div>
+      <div class="chart-wrap">
+        <canvas id="chartLympho"></canvas>
+      </div>
+    </div>
+    <div class="chart-card fade-up" style="animation-delay:0.27s;">
+      <div class="chart-header">
+        <div class="chart-title">
+          <h3>HLA Class I Typing - Serology รายเดือน</h3>
+          <p>KT &amp; LRD / Donor BMT / Plt. Pheresis / Pt. TT for search Plt. (ราย)</p>
+        </div>
+      </div>
+      <div class="chart-wrap">
+        <canvas id="chartClass1"></canvas>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== CHARTS ROW 2: KPI #3 HLA-B27 / KPI #4 Lymphocyte Crossmatch CDC ===== -->
+  <div class="charts-grid">
+    <div class="chart-card fade-up" style="animation-delay:0.29s;">
+      <div class="chart-header">
+        <div class="chart-title">
+          <h3>HLA-B27 Typing รายเดือน</h3>
+          <p>จำแนกตามแหล่งส่งตรวจ: ศิริราช/SIPH vs ศูนย์กาญจนาฯ (ราย)</p>
+        </div>
+      </div>
+      <div class="chart-wrap">
+        <canvas id="chartB27"></canvas>
+      </div>
+    </div>
+    <div class="chart-card fade-up" style="animation-delay:0.31s;">
+      <div class="chart-header">
+        <div class="chart-title">
+          <h3>Lymphocyte Crossmatch (CDC, AHG-CDC) รายเดือน</h3>
+          <p>For KT-LRD / Re-crossmatch / Granulocyte CDC-XM (คู่/ราย)</p>
+        </div>
+      </div>
+      <div class="chart-wrap">
+        <canvas id="chartCDC"></canvas>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== CHARTS ROW 3: KPI #5 FCXM / KPI #6 Platelet Antibody ===== -->
+  <div class="charts-grid">
+    <div class="chart-card fade-up" style="animation-delay:0.33s;">
+      <div class="chart-header">
+        <div class="chart-title">
+          <h3>Flowcytometry Crossmatch (FCXM) รายเดือน</h3>
+          <p>KT-LRD / Re-crossmatch (คู่)</p>
+        </div>
+      </div>
+      <div class="chart-wrap">
+        <canvas id="chartFCXM"></canvas>
+      </div>
+    </div>
+    <div class="chart-card fade-up" style="animation-delay:0.35s;">
+      <div class="chart-header">
+        <div class="chart-title">
+          <h3>Platelet Antibody Screening รายเดือน</h3>
+          <p>จำนวนผู้ป่วย / Negative / Positive (ราย)</p>
+        </div>
+      </div>
+      <div class="chart-wrap">
+        <canvas id="chartPltAb"></canvas>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== CHARTS ROW 4: KPI #7 Platelet Crossmatching / KPI #8 Serum Derived Drop (monthly) ===== -->
+  <div class="charts-grid">
+    <div class="chart-card fade-up" style="animation-delay:0.37s;">
+      <div class="chart-header">
+        <div class="chart-title">
+          <h3>Platelet Crossmatching รายเดือน</h3>
+          <p>จำนวนครั้ง vs ยูนิทที่ทดสอบ (Negative / Positive)</p>
+        </div>
+      </div>
+      <div class="chart-wrap">
+        <canvas id="chartPltXM"></canvas>
+      </div>
+    </div>
+    <div class="chart-card fade-up" style="animation-delay:0.39s;">
+      <div class="chart-header">
+        <div class="chart-title">
+          <h3>Serum Derived Drop รายเดือน</h3>
+          <p>Autologous / Allogenic / PRP จากผู้บริจาคเลือด (ราย)</p>
+        </div>
+      </div>
+      <div class="chart-wrap">
+        <canvas id="chartSerum"></canvas>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== CHARTS ROW 5: KPI #8 Serum Source / KPI #10 RBC-Ag Kell ===== -->
+  <div class="charts-grid" style="grid-template-columns:0.7fr 1.3fr;">
+    <div class="chart-card fade-up" style="animation-delay:0.41s;">
+      <div class="chart-header">
+        <div class="chart-title">
+          <h3>Serum Derived Drop — แหล่งผู้ป่วย</h3>
+          <p>สัดส่วน OPD / Ward / SIPH</p>
+        </div>
+      </div>
+      <div class="chart-wrap" style="position: relative; display: flex; align-items: center; justify-content: center;">
+        <img src="serum_drop_icon.png" alt="Serum Icon" style="position: absolute; top: 48%; left: 50%; transform: translate(-50%, -50%); width: 90px; height: 90px; object-fit: cover; border-radius: 50%; pointer-events: none; mix-blend-mode: darken; z-index: 0; box-shadow: 0 4px 12px rgba(79,70,229,0.15);">
+        <canvas id="chartSerumSrc" style="position: relative; z-index: 1;"></canvas>
+      </div>
+    </div>
+    <div class="chart-card fade-up" style="animation-delay:0.43s;">
+      <div class="chart-header">
+        <div class="chart-title">
+          <h3>RBC-Ag Typing (Kell) รายเดือน</h3>
+          <p>จำนวนผู้บริจาคที่ตรวจ Kell antigen และพบ K+ (ราย)</p>
+        </div>
+      </div>
+      <div class="chart-wrap">
+        <canvas id="chartKell"></canvas>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== CHARTS ROW 6: KPI #9 Red Cell Genotyping ===== -->
+  <div class="charts-grid">
+    <div class="chart-card fade-up" style="animation-delay:0.45s;">
+      <div class="chart-header">
+        <div class="chart-title">
+          <h3>Red Cell Genotyping รายเดือน</h3>
+          <p>ประเภทการตรวจ Genotyping แยกตาม antigen system (ราย)</p>
+        </div>
+      </div>
+      <div class="chart-wrap">
+        <canvas id="chartGeno"></canvas>
+      </div>
+    </div>
+    <div class="chart-card fade-up" style="animation-delay:0.47s;">
+      <div class="chart-header">
+        <div class="chart-title">
+          <h3>Red Cell Genotyping — สัดส่วน</h3>
+          <p>สัดส่วน antigen system ที่ตรวจทั้งหมด</p>
+        </div>
+      </div>
+      <div class="chart-wrap" style="position: relative; display: flex; align-items: center; justify-content: center;">
+        <img src="dna_rbc_icon.png" alt="DNA RBC Icon" style="position: absolute; top: 48%; left: 50%; transform: translate(-50%, -50%); width: 85px; height: 85px; object-fit: cover; border-radius: 50%; pointer-events: none; mix-blend-mode: darken; z-index: 0; box-shadow: 0 4px 12px rgba(219,39,119,0.15);">
+        <canvas id="chartGenoPie" style="position: relative; z-index: 1;"></canvas>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== CHARTS ROW 7: KPI #11-12 QC — ปฏิเสธสิ่งส่งตรวจ & รายงานค่าวิกฤต ===== -->
+  <div class="charts-grid">
+    <div class="chart-card fade-up" style="animation-delay:0.45s;">
+      <div class="chart-header">
+        <div class="chart-title">
+          <h3>ปฏิเสธสิ่งส่งตรวจ รายเดือน</h3>
+          <p>จำนวนสิ่งส่งตรวจที่ถูกปฏิเสธ เทียบกับปีที่แล้ว (ราย)</p>
+        </div>
+      </div>
+      <div class="chart-wrap">
+        <canvas id="chartReject"></canvas>
+      </div>
+    </div>
+    <div class="chart-card fade-up" style="animation-delay:0.47s;">
+      <div class="chart-header">
+        <div class="chart-title">
+          <h3>รายงานค่าวิกฤต รายเดือน</h3>
+          <p>จำนวนการรายงานค่าวิกฤต เทียบกับปีที่แล้ว (ราย)</p>
+        </div>
+      </div>
+      <div class="chart-wrap">
+        <canvas id="chartCritical"></canvas>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== DATA TABLE ===== -->
+  <div class="table-section fade-up" style="animation-delay:0.45s;">
+    <div class="table-header">
+      <div class="table-title">
+        <h3>รายงานตารางสถิติ HLA Laboratory รายเดือนอย่างละเอียด</h3>
+        <p>แสดงตัวเลขรายเดือนของปีที่เลือกและยอดสะสมประจำปี</p>
+      </div>
+    </div>
+    <div class="table-wrap">
+      <table id="dataTable"></table>
+    </div>
+  </div>
+
+  <!-- ===== ANALYSIS SECTION ===== -->
+  <div class="analysis-section fade-up" style="animation-delay:0.5s; margin-bottom:32px;">
+    <div class="analysis-header">
+      <div class="analysis-title">
+        <h3>🧠 บทวิเคราะห์แนวโน้มสถิติ HLA Laboratory และการบริหารคุณภาพเชิงยุทธศาสตร์ (2566 - ปัจจุบัน)</h3>
+        <p>วิเคราะห์เปรียบเทียบปริมาณงานและแนวโน้มการทดสอบ HLA / Platelet Immunology / Serum Eye Drop</p>
+      </div>
+    </div>
+    <div class="analysis-grid">
+      <div class="analysis-card">
+        <h4>📊 บทวิเคราะห์จากฐานข้อมูลสถิติห้อง HLA Laboratory (2566 - 2569)</h4>
+        <ul>
+          <li><strong>Platelet Crossmatching เป็นงานหลักปริมาณสูง:</strong> ยอดการทดสอบ Platelet Crossmatching ทั้งในด้านจำนวนครั้งและจำนวนยูนิทมีปริมาณสูงและสม่ำเสมอ โดยปี 2568 มียอดรวมกว่า 707 ครั้ง และยูนิทรวมกว่า 6,200 ยูนิท สะท้อนความต้องการ HLA-matched platelet ที่สูงในผู้ป่วยมะเร็งโลหิตวิทยา</li>
+          <li><strong>Serum Derived Drop (Eye Drop):</strong> งาน Autologous Serum Eye Drop สำหรับผู้ป่วย Dry Eye / GvHD มีปริมาณงานสูงสุดในกลุ่มผู้ป่วย OPD ≥ 60% ของทั้งหมด โดยยอดรวมปี 2568 อยู่ที่ 1,316 ราย สะท้อนการขยายตัวของบริการนี้ในมหาวิทยาลัย</li>
+          <li><strong>HLA-B27 Typing ทรงตัว:</strong> ยอด HLA-B27 สำหรับ Ankylosing Spondylitis อยู่ในระดับ 10-26 รายต่อเดือน โดยมาจาก ศิริราช/SIPH เป็นส่วนใหญ่ และมีแนวโน้มเพิ่มขึ้นเล็กน้อยในปี 2568-2569</li>
+        </ul>
+      </div>
+      <div class="analysis-card">
+        <h4>🌐 แนวทางการบริหารจัดการและพัฒนาคุณภาพห้อง HLA Laboratory</h4>
+        <ul>
+          <li><strong>การบริหารคลัง Platelet Donor Pool:</strong> งาน Platelet Crossmatching ต้องอาศัย Donor Panel Pool ขนาดใหญ่ (ยูนิทรวมกว่า 500 ยูนิทต่อเดือน) การพัฒนาระบบ Electronic Crossmatch หรือ Virtual Crossmatch จะช่วยลดการใช้ Donor Panel จริงและประหยัดทรัพยากร</li>
+          <li><strong>Lymphocyte Crossmatch (CDC + FCXM):</strong> อัตราการทำ Re-crossmatch สูงกว่า For KT LRD สะท้อนถึงความซับซ้อนของการจัดหาอวัยวะและการติดตามผู้รับอวัยวะ ควรพัฒนา Protocol การส่งตรวจร่วมกับทีม Transplant Coordinator</li>
+          <li><strong>Red Cell Genotyping:</strong> งาน RBC-Ag Kell Typing (microplate) มีปริมาณสูงสุด (≥ 500 รายต่อเดือน) เนื่องจากเป็น routine screening สำหรับ Platelet donor ควรพิจารณาการ automate ขั้นตอนการตรวจเพื่อเพิ่มประสิทธิภาพ</li>
+        </ul>
+      </div>
+    </div>
+    <div class="recommendations-box">
+      <h5>💡 ข้อเสนอแนะเชิงยุทธศาสตร์เพื่อการพัฒนาประสิทธิภาพห้อง HLA Laboratory</h5>
+      <ol>
+        <li><strong>พัฒนาระบบ Virtual/Electronic Crossmatch:</strong> ลดการใช้ Donor platelet ในการทดสอบ Platelet Crossmatching จริง โดยใช้ฐานข้อมูล HLA typing ของ Donor ร่วมกับผล Antibody Screening ของผู้ป่วย ช่วยประหยัดเวลาและทรัพยากร</li>
+        <li><strong>ขยายบริการ Serum Eye Drop:</strong> เนื่องจากมีแนวโน้มผู้ป่วยเพิ่มขึ้น ควรพัฒนา SOP และระบบจัดการคิวผู้ป่วยเฉพาะสำหรับบริการนี้ รวมถึงการสื่อสารกับแพทย์จักษุเวชเพื่อเพิ่มการส่งตรวจ Allogenic และ PRP</li>
+        <li><strong>มาตรฐานคุณภาพ EQA:</strong> เพิ่มการเข้าร่วม External Quality Assessment (EQA) ครบทุกโปรแกรม ได้แก่ HLA Class I Serology, HLA-B27, FCXM, Platelet Antibody Screening และ Crossmatching เพื่อยืนยันมาตรฐานระดับสากล</li>
+      </ol>
+    </div>
+  </div>
+
+</main>
+
+<!-- ===== FOOTER ===== -->
+<footer class="footer">
+  <div>ห้องปฏิบัติการสาขา HLA Laboratory · สถิติปีปฏิทิน 2564 - 2569 · อ้างอิงสถิติมหาวิทยาลัยมหิดล</div>
+  <div id="monthSelectorFootnote">Dashboard สร้างจาก: สถิติ 69.xlsx (Tab: HLA1) · อัปเดตล่าสุด: มิถุนายน 2569</div>
+</footer>
+
+<audio id="bgMusic" loop preload="none">
+  <source src="bgm.mp3" type="audio/mpeg">
+  <source src="https://upload.wikimedia.org/wikipedia/commons/d/d3/Gymnop%C3%A9die_No._1.ogg" type="audio/ogg">
+</audio>
+
+<script>
+// =====================================================
+//  DATA — HLA Laboratory (CY 2568 - 2569)
+//  Source: mapped_hla.js + สถิติ 69.xlsx Tab HLA1
+// =====================================================
+
+const HLA2568 = {
+  hla_lympho_patient:    [31,21,22,14,23,26,18,22,28,21,10,8],
+  hla_lympho_donor:      [18,9,16,12,14,16,13,19,17,16,19,10],
+  hla_lympho_panel:      [6,0,1,1,6,0,9,4,15,11,8,9],
+  hla_lympho_granu:      [0,2,0,2,0,4,39,0,0,0,2,20],
+  hla_class1_kt:         [0,0,6,0,0,0,0,4,0,2,0,2],
+  hla_class1_bmt:        [8,2,6,8,5,3,7,11,6,11,10,3],
+  hla_class1_plt_pher:   [6,0,0,1,6,0,8,4,14,11,8,9],
+  hla_class1_pt_tt:      [1,0,1,2,1,1,1,2,0,1,1,1],
+  hla_b27_siriraj:       [16,11,11,6,12,14,10,10,16,10,12,10],
+  hla_b27_center:        [4,3,2,3,1,2,1,2,1,5,5,2],
+  hla_cdc_kt:            [7,2,6,2,6,9,1,6,11,3,5,5],
+  hla_cdc_re:            [3,5,3,2,3,2,5,2,4,2,4,2],
+  hla_cdc_granu:         [0,2,0,2,0,4,39,0,0,0,2,20],
+  hla_fcxm_kt:           [7,2,6,2,6,9,1,5,11,3,5,5],
+  hla_fcxm_re:           [3,5,3,2,3,2,4,2,4,2,4,2],
+  hla_plt_ab_patient:    [17,13,14,12,11,11,12,16,16,23,11,14],
+  hla_plt_ab_neg:        [7,6,5,2,8,5,9,11,13,13,8,9],
+  hla_plt_ab_pos:        [10,7,9,10,2,6,3,5,3,10,3,5],
+  hla_plt_xm_case:       [71,38,91,73,42,52,57,76,39,68,55,45],
+  hla_plt_xm_unit_neg:   [384,211,466,565,205,287,346,392,500,554,146,270],
+  hla_plt_xm_unit_pos:   [419,231,358,182,65,197,247,415,218,430,357,87],
+  hla_serum_auto:        [128,98,107,96,105,112,109,112,116,121,112,100],
+  hla_serum_allo:        [12,10,19,11,11,24,21,12,19,23,18,13],
+  hla_serum_prp:         [1,0,0,1,2,3,0,1,2,3,0,2],
+  hla_serum_src_opd:     [103,88,97,85,93,103,89,88,112,103,90,85],
+  hla_serum_src_ward:    [17,3,5,10,4,14,15,12,11,15,14,6],
+  hla_serum_src_siph:    [21,17,24,13,21,22,26,25,14,29,26,24],
+  hla_rc_geno_rhd:       [1,5,5,10,9,17,11,2,2,5,6,3],
+  hla_rc_geno_rhdel:     [1,5,5,10,9,17,11,11,4,17,8,8],
+  hla_rc_geno_kidd:      [0,1,0,1,0,0,0,0,1,3,0,0],
+  hla_rc_geno_duffy:     [0,0,0,0,0,2,0,0,0,0,0,0],
+  hla_rc_geno_fc_rhdel:  [0,1,3,5,7,9,5,0,0,0,0,0],
+  hla_rbc_ag_kell:       [740,490,1346,406,552,665,642,589,628,512,472,665],
+  hla_rbc_kell_pos:      [null,null,1,null,null,1,1,2,null,3,4,1],
+  hla_rc_geno_rhce:      [null,null,null,null,null,0,null,null,null,null,null,null],
+  hla_rc_geno_dombrock:  [null,null,null,null,null,0,null,null,null,null,null,null],
+  hla_prep_hla_ab:       [0,0,0,215,0,0,0,0,0,0,0,0],
+  hla_prep_hla_b27:      [0,0,0,0,215,0,0,0,0,0,0,0],
+  hla_eqa_class1:        [0,0,0,0,2,0,2,0,2,0,2,0],
+  hla_eqa_b27:           [0,0,0,0,2,0,2,0,2,0,2,0],
+  hla_eqa_fcxm:          [0,0,8,0,0,8,0,0,8,0,0,0],
+  hla_eqa_si_ra:         [0,0,0,0,0,0,0,8,8,0,0,0],
+  hla_eqa_plt_ab:        [0,0,0,0,0,0,2,0,0,0,2,0],
+  hla_eqa_plt_xm:        [0,0,0,0,0,0,8,0,0,0,8,0],
+  hla_reject:            [3,0,2,1,0,0,0,0,0,0,0,0],
+  hla_critical:          [2,2,2,1,1,1,3,3,2,6,1,3],
+};
+
+const HLA2569 = {
+  hla_lympho_patient:    [24,24,30,24,29,null,null,null,null,null,null,null],
+  hla_lympho_donor:      [9,19,15,10,13,null,null,null,null,null,null,null],
+  hla_lympho_panel:      [7,2,7,4,6,null,null,null,null,null,null,null],
+  hla_lympho_granu:      [2,0,0,0,0,null,null,null,null,null,null,null],
+  hla_class1_kt:         [0,2,0,0,0,null,null,null,null,null,null,null],
+  hla_class1_bmt:        [5,11,10,4,5,null,null,null,null,null,null,null],
+  hla_class1_plt_pher:   [7,2,7,4,6,null,null,null,null,null,null,null],
+  hla_class1_pt_tt:      [0,1,0,4,0,null,null,null,null,null,null,null],
+  hla_b27_siriraj:       [15,11,25,15,19,null,null,null,null,null,null,null],
+  hla_b27_center:        [5,4,1,0,0,null,null,null,null,null,null,null],
+  hla_cdc_kt:            [0,1,2,3,5,null,null,null,null,null,null,null],
+  hla_cdc_re:            [5,6,3,3,2,null,null,null,null,null,null,null],
+  hla_cdc_granu:         [2,0,0,0,0,null,null,null,null,null,null,null],
+  hla_fcxm_kt:           [0,1,2,3,6,null,null,null,null,null,null,null],
+  hla_fcxm_re:           [5,6,3,2,2,null,null,null,null,null,null,null],
+  hla_plt_ab_patient:    [9,15,17,13,13,null,null,null,null,null,null,null],
+  hla_plt_ab_neg:        [6,13,10,8,10,null,null,null,null,null,null,null],
+  hla_plt_ab_pos:        [3,2,7,5,3,null,null,null,null,null,null,null],
+  hla_plt_xm_case:       [40,44,34,40,24,null,null,null,null,null,null,null],
+  hla_plt_xm_unit_neg:   [148,331,367,258,288,null,null,null,null,null,null,null],
+  hla_plt_xm_unit_pos:   [68,116,137,230,104,null,null,null,null,null,null,null],
+  hla_serum_auto:        [99,109,110,92,106,null,null,null,null,null,null,null],
+  hla_serum_allo:        [19,14,24,28,18,null,null,null,null,null,null,null],
+  hla_serum_prp:         [3,2,2,1,0,null,null,null,null,null,null,null],
+  hla_serum_src_opd:     [95,92,96,92,87,null,null,null,null,null,null,null],
+  hla_serum_src_ward:    [7,10,9,8,13,null,null,null,null,null,null,null],
+  hla_serum_src_siph:    [19,23,31,21,24,null,null,null,null,null,null,null],
+  hla_rc_geno_rhd:       [2,3,2,0,5,null,null,null,null,null,null,null],
+  hla_rc_geno_rhdel:     [2,7,7,3,9,null,null,null,null,null,null,null],
+  hla_rc_geno_kidd:      [1,1,0,0,0,null,null,null,null,null,null,null],
+  hla_rc_geno_duffy:     [0,0,0,0,0,null,null,null,null,null,null,null],
+  hla_rc_geno_fc_rhdel:  [0,0,0,0,0,null,null,null,null,null,null,null],
+  hla_rc_geno_rhce:      [0,0,0,1,0,null,null,null,null,null,null,null],
+  hla_rc_geno_dombrock:  [0,0,0,1,0,null,null,null,null,null,null,null],
+  hla_rbc_ag_kell:       [561,744,580,453,565,null,null,null,null,null,null,null],
+  hla_rbc_kell_pos:      [1,null,null,2,2,null,null,null,null,null,null,null],
+  hla_prep_hla_ab:       [0,0,0,0,0,null,null,null,null,null,null,null],
+  hla_prep_hla_b27:      [0,0,0,0,0,null,null,null,null,null,null,null],
+  hla_eqa_class1:        [0,0,0,0,0,null,null,null,null,null,null,null],
+  hla_eqa_b27:           [0,0,0,0,0,null,null,null,null,null,null,null],
+  hla_eqa_fcxm:          [0,0,8,0,0,null,null,null,null,null,null,null],
+  hla_eqa_si_ra:         [0,0,4,0,0,null,null,null,null,null,null,null],
+  hla_eqa_plt_ab:        [0,0,0,0,0,null,null,null,null,null,null,null],
+  hla_eqa_plt_xm:        [0,0,0,0,0,null,null,null,null,null,null,null],
+  hla_reject:            [0,0,0,0,0,null,null,null,null,null,null,null],
+  hla_critical:          [1,1,2,4,0,null,null,null,null,null,null,null],
+};
+
+// =====================================================
+//  STATE & HELPERS
+// =====================================================
+let selectedYear  = 2569;
+let selectedMonth = null;
+
+const MONTHS_FY = ['ม.ค.','ก.พ.','มี.ค.','เม.ย.','พ.ค.','มิ.ย.','ก.ค.','ส.ค.','ก.ย.','ต.ค.','พ.ย.','ธ.ค.'];
+const MONTHS_FULL = ['มกราคม','กุมภาพันธ์','มีนาคม','เมษายน','พฤษภาคม','มิถุนายน','กรกฎาคม','สิงหาคม','กันยายน','ตุลาคม','พฤศจิกายน','ธันวาคม'];
+const YEARS = [2569, 2568];
+
+const getYearData = (y) => {
+  if (y === 2569) return HLA2569;
+  if (y === 2568) return HLA2568;
+  return null;
+};
+
+const currentData = () => getYearData(selectedYear);
+const prevData    = () => getYearData(selectedYear - 1);
+
+function getAvailableIdx(year) {
+  if (year === 2569) return [0, 1, 2, 3, 4]; // ม.ค. - พ.ค. 2569
+  return [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11];
+}
+
+const getAvailableIdxs = () => getAvailableIdx(selectedYear);
+const hasData = i => getAvailableIdxs().includes(i);
+
+const sum = (arr, idxs) => {
+  if (!arr) return 0;
+  if (!idxs) idxs = getAvailableIdxs();
+  return idxs.reduce((acc, i) => acc + (arr[i] || 0), 0);
+};
+
+const sumOf = (key, idxs, customData) => sum((customData || currentData())[key], idxs);
+
+const fmt = (v, dec = 0) => {
+  if (v == null || isNaN(v)) return '–';
+  return Number(v).toLocaleString('th-TH', {minimumFractionDigits: dec, maximumFractionDigits: dec});
+};
+
+const pct   = (a, b) => b ? Math.round((a / b) * 100) : 0;
+const delta = (a, b) => (b == null || b === 0 || a == null) ? null : Math.round(((a - b) / b) * 100);
+
+function getCurrentIdxs() {
+  return selectedMonth !== null ? [selectedMonth] : getAvailableIdxs();
+}
+
+function d2badge(d, prevYear) {
+  if (d === null || isNaN(d)) return '';
+  if (d > 0) return `<span class="kpi-badge up">↑ ${d}% vs ปี ${prevYear}</span>`;
+  if (d < 0) return `<span class="kpi-badge down">↓ ${Math.abs(d)}% vs ปี ${prevYear}</span>`;
+  return `<span class="kpi-badge same">≈ 0% vs ปี ${prevYear}</span>`;
+}
+
+// =====================================================
+//  YEAR & MONTH TABS
+// =====================================================
+function buildYearTabs() {
+  const container = document.getElementById('yearTabs');
+  container.innerHTML = '';
+  YEARS.forEach(y => {
+    const tab = document.createElement('div');
+    tab.className = 'month-tab' + (selectedYear === y ? ' active' : '');
+    const info = y === 2569 ? 'ม.ค. - มี.ค. (3 เดือน)' : 'ม.ค. - ธ.ค. (12 เดือน)';
+    tab.innerHTML = `<div class="month-tab-abbr">ปี ${y}</div><div class="month-tab-num">${info}</div><div class="month-tab-dot"></div>`;
+    tab.addEventListener('click', () => {
+      if (selectedYear === y) return;
+      selectedYear = y;
+      if (selectedMonth !== null && !getAvailableIdxs().includes(selectedMonth)) selectedMonth = null;
+      refresh();
+      buildCharts();
+    });
+    container.appendChild(tab);
+  });
+
+  document.getElementById('selectedYearTag').textContent = `ปีปฏิทิน ${selectedYear}`;
+  document.getElementById('headerYearPill').innerHTML = `📅 ปี ${selectedYear}`;
+  const mStr = selectedYear === 2569 ? 'ม.ค.–มี.ค.' : 'ม.ค.–ธ.ค.';
+  document.getElementById('headerMonthsPill').innerHTML = `<span class="live-dot"></span> ข้อมูล ${mStr} ${selectedYear}`;
+  document.getElementById('headerFilePill').textContent = `📄 สถิติ ${selectedYear - 2500}.xlsx`;
+  document.getElementById('monthSelectorFootnote').innerHTML = `Dashboard สร้างจาก: สถิติ ${selectedYear - 2500}.xlsx (Tab: HLA1) · อัปเดตล่าสุด: มิถุนายน 2569`;
+}
+
+function buildMonthTabs() {
+  const container = document.getElementById('monthTabs');
+  container.innerHTML = '';
+  MONTHS_FY.forEach((m, i) => {
+    const isAvail = hasData(i);
+    const tab = document.createElement('div');
+    tab.className = 'month-tab' + (!isAvail ? ' disabled' : '') + (selectedMonth === i ? ' active' : '');
+    tab.innerHTML = `<div class="month-tab-abbr">${m}</div><div class="month-tab-num">${selectedYear}</div><div class="month-tab-dot"></div>`;
+    tab.addEventListener('click', () => {
+      if (!isAvail) return;
+      selectedMonth = selectedMonth === i ? null : i;
+      refresh();
+    });
+    container.appendChild(tab);
+  });
+
+  const tag = document.getElementById('selectedMonthTag');
+  if (selectedMonth === null) {
+    const mStr = selectedYear === 2569 ? 'ม.ค.–มี.ค.' : 'ม.ค.–ธ.ค.';
+    tag.textContent = `รวมทุกเดือน (${mStr} ${selectedYear})`;
+  } else {
+    tag.textContent = `${MONTHS_FULL[selectedMonth]} ${selectedYear}`;
+  }
+}
+
+function selectAll() {
+  selectedMonth = null;
+  refresh();
+}
+
+// =====================================================
+//  MONTH DETAIL PANEL
+// =====================================================
+function renderMonthPanel() {
+  const panel = document.getElementById('monthDetailPanel');
+  if (selectedMonth === null) { panel.style.display = 'none'; return; }
+  panel.style.display = 'flex';
+  const d = currentData();
+  const i = selectedMonth;
+  const gv = key => (d[key] && d[key][i] != null) ? d[key][i] : 0;
+  const lymphoTotal = gv('hla_lympho_patient') + gv('hla_lympho_donor') + gv('hla_lympho_panel') + gv('hla_lympho_granu');
+  const pltXmCase  = gv('hla_plt_xm_case');
+  const serumTotal = gv('hla_serum_auto') + gv('hla_serum_allo') + gv('hla_serum_prp');
+  const b27Total   = gv('hla_b27_siriraj') + gv('hla_b27_center');
+  panel.innerHTML = `
+    <div class="mdp-month-badge">
+      <div class="mdp-month-name">${MONTHS_FULL[i]}</div>
+      <div class="mdp-month-year">${selectedYear}</div>
+    </div>
+    <div class="mdp-divider"></div>
+    <div class="mdp-stats">
+      <div class="mdp-stat"><span class="mdp-stat-val">${fmt(lymphoTotal)}</span><span class="mdp-stat-lbl">Lymphocyte Separation</span></div>
+      <div class="mdp-stat"><span class="mdp-stat-val">${fmt(pltXmCase)}</span><span class="mdp-stat-lbl">Platelet XM (ครั้ง)</span></div>
+      <div class="mdp-stat"><span class="mdp-stat-val">${fmt(serumTotal)}</span><span class="mdp-stat-lbl">Serum Eye Drop</span></div>
+      <div class="mdp-stat"><span class="mdp-stat-val">${fmt(b27Total)}</span><span class="mdp-stat-lbl">HLA-B27 Typing</span></div>
+    </div>
+    <button class="btn-action" onclick="selectAll()" style="margin-left:auto;">ดูทั้งปี</button>
+  `;
+}
+
+// =====================================================
+//  KPI GRID 1 — Main
+// =====================================================
+function renderKPI() {
+  const idxs = getCurrentIdxs();
+  const note = document.getElementById('kpiPeriodNote');
+  note.textContent = selectedMonth !== null
+    ? `เดือน ${MONTHS_FULL[selectedMonth]} ${selectedYear}`
+    : `รวม ${idxs.length} เดือน (${idxs.map(i => MONTHS_FY[i]).join(', ')})`;
+
+  const pData = prevData();
+  const pi = idxs;
+
+  // 1. Lymphocyte Separation Total
+  const lympho = sumOf('hla_lympho_patient', pi) + sumOf('hla_lympho_donor', pi) + sumOf('hla_lympho_panel', pi) + sumOf('hla_lympho_granu', pi);
+  const lymphoP = pData ? (sumOf('hla_lympho_patient', pi, pData) + sumOf('hla_lympho_donor', pi, pData) + sumOf('hla_lympho_panel', pi, pData) + sumOf('hla_lympho_granu', pi, pData)) : 0;
+
+  // 2. HLA Class I total
+  const class1 = sumOf('hla_class1_kt', pi) + sumOf('hla_class1_bmt', pi) + sumOf('hla_class1_plt_pher', pi) + sumOf('hla_class1_pt_tt', pi);
+  const class1P = pData ? (sumOf('hla_class1_kt', pi, pData) + sumOf('hla_class1_bmt', pi, pData) + sumOf('hla_class1_plt_pher', pi, pData) + sumOf('hla_class1_pt_tt', pi, pData)) : 0;
+
+  // 3. HLA-B27
+  const b27 = sumOf('hla_b27_siriraj', pi) + sumOf('hla_b27_center', pi);
+  const b27P = pData ? (sumOf('hla_b27_siriraj', pi, pData) + sumOf('hla_b27_center', pi, pData)) : 0;
+
+  // 4. CDC Crossmatch total pairs
+  const cdc = sumOf('hla_cdc_kt', pi) + sumOf('hla_cdc_re', pi) + sumOf('hla_cdc_granu', pi);
+  const cdcP = pData ? (sumOf('hla_cdc_kt', pi, pData) + sumOf('hla_cdc_re', pi, pData) + sumOf('hla_cdc_granu', pi, pData)) : 0;
+
+  // 5. FCXM total pairs
+  const fcxm = sumOf('hla_fcxm_kt', pi) + sumOf('hla_fcxm_re', pi);
+  const fcxmP = pData ? (sumOf('hla_fcxm_kt', pi, pData) + sumOf('hla_fcxm_re', pi, pData)) : 0;
+
+  // 6. Platelet Antibody Screening
+  const pltAb = sumOf('hla_plt_ab_patient', pi);
+  const pltAbP = pData ? sumOf('hla_plt_ab_patient', pi, pData) : 0;
+
+  // 7. Platelet Crossmatching (cases)
+  const pltCase = sumOf('hla_plt_xm_case', pi);
+  const pltCaseP = pData ? sumOf('hla_plt_xm_case', pi, pData) : 0;
+
+  // 8. Serum Derived Drop
+  const serum = sumOf('hla_serum_auto', pi) + sumOf('hla_serum_allo', pi) + sumOf('hla_serum_prp', pi);
+  const serumP = pData ? (sumOf('hla_serum_auto', pi, pData) + sumOf('hla_serum_allo', pi, pData) + sumOf('hla_serum_prp', pi, pData)) : 0;
+
+  // 9. Red cell genotyping
+  const rcGeno = sumOf('hla_rc_geno_rhd', pi) + sumOf('hla_rc_geno_rhdel', pi) + sumOf('hla_rc_geno_kidd', pi) + sumOf('hla_rc_geno_duffy', pi) + sumOf('hla_rc_geno_fc_rhdel', pi);
+  const rcGenoP = pData ? (sumOf('hla_rc_geno_rhd', pi, pData) + sumOf('hla_rc_geno_rhdel', pi, pData) + sumOf('hla_rc_geno_kidd', pi, pData) + sumOf('hla_rc_geno_duffy', pi, pData) + sumOf('hla_rc_geno_fc_rhdel', pi, pData)) : 0;
+
+  // 10. RBC-Ag Kell
+  const kell = sumOf('hla_rbc_ag_kell', pi);
+  const kellP = pData ? sumOf('hla_rbc_ag_kell', pi, pData) : 0;
+
+  // 11. ปฏิเสธสิ่งส่งตรวจ
+  const reject = sumOf('hla_reject', pi);
+  const rejectP = pData ? sumOf('hla_reject', pi, pData) : 0;
+
+  // 12. รายงานค่าวิกฤต
+  const critical = sumOf('hla_critical', pi);
+  const criticalP = pData ? sumOf('hla_critical', pi, pData) : 0;
+
+  const kpis = [
+    {
+      icon: '🧫', label: 'Lymphocyte Separation', val: fmt(lympho), sub: 'ราย — แยกเม็ดเลือดขาวทุกประเภท',
+      color: 'var(--indigo)', bg: 'var(--indigo-lt)',
+      badge: d2badge(delta(lympho, lymphoP), selectedYear - 1),
+      splits: [
+        { label: 'Patient',                       val: `${fmt(sumOf('hla_lympho_patient', pi))} ราย` },
+        { label: 'Donor',                         val: `${fmt(sumOf('hla_lympho_donor', pi))} ราย` },
+        { label: 'Panel cell / Donor SDP',        val: `${fmt(sumOf('hla_lympho_panel', pi))} ราย` },
+        { label: 'Donor for Granulocyte Crossmatch', val: `${fmt(sumOf('hla_lympho_granu', pi))} ราย` },
+      ],
+    },
+    {
+      icon: '🔬', label: 'HLA Class I typing - serology', val: fmt(class1), sub: 'ราย — Serology typing ทุกประเภท',
+      color: 'var(--blue)', bg: 'var(--blue-lt)',
+      badge: d2badge(delta(class1, class1P), selectedYear - 1),
+      splits: [
+        { label: 'KT &amp; LRD',           val: `${fmt(sumOf('hla_class1_kt', pi))} ราย` },
+        { label: 'Donor BMT',              val: `${fmt(sumOf('hla_class1_bmt', pi))} ราย` },
+        { label: 'Donor Plt. Pheresis',    val: `${fmt(sumOf('hla_class1_plt_pher', pi))} ราย` },
+        { label: 'Pt. TT for search Plt.', val: `${fmt(sumOf('hla_class1_pt_tt', pi))} ราย` },
+      ],
+    },
+    {
+      icon: '🧬', label: 'HLA-B27 typing', val: fmt(b27), sub: 'ราย — ตรวจ HLA-B27 (Ankylosing Spondylitis)',
+      color: 'var(--violet)', bg: 'var(--violet-lt)',
+      badge: d2badge(delta(b27, b27P), selectedYear - 1),
+      splits: [
+        { label: 'ศิริราช, SIPH, H solution', val: `${fmt(sumOf('hla_b27_siriraj', pi))} ราย` },
+        { label: 'ศูนย์การแพทย์กาญจนาฯ',    val: `${fmt(sumOf('hla_b27_center', pi))} ราย` },
+      ],
+    },
+    {
+      icon: '⚗️', label: 'Lymphocyte crossmatch (CDC, AHG-CDC)', val: fmt(cdc), sub: 'คู่ — CDC & CDC/AHG Crossmatch',
+      color: 'var(--amber)', bg: 'var(--amber-lt)',
+      badge: d2badge(delta(cdc, cdcP), selectedYear - 1),
+      splits: [
+        { label: 'For KT - LRD (คู่)',                    val: `${fmt(sumOf('hla_cdc_kt', pi))} คู่` },
+        { label: 'Re crossmatch (คู่)',                   val: `${fmt(sumOf('hla_cdc_re', pi))} คู่` },
+        { label: 'For Granulocyte-CDC-XM Pt+Donor (ราย)', val: `${fmt(sumOf('hla_cdc_granu', pi))} ราย` },
+      ],
+    },
+    {
+      icon: '🌀', label: 'Flowcytometry crossmatch (FCXM)', val: fmt(fcxm), sub: 'คู่ — Flow Cytometry Crossmatch',
+      color: 'var(--pink)', bg: 'var(--pink-lt)',
+      badge: d2badge(delta(fcxm, fcxmP), selectedYear - 1),
+      splits: [
+        { label: 'KT - LRD',     val: `${fmt(sumOf('hla_fcxm_kt', pi))} คู่` },
+        { label: 'Re crossmatch', val: `${fmt(sumOf('hla_fcxm_re', pi))} คู่` },
+      ],
+    },
+    {
+      icon: '🩺', label: 'Platelet  Antibody screening (ราย)', val: fmt(pltAb), sub: 'ราย — ตรวจ Platelet Antibody ในผู้ป่วย',
+      color: 'var(--teal)', bg: 'var(--teal-lt)',
+      badge: d2badge(delta(pltAb, pltAbP), selectedYear - 1),
+      splits: [
+        { label: 'Negative (ราย)', val: `${fmt(sumOf('hla_plt_ab_neg', pi))} ราย` },
+        { label: 'Positive(ราย)',  val: `${fmt(sumOf('hla_plt_ab_pos', pi))} ราย` },
+      ],
+    },
+    {
+      icon: '🩸', label: 'Platelet Crossmatching', val: fmt(pltCase), sub: 'ครั้ง — ทดสอบความเข้ากันได้ของเกล็ดเลือด',
+      color: 'var(--red)', bg: 'var(--red-lt)',
+      badge: d2badge(delta(pltCase, pltCaseP), selectedYear - 1),
+      splits: [
+        { label: 'Negative (Unit)', val: `${fmt(sumOf('hla_plt_xm_unit_neg', pi))} unit` },
+        { label: 'Positive (Unit)', val: `${fmt(sumOf('hla_plt_xm_unit_pos', pi))} unit` },
+      ],
+    },
+    {
+      icon: '💧', label: 'Serum derived drop', val: fmt(serum), sub: 'ราย — เตรียม Autologous Serum Eye Drop',
+      color: 'var(--teal)', bg: 'var(--teal-lt)',
+      badge: d2badge(delta(serum, serumP), selectedYear - 1),
+      splits: [
+        { label: 'Autologous',          val: `${fmt(sumOf('hla_serum_auto', pi))} ราย` },
+        { label: 'Allogenic',           val: `${fmt(sumOf('hla_serum_allo', pi))} ราย` },
+        { label: 'PRP from blood donor',val: `${fmt(sumOf('hla_serum_prp', pi))} ราย` },
+        { label: '— Source —',          val: '', wide: true },
+        { label: 'OPD',                 val: `${fmt(sumOf('hla_serum_src_opd', pi))} ราย` },
+        { label: 'Ward',                val: `${fmt(sumOf('hla_serum_src_ward', pi))} ราย` },
+        { label: 'SIPH',                val: `${fmt(sumOf('hla_serum_src_siph', pi))} ราย` },
+      ],
+    },
+    {
+      icon: '🧬', label: 'Red cell genotyping', val: fmt(rcGeno), sub: 'ราย — ตรวจพันธุกรรมหมู่เลือด',
+      color: 'var(--indigo)', bg: 'var(--indigo-lt)',
+      badge: d2badge(delta(rcGeno, rcGenoP), selectedYear - 1),
+      splits: [
+        { label: 'Multiplex Rh D (in-house)', val: `${fmt(sumOf('hla_rc_geno_rhd', pi))} ราย` },
+        { label: 'Rh Del (in-house)',         val: `${fmt(sumOf('hla_rc_geno_rhdel', pi))} ราย` },
+        { label: 'Kidd (in-house)',           val: `${fmt(sumOf('hla_rc_geno_kidd', pi))} ราย` },
+        { label: 'Duffy (in-house)',          val: `${fmt(sumOf('hla_rc_geno_duffy', pi))} ราย` },
+        { label: 'Flow cytometry-Rh Del',    val: `${fmt(sumOf('hla_rc_geno_fc_rhdel', pi))} ราย` },
+      ],
+    },
+    {
+      icon: '🧪', label: 'RBC-Ag typing (microplate) - Kell', val: fmt(kell), sub: 'ราย — ตรวจ Kell antigen ในผู้บริจาคเกล็ดเลือด',
+      color: 'var(--orange)', bg: 'var(--orange-lt)',
+      badge: d2badge(delta(kell, kellP), selectedYear - 1),
+      splits: [
+        { label: 'Kell (ราย)', val: `${fmt(kell)} ราย` },
+        { label: 'K+ (ราย)',   val: `${fmt(sumOf('hla_rbc_kell_pos', pi))} ราย` },
+      ],
+    },
+    {
+      icon: '🚫', label: 'ปฏิเสธสิ่งส่งตรวจ (ราย)', val: fmt(reject), sub: 'ราย — สิ่งส่งตรวจที่ไม่ผ่านเกณฑ์',
+      color: 'var(--red)', bg: 'var(--red-lt)',
+      badge: d2badge(delta(reject, rejectP), selectedYear - 1),
+      splits: [
+        { label: 'ปฏิเสธสิ่งส่งตรวจ (ราย)', val: `${fmt(reject)} ราย` },
+      ],
+    },
+    {
+      icon: '⚠️', label: 'รายงานค่าวิกฤต (ราย)', val: fmt(critical), sub: 'ราย — รายงาน Critical value',
+      color: 'var(--amber)', bg: 'var(--amber-lt)',
+      badge: d2badge(delta(critical, criticalP), selectedYear - 1),
+      splits: [
+        { label: 'รายงานค่าวิกฤต (ราย)', val: `${fmt(critical)} ราย` },
+      ],
+    },
+  ];
+
+  document.getElementById('kpiGrid').innerHTML = kpis.map(k => `
+    <div class="kpi-card fade-up" style="--kpi-color:${k.color}; --kpi-bg:${k.bg};">
+      <div style="display:flex; justify-content:space-between; align-items:flex-start;">
+        <div class="kpi-icon-wrap">${k.icon}</div>
+        ${k.badge}
+      </div>
+      <div class="kpi-label">${k.label}</div>
+      <div class="kpi-value">${k.val}</div>
+      <div class="kpi-sub">${k.sub}</div>
+      <div class="kpi-split-row">
+        ${k.splits.map(s => s.val === '' && s.wide
+          ? `<div style="flex:1 1 100%;font-size:10px;font-weight:700;color:var(--kpi-color,var(--indigo));letter-spacing:.04em;margin:4px 0 2px;opacity:.7;">${s.label}</div>`
+          : `<div class="kpi-split-col" style="${s.wide ? 'flex:1 1 100%' : ''}"><span class="kpi-split-label">${s.label}</span><span class="kpi-split-value">${s.val}</span></div>`).join('')}
+      </div>
+    </div>
+  `).join('');
+}
+
+// =====================================================
+//  KPI GRID 2 — merged into renderKPI above
+// =====================================================
+function renderKPI2() {
+  document.getElementById('kpiGrid2').innerHTML = '';
+}
+
+// =====================================================
+//  DATA TABLE
+// =====================================================
+function renderTable() {
+  const idxs   = getCurrentIdxs();
+  const tIdxs  = getAvailableIdxs();
+  const active = new Set(selectedMonth !== null ? [selectedMonth] : []);
+
+  const thead = `
+    <thead>
+      <tr>
+        <th class="text-left sticky-col-1">ลำดับ</th>
+        <th class="text-left sticky-col-2">รายการทดสอบ</th>
+        ${tIdxs.map(i => `<th class="${active.has(i) ? 'active-month-col' : ''}"><span style="font-size:12px;font-weight:700;">${MONTHS_FY[i]}</span></th>`).join('')}
+        <th class="col-total">รวมปี ${selectedYear}</th>
+      </tr>
+    </thead>`;
+
+  const row = (num, name, key) => {
+    const arr = currentData()[key];
+    const isTotal = num === '';
+    const style   = isTotal ? 'font-weight:700;' : '';
+    let cells = tIdxs.map(i => {
+      const ac = active.has(i) ? 'active-month-col' : '';
+      const v = arr ? arr[i] : null;
+      return `<td class="${ac}" style="${style}">${v != null ? fmt(v) : '–'}</td>`;
+    }).join('');
+    const total = arr ? fmt(sum(arr, tIdxs)) : '–';
+    return `
+      <tr class="${isTotal ? 'tr-total' : ''}">
+        <td class="text-left sticky-col-1" style="${isTotal ? 'font-weight:700;' : ''}">${num}</td>
+        <td class="text-left sticky-col-2" style="${isTotal ? 'font-weight:700;' : ''}">${name}</td>
+        ${cells}
+        <td class="col-total" style="${isTotal ? 'font-weight:700;' : ''}">${total}</td>
+      </tr>`;
+  };
+
+  const grp = t => `<tr class="section-header"><td colspan="${tIdxs.length + 3}">${t}</td></tr>`;
+
+  const tbody = `<tbody>
+    ${grp('1. Lymphocyte Separation (ราย)')}
+    ${row('1.1', 'Patient', 'hla_lympho_patient')}
+    ${row('1.2', 'Donor', 'hla_lympho_donor')}
+    ${row('1.3', 'Panel cell / Donor SDP', 'hla_lympho_panel')}
+    ${row('1.4', 'Donor for Granulocyte Crossmatch', 'hla_lympho_granu')}
+
+    ${grp('2. HLA Class I typing - serology')}
+    ${row('2.1', 'KT &amp; LRD', 'hla_class1_kt')}
+    ${row('2.2', 'Donor BMT', 'hla_class1_bmt')}
+    ${row('2.3', 'Donor Plt. Pheresis', 'hla_class1_plt_pher')}
+    ${row('2.4', 'Pt. TT for search Plt.', 'hla_class1_pt_tt')}
+
+    ${grp('3. - HLA-B27 typing')}
+    ${row('3.1', 'ศิริราช, SIPH, H solution', 'hla_b27_siriraj')}
+    ${row('3.2', 'ศูนย์การแพทย์กาญจนาฯ', 'hla_b27_center')}
+
+    ${grp('4. Lymphocyte crossmatch (CDC, AHG-CDC)')}
+    ${row('4.1', 'For KT - LRD (คู่)', 'hla_cdc_kt')}
+    ${row('4.2', 'Re crossmatch (คู่)', 'hla_cdc_re')}
+    ${row('4.3', 'For Granulocyte-CDC-XM Pt+Donor (ราย)', 'hla_cdc_granu')}
+
+    ${grp('5 Flowcytometry crossmatch (FCXM)')}
+    ${row('5.1', 'KT - LRD', 'hla_fcxm_kt')}
+    ${row('5.2', 'Re crossmatch', 'hla_fcxm_re')}
+
+    ${grp('6. Platelet  Antibody screening (ราย)')}
+    ${row('6.1', 'patient (ราย)', 'hla_plt_ab_patient')}
+    ${row('6.2', 'Negative (ราย)', 'hla_plt_ab_neg')}
+    ${row('6.3', 'Positive(ราย)', 'hla_plt_ab_pos')}
+
+    ${grp('7. Platelet Crossmatching (ครั้ง)')}
+    ${row('7.1', 'Platelet Crossmatching (ครั้ง)', 'hla_plt_xm_case')}
+    ${row('7.2', 'Donors - Negative (Unit)', 'hla_plt_xm_unit_neg')}
+    ${row('7.3', 'Donors - Positive (Unit)', 'hla_plt_xm_unit_pos')}
+
+    ${grp('8. Serum derived drop (ราย)')}
+    ${row('8.1', 'Autologous', 'hla_serum_auto')}
+    ${row('8.2', 'Allogenic', 'hla_serum_allo')}
+    ${row('8.3', 'PRP from blood donor', 'hla_serum_prp')}
+    ${row('', 'source - OPD', 'hla_serum_src_opd')}
+    ${row('', 'source - Ward', 'hla_serum_src_ward')}
+    ${row('', 'source - SIPH', 'hla_serum_src_siph')}
+
+    ${grp('9.Red cell genotyping')}
+    ${row('9.1', 'Multiplex Rh D (in-house)', 'hla_rc_geno_rhd')}
+    ${row('9.2', 'Rh Del (in-house)', 'hla_rc_geno_rhdel')}
+    ${row('9.3', 'Kidd (in-house)', 'hla_rc_geno_kidd')}
+    ${row('9.4', 'Duffy (in-house)', 'hla_rc_geno_duffy')}
+    ${row('9.5', 'Flow cytometry-Rh Del', 'hla_rc_geno_fc_rhdel')}
+    ${row('9.6', 'RHCE (in-house)', 'hla_rc_geno_rhce')}
+    ${row('9.7', 'Dombrock (in-house)', 'hla_rc_geno_dombrock')}
+
+    ${grp('10. RBC-Ag typing (microplate) - Kell')}
+    ${row('10', 'Kell (ราย)', 'hla_rbc_ag_kell')}
+    ${row('', 'K+ (ราย)', 'hla_rbc_kell_pos')}
+
+    ${grp('11. เตรียมชุดตรวจ')}
+    ${row('11.1', 'HLA - AB (ชุด)', 'hla_prep_hla_ab')}
+    ${row('11.2', 'HLA - B27 (ชุด)', 'hla_prep_hla_b27')}
+
+    ${grp('12. EQA')}
+    ${row('12.1', 'HLA Class I serology Typing (TRC)', 'hla_eqa_class1')}
+    ${row('12.2', 'HLA-B27 Typing (TRC)', 'hla_eqa_b27')}
+    ${row('12.3', 'FCXM (UCLA)', 'hla_eqa_fcxm')}
+    ${row('12.4', 'Si-RA CDC-XM : Inter Lab', 'hla_eqa_si_ra')}
+    ${row('12.5', 'Platelet Ab. screening (TRC) : Inter Lab', 'hla_eqa_plt_ab')}
+    ${row('12.6', 'Platelet Crossmatching (TRC) : Inter Lab', 'hla_eqa_plt_xm')}
+
+    ${grp('13. ปฏิเสธสิ่งส่งตรวจ (ราย)')}
+    ${row('13', 'ปฏิเสธสิ่งส่งตรวจ (ราย)', 'hla_reject')}
+
+    ${grp('14. รายงานค่าวิกฤต (ราย)')}
+    ${row('14', 'รายงานค่าวิกฤต (ราย)', 'hla_critical')}
+  </tbody>`;
+
+  document.getElementById('dataTable').innerHTML = thead + tbody;
+}
+
+// =====================================================
+//  CHARTS
+// =====================================================
+let cLympho, cClass1, cB27, cCDC, cFCXM, cPltAb, cPltXM, cSerum, cSerumSrc, cKell, cGeno, cGenoPie, cReject, cCritical;
+
+function destroyCharts() {
+  [cLympho, cClass1, cB27, cCDC, cFCXM, cPltAb, cPltXM, cSerum, cSerumSrc, cKell, cGeno, cGenoPie, cReject, cCritical].forEach(c => c && c.destroy());
+}
+
+function buildCharts() {
+  destroyCharts();
+  const d    = currentData();
+  const idxs = getAvailableIdxs();
+  const lbl  = idxs.map(i => MONTHS_FY[i]);
+  const ga   = key => idxs.map(i => d[key] ? (d[key][i] || 0) : 0);
+
+  // ---- datalabels plugin setup ----
+  const DL = (typeof ChartDataLabels !== 'undefined') ? ChartDataLabels : null;
+  const pl = DL ? [DL] : [];
+  const F  = { family: 'Sarabun', size: 11, weight: '800' };
+
+  // Stacked bar: show column total only on topmost non-zero bar segment; hide all others entirely
+  function isTopBarSegment(ctx) {
+    const ds = ctx.chart.data.datasets, di = ctx.datasetIndex, idx = ctx.dataIndex;
+    for (let k = ds.length - 1; k >= 0; k--) {
+      if ((ds[k].data[idx] || 0) > 0 && ds[k].type !== 'line') return k === di;
+    }
+    return false;
+  }
+  const dlStack = {
+    display: ctx => isTopBarSegment(ctx),
+    color: '#1e293b', anchor: 'end', align: 'end', offset: 4, font: F, clamp: true,
+    formatter(value, ctx) {
+      const ds = ctx.chart.data.datasets, idx = ctx.dataIndex;
+      const tot = ds.filter(s => s.type !== 'line').reduce((a, s) => a + (s.data[idx] || 0), 0);
+      return tot > 0 ? tot : '';
+    }
+  };
+  // Individual bar (non-stacked): show each bar value; hide zeros
+  const dlBar = {
+    display: ctx => (ctx.dataset.data[ctx.dataIndex] || 0) > 0,
+    color: '#1e293b', anchor: 'end', align: 'top', offset: 3, font: F, clamp: true,
+    formatter: v => v > 0 ? v : ''
+  };
+  // Line dataset overlay: show value to the right of each point to avoid overlapping bar totals
+  const dlLine = {
+    display: ctx => (ctx.dataset.data[ctx.dataIndex] || 0) > 0,
+    color: '#4f46e5', anchor: 'end', align: 'right', offset: 5,
+    font: { family: 'Sarabun', size: 10, weight: '700' },
+    formatter: v => v > 0 ? v : ''
+  };
+  // Doughnut: show % in each slice
+  const dlPie = {
+    color: '#fff', font: { family: 'Sarabun', size: 12, weight: '700' },
+    formatter(v, ctx) {
+      const tot = ctx.chart.data.datasets[0].data.reduce((a, b) => a + (b || 0), 0);
+      return (tot > 0 && v > 0) ? Math.round(v / tot * 100) + '%' : '';
+    }
+  };
+
+  // 1. Lymphocyte Separation
+  cLympho = new Chart(document.getElementById('chartLympho'), {
+    type: 'bar', plugins: pl,
+    data: {
+      labels: lbl,
+      datasets: [
+        { label: 'Patient',     data: ga('hla_lympho_patient'), backgroundColor: '#4f46e5', borderRadius: 4 },
+        { label: 'Donor',       data: ga('hla_lympho_donor'),   backgroundColor: '#818cf8', borderRadius: 4 },
+        { label: 'Panel Cell',  data: ga('hla_lympho_panel'),   backgroundColor: '#c7d2fe', borderRadius: 4 },
+        { label: 'Granulocyte', data: ga('hla_lympho_granu'),   backgroundColor: '#6ee7b7', borderRadius: 4 },
+      ]
+    },
+    options: { responsive: true, maintainAspectRatio: false,
+      layout: { padding: { top: 22 } },
+      plugins: { legend: { display: true, position: 'top' }, datalabels: dlStack },
+      scales: { x: { stacked: true }, y: { beginAtZero: true, stacked: true, suggestedMax: 65 } }
+    }
+  });
+
+  // 2. HLA Class I Typing - Serology
+  cClass1 = new Chart(document.getElementById('chartClass1'), {
+    type: 'bar', plugins: pl,
+    data: {
+      labels: lbl,
+      datasets: [
+        { label: 'KT & LRD',               data: ga('hla_class1_kt'),       backgroundColor: '#4f46e5', borderRadius: 4 },
+        { label: 'Donor BMT',              data: ga('hla_class1_bmt'),      backgroundColor: '#818cf8', borderRadius: 4 },
+        { label: 'Donor Plt. Pheresis',    data: ga('hla_class1_plt_pher'), backgroundColor: '#c7d2fe', borderRadius: 4 },
+        { label: 'Pt. TT for search Plt.', data: ga('hla_class1_pt_tt'),    backgroundColor: '#6ee7b7', borderRadius: 4 },
+      ]
+    },
+    options: { responsive: true, maintainAspectRatio: false,
+      layout: { padding: { top: 22 } },
+      plugins: { legend: { display: true, position: 'top' }, datalabels: dlStack },
+      scales: { x: { stacked: true }, y: { beginAtZero: true, stacked: true, suggestedMax: 20 } }
+    }
+  });
+
+  // 3. HLA-B27
+  cB27 = new Chart(document.getElementById('chartB27'), {
+    type: 'bar', plugins: pl,
+    data: {
+      labels: lbl,
+      datasets: [
+        { label: 'ศิริราช / SIPH', data: ga('hla_b27_siriraj'), backgroundColor: '#166534', borderRadius: 4 },
+        { label: 'ศูนย์กาญจนาฯ',  data: ga('hla_b27_center'),  backgroundColor: '#d97706', borderRadius: 4 },
+      ]
+    },
+    options: { responsive: true, maintainAspectRatio: false,
+      layout: { padding: { top: 22 } },
+      plugins: { legend: { display: true, position: 'top' }, datalabels: dlBar },
+      scales: { y: { beginAtZero: true, suggestedMax: 30 } }
+    }
+  });
+
+  // 4. Lymphocyte Crossmatch CDC/AHG-CDC
+  cCDC = new Chart(document.getElementById('chartCDC'), {
+    type: 'bar', plugins: pl,
+    data: {
+      labels: lbl,
+      datasets: [
+        { label: 'For KT - LRD (คู่)',       data: ga('hla_cdc_kt'),    backgroundColor: '#f59e0b', borderRadius: 4 },
+        { label: 'Re crossmatch (คู่)',      data: ga('hla_cdc_re'),    backgroundColor: '#fcd34d', borderRadius: 4 },
+        { label: 'Granulocyte CDC-XM (ราย)', data: ga('hla_cdc_granu'), backgroundColor: '#6ee7b7', borderRadius: 4 },
+      ]
+    },
+    options: { responsive: true, maintainAspectRatio: false,
+      layout: { padding: { top: 22 } },
+      plugins: { legend: { display: true, position: 'top' }, datalabels: dlStack },
+      scales: { x: { stacked: true }, y: { beginAtZero: true, stacked: true, suggestedMax: 12 } }
+    }
+  });
+
+  // 5. FCXM
+  cFCXM = new Chart(document.getElementById('chartFCXM'), {
+    type: 'bar', plugins: pl,
+    data: {
+      labels: lbl,
+      datasets: [
+        { label: 'KT - LRD (คู่)',      data: ga('hla_fcxm_kt'), backgroundColor: '#db2777', borderRadius: 4 },
+        { label: 'Re crossmatch (คู่)', data: ga('hla_fcxm_re'), backgroundColor: '#f9a8d4', borderRadius: 4 },
+      ]
+    },
+    options: { responsive: true, maintainAspectRatio: false,
+      layout: { padding: { top: 22 } },
+      plugins: { legend: { display: true, position: 'top' }, datalabels: dlStack },
+      scales: { x: { stacked: true }, y: { beginAtZero: true, stacked: true, suggestedMax: 12 } }
+    }
+  });
+
+  // 6. Platelet Antibody Screening
+  cPltAb = new Chart(document.getElementById('chartPltAb'), {
+    type: 'bar', plugins: pl,
+    data: {
+      labels: lbl,
+      datasets: [
+        { label: 'Negative (ราย)', data: ga('hla_plt_ab_neg'), backgroundColor: '#10b981', borderRadius: 4 },
+        { label: 'Positive (ราย)', data: ga('hla_plt_ab_pos'), backgroundColor: '#f43f5e', borderRadius: 4 },
+        { label: 'Total patients', data: ga('hla_plt_ab_patient'), type: 'line',
+          borderColor: '#4f46e5', backgroundColor: 'transparent', borderWidth: 2,
+          pointRadius: 4, pointBackgroundColor: '#4f46e5', yAxisID: 'y2',
+          datalabels: { display: false } },
+      ]
+    },
+    options: { responsive: true, maintainAspectRatio: false,
+      layout: { padding: { top: 22 } },
+      plugins: { legend: { display: true, position: 'top' }, datalabels: dlStack },
+      scales: {
+        x: { stacked: true },
+        y:  { beginAtZero: true, stacked: true, suggestedMax: 20, title: { display: true, text: 'ราย' } },
+        y2: { beginAtZero: true, position: 'right', grid: { drawOnChartArea: false }, suggestedMax: 20, title: { display: true, text: 'Total (ราย)' } }
+      }
+    }
+  });
+
+  // 7. Platelet Crossmatching
+  cPltXM = new Chart(document.getElementById('chartPltXM'), {
+    type: 'bar', plugins: pl,
+    data: {
+      labels: lbl,
+      datasets: [
+        { label: 'Units — Negative', data: ga('hla_plt_xm_unit_neg'), backgroundColor: '#10b981', borderRadius: 4 },
+        { label: 'Units — Positive', data: ga('hla_plt_xm_unit_pos'), backgroundColor: '#f43f5e', borderRadius: 4 },
+        { label: 'ครั้ง', data: ga('hla_plt_xm_case'), type: 'line',
+          borderColor: '#4f46e5', backgroundColor: 'transparent', borderWidth: 2.5,
+          pointRadius: 4, pointBackgroundColor: '#4f46e5', yAxisID: 'y2',
+          datalabels: { display: false } },
+      ]
+    },
+    options: { responsive: true, maintainAspectRatio: false,
+      layout: { padding: { top: 22 } },
+      plugins: { legend: { display: true, position: 'top' }, datalabels: dlStack },
+      scales: {
+        x: { stacked: true },
+        y:  { beginAtZero: true, stacked: true, suggestedMax: 1000, title: { display: true, text: 'Units' } },
+        y2: { beginAtZero: true, position: 'right', grid: { drawOnChartArea: false }, suggestedMax: 100, title: { display: true, text: 'ครั้ง' } }
+      }
+    }
+  });
+
+  // 8. Serum Derived Drop Monthly
+  cSerum = new Chart(document.getElementById('chartSerum'), {
+    type: 'bar', plugins: pl,
+    data: {
+      labels: lbl,
+      datasets: [
+        { label: 'Autologous', data: ga('hla_serum_auto'), backgroundColor: '#4f46e5', borderRadius: 4 },
+        { label: 'Allogenic',  data: ga('hla_serum_allo'), backgroundColor: '#818cf8', borderRadius: 4 },
+        { label: 'PRP',        data: ga('hla_serum_prp'),  backgroundColor: '#c7d2fe', borderRadius: 4 },
+      ]
+    },
+    options: { responsive: true, maintainAspectRatio: false,
+      layout: { padding: { top: 22 } },
+      plugins: { legend: { display: true, position: 'top' }, datalabels: dlStack },
+      scales: { x: { stacked: true }, y: { beginAtZero: true, stacked: true, suggestedMax: 160 } }
+    }
+  });
+
+  // 8b. Serum Source Doughnut
+  const srcOPD  = idxs.reduce((a,i) => a + (d.hla_serum_src_opd  && d.hla_serum_src_opd[i]  || 0), 0);
+  const srcWard = idxs.reduce((a,i) => a + (d.hla_serum_src_ward  && d.hla_serum_src_ward[i] || 0), 0);
+  const srcSIPH = idxs.reduce((a,i) => a + (d.hla_serum_src_siph  && d.hla_serum_src_siph[i] || 0), 0);
+  cSerumSrc = new Chart(document.getElementById('chartSerumSrc'), {
+    type: 'doughnut', plugins: pl,
+    data: {
+      labels: ['OPD', 'Ward', 'SIPH'],
+      datasets: [{ data: [srcOPD, srcWard, srcSIPH], backgroundColor: ['#4f46e5', '#10b981', '#f59e0b'], borderWidth: 0 }]
+    },
+    options: { responsive: true, maintainAspectRatio: false,
+      layout: { padding: { bottom: 10 } },
+      plugins: { legend: { display: true, position: 'bottom' }, datalabels: dlPie },
+      cutout: '68%'
+    }
+  });
+
+  // 10. RBC-Ag Kell Typing (bar) + K+ line
+  cKell = new Chart(document.getElementById('chartKell'), {
+    type: 'bar', plugins: pl,
+    data: {
+      labels: lbl,
+      datasets: [
+        { label: 'Kell typed (ราย)', data: ga('hla_rbc_ag_kell'),
+          backgroundColor: 'rgba(79,70,229,0.75)', borderRadius: 4 },
+        { label: 'K+ พบผลบวก (ราย)', data: ga('hla_rbc_kell_pos'), type: 'line',
+          borderColor: '#f43f5e', backgroundColor: 'transparent',
+          borderWidth: 2.5, pointRadius: 5, pointBackgroundColor: '#f43f5e',
+          yAxisID: 'y2', datalabels: { display: false } },
+      ]
+    },
+    options: { responsive: true, maintainAspectRatio: false,
+      layout: { padding: { top: 22 } },
+      plugins: { legend: { display: true, position: 'top' }, datalabels: dlBar },
+      scales: {
+        x: {},
+        y:  { beginAtZero: true, suggestedMax: 800, title: { display: true, text: 'ราย (Kell typed)' } },
+        y2: { beginAtZero: true, position: 'right', grid: { drawOnChartArea: false },
+              suggestedMax: 6, ticks: { stepSize: 1 },
+              title: { display: true, text: 'K+ (ราย)' } }
+      }
+    }
+  });
+
+  // 9. Red Cell Genotyping stacked bars
+  cGeno = new Chart(document.getElementById('chartGeno'), {
+    type: 'bar', plugins: pl,
+    data: {
+      labels: lbl,
+      datasets: [
+        { label: 'Multiplex RhD',  data: ga('hla_rc_geno_rhd'),       backgroundColor: '#4f46e5', borderRadius: 4 },
+        { label: 'Rh Del',         data: ga('hla_rc_geno_rhdel'),      backgroundColor: '#818cf8', borderRadius: 4 },
+        { label: 'Kidd',           data: ga('hla_rc_geno_kidd'),       backgroundColor: '#6ee7b7', borderRadius: 4 },
+        { label: 'Duffy',          data: ga('hla_rc_geno_duffy'),      backgroundColor: '#fcd34d', borderRadius: 4 },
+        { label: 'Fc RhDel',       data: ga('hla_rc_geno_fc_rhdel'),   backgroundColor: '#f97316', borderRadius: 4 },
+      ]
+    },
+    options: { responsive: true, maintainAspectRatio: false,
+      layout: { padding: { top: 22 } },
+      plugins: { legend: { display: true, position: 'top' }, datalabels: dlStack },
+      scales: {
+        x: { stacked: true },
+        y: { beginAtZero: true, stacked: true, suggestedMax: 20,
+             title: { display: true, text: 'ราย' } }
+      }
+    }
+  });
+
+  // 9b. Genotyping Pie — สัดส่วน antigen system
+  const genoKeys = ['hla_rc_geno_rhd','hla_rc_geno_rhdel','hla_rc_geno_kidd','hla_rc_geno_duffy','hla_rc_geno_fc_rhdel'];
+  const genoLabels = ['Multiplex RhD','Rh Del','Kidd','Duffy','Fc RhDel'];
+  const genoColors = ['#4f46e5','#818cf8','#6ee7b7','#fcd34d','#f97316'];
+  const genoTotals = genoKeys.map(k => idxs.reduce((a,i) => a + (d[k] ? (d[k][i] || 0) : 0), 0));
+  cGenoPie = new Chart(document.getElementById('chartGenoPie'), {
+    type: 'doughnut', plugins: pl,
+    data: {
+      labels: genoLabels,
+      datasets: [{ data: genoTotals, backgroundColor: genoColors, borderWidth: 0 }]
+    },
+    options: { responsive: true, maintainAspectRatio: false,
+      layout: { padding: { bottom: 10 } },
+      plugins: { legend: { display: true, position: 'bottom' }, datalabels: dlPie },
+      cutout: '66%'
+    }
+  });
+
+  // 11-12. QC — แยก 2 กราฟ
+  const pd  = prevData();
+  const gp  = key => idxs.map(i => pd && pd[key] ? (pd[key][i] || 0) : null);
+  const pyLabel = selectedYear - 1;
+  const prevLine = (color) => ({
+    type: 'line', borderColor: color, backgroundColor: 'transparent',
+    borderWidth: 1.8, borderDash: [5, 4], pointRadius: 3, pointBackgroundColor: color,
+    tension: 0.3, datalabels: { display: false }
+  });
+  const qcScales = {
+    x: { ticks: { font: { family: 'Sarabun' } } },
+    y: { beginAtZero: true, suggestedMax: 7, ticks: { stepSize: 1 }, title: { display: true, text: 'ราย' } }
+  };
+
+  // 11. ปฏิเสธสิ่งส่งตรวจ
+  cReject = new Chart(document.getElementById('chartReject'), {
+    type: 'bar', plugins: pl,
+    data: {
+      labels: lbl,
+      datasets: [
+        { label: `${selectedYear}`, data: ga('hla_reject'), backgroundColor: '#ef4444', borderRadius: 5 },
+        { label: `${pyLabel} (เปรียบเทียบ)`, data: gp('hla_reject'), ...prevLine('#ef4444') },
+      ]
+    },
+    options: { responsive: true, maintainAspectRatio: false,
+      layout: { padding: { top: 22 } },
+      plugins: { 
+        legend: { display: true, position: 'top', labels: { font: { family: 'Sarabun', size: 12 } } }, 
+        datalabels: {
+          display: ctx => ctx.datasetIndex === 0 && ctx.dataset.data[ctx.dataIndex] !== null,
+          color: '#1e293b', anchor: 'end', align: 'top', offset: 3, font: F, clamp: true,
+          formatter: v => v !== null ? v : ''
+        }
+      },
+      scales: qcScales
+    }
+  });
+
+  // 12. รายงานค่าวิกฤต
+  cCritical = new Chart(document.getElementById('chartCritical'), {
+    type: 'bar', plugins: pl,
+    data: {
+      labels: lbl,
+      datasets: [
+        { label: `${selectedYear}`, data: ga('hla_critical'), backgroundColor: '#f59e0b', borderRadius: 5 },
+        { label: `${pyLabel} (เปรียบเทียบ)`, data: gp('hla_critical'), ...prevLine('#d97706') },
+      ]
+    },
+    options: { responsive: true, maintainAspectRatio: false,
+      layout: { padding: { top: 22 } },
+      plugins: { legend: { display: true, position: 'top', labels: { font: { family: 'Sarabun', size: 12 } } }, datalabels: dlBar },
+      scales: qcScales
+    }
+  });
+}
+
+// =====================================================
+//  RENDER ALL & REFRESH LOGIC
+// =====================================================
+function renderAll() {
+  renderKPI();
+  renderKPI2();
+  renderTable();
+  buildCharts();
+  renderMonthPanel();
+}
+
+function updatePills() {
+  const yp = document.getElementById('headerYearPill');
+  if(yp) yp.innerHTML = `📅 ปี ${selectedYear}`;
+  
+  const mt = document.getElementById('selectedYearTag');
+  if(mt) mt.innerText = `ปี ${selectedYear}`;
+  
+  const mp = document.getElementById('headerMonthsPill');
+  if(mp) {
+    if (selectedMonth !== null) {
+      mp.innerHTML = `<span class="live-dot"></span> ข้อมูล ${MONTHS_FY[selectedMonth]} ${selectedYear}`;
+    } else {
+      mp.innerHTML = `<span class="live-dot"></span> ข้อมูล รวมทุกเดือน`;
+    }
+  }
+  
+  const fp = document.getElementById('headerFilePill');
+  if(fp) {
+    fp.innerHTML = `📄 สถิติ ${selectedYear - 2500}.xlsx`;
+  }
+  
+  const smt = document.getElementById('selectedMonthTag');
+  if(smt) {
+    smt.innerText = selectedMonth !== null ? `${MONTHS_FY[selectedMonth]} ${selectedYear}` : `รวมทุกเดือน`;
+  }
+}
+
+function refresh() {
+  buildYearTabs();
+  buildMonthTabs();
+  renderAll();
+  updatePills();
+}
+
+function triggerSoftRefresh() {
+  const btn = document.getElementById('btnRefresh');
+  if(btn) btn.classList.add('spinning');
+  setTimeout(() => {
+    refresh();
+    if(btn) btn.classList.remove('spinning');
+  }, 400);
+}
+
+function toggleNavDropdown(e) {
+  e.preventDefault();
+  e.stopPropagation();
+  const dd = e.currentTarget.nextElementSibling;
+  if (dd) dd.classList.toggle('show');
+}
+
+document.addEventListener('click', (e) => {
+  if (!e.target.closest('.nav-item-dropdown')) {
+    document.querySelectorAll('.nav-dropdown-content').forEach(c => c.classList.remove('show'));
+  }
+});
+
+document.addEventListener('DOMContentLoaded', () => {
+  refresh();
+});
+</script>
+
+<script src="xlsx.full.min.js"></script>
+<script src="dashboard_autoload.js"></script>
+<script src="live_hla.js"></script>
+<script src="autoload_hla.js"></script>
+</body>
+</html>

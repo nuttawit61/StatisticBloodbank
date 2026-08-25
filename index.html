@@ -1,0 +1,819 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Dashboard สถิติ · ภาควิชาเวชศาสตร์การธนาคารเลือด</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;500;600;700;800&family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --bg: #f8fafc;
+      --bg-alt: #f1f5f9;
+      --surface: #ffffff;
+      --border: #e2e8f0;
+      --text-1: #0f172a;
+      --text-2: #334155;
+      --text-3: #64748b;
+      --shadow-sm: 0 1px 3px rgba(15,23,42,0.07), 0 1px 2px rgba(15,23,42,0.04);
+      --shadow-md: 0 4px 16px rgba(15,23,42,0.10), 0 2px 6px rgba(15,23,42,0.05);
+      --shadow-lg: 0 12px 32px rgba(15,23,42,0.13), 0 4px 8px rgba(15,23,42,0.06);
+      --radius: 18px;
+      --radius-sm: 12px;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body {
+      font-family: 'Sarabun', 'Inter', sans-serif;
+      background: var(--bg);
+      color: var(--text-1);
+      min-height: 100vh;
+      font-size: 15px;
+      line-height: 1.6;
+    }
+
+    /* ===== HERO HEADER ===== */
+    .hero {
+      background: linear-gradient(135deg, #0c1a2e 0%, #1a2e4a 45%, #1b2d3e 100%);
+      color: #fff;
+      padding: 0;
+      position: relative;
+      overflow: hidden;
+    }
+
+    /* decorative blobs */
+    .hero::before {
+      content: '';
+      position: absolute;
+      top: -80px; right: 420px;
+      width: 340px; height: 340px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(220,38,38,0.10) 0%, transparent 70%);
+      pointer-events: none;
+    }
+    .hero::after {
+      content: '';
+      position: absolute;
+      bottom: -60px; left: 10%;
+      width: 280px; height: 280px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(37,99,235,0.09) 0%, transparent 70%);
+      pointer-events: none;
+    }
+
+    /* top bar: logo + org */
+    .hero-topbar {
+      border-bottom: 1px solid rgba(255,255,255,0.08);
+      padding: 14px 40px;
+    }
+
+    .hero-topbar-inner {
+      max-width: 1200px;
+      margin: 0 auto;
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .hero-logo {
+      height: 46px;
+      width: auto;
+      object-fit: contain;
+      filter: brightness(0) invert(1);
+      opacity: 0.88;
+      flex-shrink: 0;
+    }
+
+    .hero-logo-redcross {
+      height: 40px;
+      width: auto;
+      object-fit: contain;
+      filter: brightness(0) invert(1);
+      opacity: 0.82;
+      flex-shrink: 0;
+    }
+
+    .hero-topbar-divider {
+      width: 1px;
+      height: 32px;
+      background: rgba(255,255,255,0.18);
+      flex-shrink: 0;
+    }
+
+    .hero-org {
+      font-size: 12.5px;
+      color: rgba(255,255,255,0.60);
+      font-weight: 500;
+      line-height: 1.4;
+    }
+
+    /* main content area */
+    .hero-inner {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 36px 40px 44px;
+      position: relative;
+      z-index: 1;
+      display: flex;
+      align-items: center;
+      gap: 48px;
+    }
+
+    .hero-content {
+      flex: 1;
+      min-width: 0;
+    }
+
+    /* hero illustration */
+    .hero-illustration {
+      flex-shrink: 0;
+      width: 320px;
+      position: relative;
+    }
+
+    .hero-illustration img {
+      width: 100%;
+      height: auto;
+      border-radius: 20px;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.35), 0 4px 16px rgba(0,0,0,0.20);
+      display: block;
+      opacity: 0.92;
+      border: 1px solid rgba(255,255,255,0.10);
+    }
+
+    .hero-illustration::before {
+      content: '';
+      position: absolute;
+      inset: -8px;
+      border-radius: 24px;
+      background: radial-gradient(circle at center, rgba(220,38,38,0.15) 0%, transparent 70%);
+      z-index: -1;
+    }
+
+    @media (max-width: 900px) {
+      .hero-inner { flex-direction: column; gap: 24px; }
+      .hero-illustration { width: 100%; max-width: 380px; }
+    }
+
+    @media (max-width: 600px) {
+      .hero-illustration { display: none; }
+    }
+
+    .hero-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: rgba(220,38,38,0.18);
+      border: 1px solid rgba(220,38,38,0.35);
+      border-radius: 20px;
+      padding: 4px 14px;
+      font-size: 11.5px;
+      font-weight: 700;
+      color: #fca5a5;
+      letter-spacing: 0.04em;
+      margin-bottom: 16px;
+    }
+
+    .hero-title {
+      font-size: clamp(24px, 3.5vw, 38px);
+      font-weight: 800;
+      line-height: 1.2;
+      margin-bottom: 12px;
+      letter-spacing: -0.3px;
+    }
+
+    .hero-subtitle {
+      font-size: 15px;
+      color: rgba(255,255,255,0.68);
+      font-weight: 400;
+      line-height: 1.75;
+      max-width: 100%;
+    }
+
+    /* stat strip — inline row under subtitle */
+    .hero-stats {
+      display: flex;
+      flex-direction: row;
+      gap: 14px;
+      margin-top: 28px;
+      flex-wrap: wrap;
+    }
+
+    .hero-stat-card {
+      background: rgba(255,255,255,0.07);
+      border: 1px solid rgba(255,255,255,0.12);
+      border-radius: 14px;
+      padding: 14px 28px;
+      text-align: center;
+      backdrop-filter: blur(8px);
+      flex: 1;
+      min-width: 100px;
+    }
+
+    .hero-stat-num {
+      font-size: 28px;
+      font-weight: 800;
+      color: #fff;
+      line-height: 1;
+      margin-bottom: 5px;
+    }
+
+    .hero-stat-lbl {
+      font-size: 11.5px;
+      color: rgba(255,255,255,0.55);
+      font-weight: 500;
+    }
+
+    .hero-pills {
+      display: flex;
+      gap: 8px;
+      margin-top: 20px;
+      flex-wrap: wrap;
+      flex-wrap: wrap;
+    }
+
+    .hero-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: rgba(255,255,255,0.08);
+      border: 1px solid rgba(255,255,255,0.14);
+      border-radius: 20px;
+      padding: 4px 12px;
+      font-size: 12px;
+      font-weight: 600;
+      color: rgba(255,255,255,0.80);
+      backdrop-filter: blur(4px);
+    }
+
+    @media (max-width: 900px) {
+      .hero-inner { padding: 28px 24px 36px; }
+      .hero-topbar { padding: 12px 24px; }
+      .hero-stat-card { padding: 12px 16px; }
+      .hero-stat-num { font-size: 22px; }
+      .hero-logo { height: 36px; }
+      .hero-logo-redcross { height: 32px; }
+    }
+
+    /* ===== MAIN CONTENT ===== */
+    .main {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 40px 28px 64px;
+    }
+
+    .section-header {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 24px;
+    }
+
+    .section-title {
+      font-size: 18px;
+      font-weight: 800;
+      color: var(--text-1);
+    }
+
+    .section-count {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      background: var(--bg-alt);
+      color: var(--text-3);
+      border-radius: 20px;
+      font-size: 12px;
+      font-weight: 700;
+      padding: 3px 10px;
+    }
+
+    /* ===== LAB GRID ===== */
+    .lab-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 20px;
+      margin-bottom: 48px;
+    }
+
+    @media (max-width: 1024px) { .lab-grid { grid-template-columns: repeat(2, 1fr); } }
+    @media (max-width: 600px)  { .lab-grid { grid-template-columns: 1fr; } }
+
+    .lab-card {
+      background: var(--surface);
+      border: 1.5px solid var(--border);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow-sm);
+      overflow: hidden;
+      text-decoration: none;
+      color: inherit;
+      display: flex;
+      flex-direction: column;
+      transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+      position: relative;
+    }
+
+    .lab-card:hover {
+      box-shadow: var(--shadow-lg);
+      transform: translateY(-4px);
+      border-color: var(--card-color, #94a3b8);
+    }
+
+    .lab-card-stripe {
+      height: 5px;
+      background: var(--card-color, #94a3b8);
+      flex-shrink: 0;
+    }
+
+    .lab-card-body {
+      padding: 22px 22px 18px;
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .lab-card-icon-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .lab-card-icon {
+      width: 46px;
+      height: 46px;
+      border-radius: 13px;
+      background: var(--card-bg, #f1f5f9);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 22px;
+      flex-shrink: 0;
+    }
+
+    .lab-card-arrow {
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      background: var(--card-bg, #f1f5f9);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--card-color, #64748b);
+      font-size: 14px;
+      transition: all 0.2s;
+    }
+
+    .lab-card:hover .lab-card-arrow {
+      background: var(--card-color, #64748b);
+      color: #fff;
+    }
+
+    .lab-card-name {
+      font-size: 16px;
+      font-weight: 800;
+      color: var(--text-1);
+      line-height: 1.3;
+    }
+
+    .lab-card-desc {
+      font-size: 12.5px;
+      color: var(--text-3);
+      line-height: 1.5;
+      flex: 1;
+    }
+
+    .lab-card-footer {
+      padding: 12px 22px 14px;
+      border-top: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: var(--bg);
+    }
+
+    .lab-card-tag {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      background: var(--card-bg, #f1f5f9);
+      color: var(--card-color, #64748b);
+      border-radius: 20px;
+      padding: 3px 10px;
+      font-size: 11px;
+      font-weight: 700;
+      border: 1px solid var(--card-color, #e2e8f0);
+    }
+
+    .lab-card-year {
+      font-size: 11px;
+      color: var(--text-3);
+      font-weight: 500;
+    }
+
+    /* ===== GROUP SECTION ===== */
+    .group-label {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 12px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: var(--text-3);
+      margin-bottom: 16px;
+      padding-bottom: 10px;
+      border-bottom: 1.5px solid var(--border);
+    }
+
+    .group-label-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--text-4, #cbd5e1);
+    }
+
+    /* ===== FOOTER ===== */
+    .footer {
+      background: var(--surface);
+      border-top: 1px solid var(--border);
+      padding: 20px 28px;
+      text-align: center;
+      font-size: 12px;
+      color: var(--text-3);
+    }
+
+    /* ===== LIVE DOT ===== */
+    .live-dot {
+      width: 7px; height: 7px;
+      border-radius: 50%;
+      background: #10b981;
+      display: inline-block;
+      animation: blink 1.8s ease-in-out infinite;
+    }
+    @keyframes blink {
+      0%,100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.4; transform: scale(0.7); }
+    }
+
+    @media print { .hero { display: none; } }
+  </style>
+</head>
+<body>
+<script>
+if (sessionStorage.getItem('auth') !== 'ok') { location.replace('login.html'); }
+</script>
+
+
+<!-- ===== HERO ===== -->
+<section class="hero">
+
+  <!-- Top bar: logo + org name -->
+  <div class="hero-topbar">
+    <div class="hero-topbar-inner">
+      <img src="F_01_png_v-logo_si_th.png" alt="Siriraj Logo" class="hero-logo" onerror="this.style.display='none'">
+      <div class="hero-topbar-divider"></div>
+<div class="hero-org">
+        คณะแพทยศาสตร์ศิริราชพยาบาล &nbsp;·&nbsp; มหาวิทยาลัยมหิดล
+      </div>
+    </div>
+  </div>
+
+  <!-- Main hero content -->
+  <div class="hero-inner">
+    <div class="hero-content">
+      <div class="hero-badge">🏥 ภาควิชาเวชศาสตร์การธนาคารเลือด</div>
+      <h1 class="hero-title">
+        Dashboard สถิติห้องปฏิบัติการเวชศาสตร์การธนาคารเลือด
+      </h1>
+      <p class="hero-subtitle">
+        แสดงสถิติผลงานและดัชนีชี้วัดคุณภาพ (KPI) ของห้องปฏิบัติการในภาควิชาฯ
+        ครอบคลุมข้อมูลปีปฏิทิน 2564–2569 แบบ interactive
+      </p>
+
+      <!-- Stats inline -->
+      <div class="hero-stats">
+        <div class="hero-stat-card">
+          <div class="hero-stat-num">10</div>
+          <div class="hero-stat-lbl">ห้องปฏิบัติการ</div>
+        </div>
+        <div class="hero-stat-card">
+          <div class="hero-stat-num">6</div>
+          <div class="hero-stat-lbl">ปีข้อมูล</div>
+        </div>
+        <div class="hero-stat-card">
+          <div class="hero-stat-num">2564–2569</div>
+          <div class="hero-stat-lbl">ปีปฏิทิน</div>
+        </div>
+        <div class="hero-stat-card">
+          <div class="hero-stat-num"><span class="live-dot" style="width:10px;height:10px;margin-right:4px;vertical-align:middle;"></span>Live</div>
+          <div class="hero-stat-lbl">อัปเดต มิ.ย. 2569</div>
+        </div>
+      </div>
+
+      <div class="hero-pills" style="margin-top:18px;">
+        <span class="hero-pill">📅 ปีปฏิทิน 2564–2569</span>
+        <span class="hero-pill">📄 สถิติ 69.xlsx</span>
+        <span class="hero-pill">📊 Chart.js 4.4</span>
+      </div>
+
+      <!-- ปุ่มเชื่อมโฟลเดอร์ครั้งเดียวใช้ทุก Dashboard -->
+      <div style="margin-top:22px;display:flex;align-items:center;gap:14px;flex-wrap:wrap;">
+        <button id="connectAllBtn" style="cursor:pointer;border:0;border-radius:30px;padding:14px 26px;
+          font-family:inherit;font-size:15px;font-weight:700;color:#fff;
+          background:linear-gradient(135deg,#3b82f6,#2563eb);box-shadow:0 8px 24px rgba(37,99,235,.35);">
+          📂 เชื่อมโฟลเดอร์ข้อมูลให้ทุก Dashboard
+        </button>
+        <span id="connectAllStatus" style="font-size:13.5px;opacity:.9;max-width:420px;">
+          กดหนึ่งครั้งแล้วเลือกโฟลเดอร์ <b>Dashboard สถิติภาค</b> · จากนั้นเปิด Dashboard ห้องใดก็จะอัพเดทอัตโนมัติเมื่อแก้ไฟล์ Excel
+        </span>
+      </div>
+    </div>
+
+    <!-- Hero illustration -->
+    <div class="hero-illustration">
+      <img src="infection_lab_banner.png" alt="Blood Bank Laboratory Illustration" onerror="this.style.display='none'">
+    </div>
+
+  </div>
+
+</section>
+
+<!-- ===== MAIN ===== -->
+<main class="main">
+
+  <!-- GROUP 1: รับบริจาคโลหิต -->
+  <div class="group-label">
+    <span class="group-label-dot" style="background:#dc2626;"></span>
+    งานรับบริจาคโลหิต
+  </div>
+  <div class="lab-grid" style="margin-bottom:36px;">
+
+    <a href="Dashboard Blood Collection.html" class="lab-card"
+       style="--card-color:#dc2626; --card-bg:#fee2e2;">
+      <div class="lab-card-stripe"></div>
+      <div class="lab-card-body">
+        <div class="lab-card-icon-row">
+          <div class="lab-card-icon">🩸</div>
+          <div class="lab-card-arrow">→</div>
+        </div>
+        <div class="lab-card-name">Blood Collection</div>
+        <div class="lab-card-desc">สถิติห้องรับบริจาคโลหิต ยอดผู้มาคัดกรอง ยอดบริจาคจริง อัตรา Defer และหน่วยเคลื่อนที่</div>
+      </div>
+      <div class="lab-card-footer">
+        <span class="lab-card-tag">🩸 Blood Donation</span>
+        <span class="lab-card-year">2565–2569</span>
+      </div>
+    </a>
+
+    <a href="Dashboard Hemapheresis.html" class="lab-card"
+       style="--card-color:#7c3aed; --card-bg:#f3e8ff;">
+      <div class="lab-card-stripe"></div>
+      <div class="lab-card-body">
+        <div class="lab-card-icon-row">
+          <div class="lab-card-icon">🔵</div>
+          <div class="lab-card-arrow">→</div>
+        </div>
+        <div class="lab-card-name">Hemapheresis</div>
+        <div class="lab-card-desc">สถิติห้องรับบริจาคเกล็ดเลือด Single Donor Platelet (SDP) และ Leukocyte Depleted Platelet</div>
+      </div>
+      <div class="lab-card-footer">
+        <span class="lab-card-tag">🔵 Platelet Donation</span>
+        <span class="lab-card-year">2564–2569</span>
+      </div>
+    </a>
+
+  </div>
+
+  <!-- GROUP 2: กระบวนการเตรียมและจ่ายเลือด -->
+  <div class="group-label">
+    <span class="group-label-dot" style="background:#f97316;"></span>
+    กระบวนการเตรียมและจ่ายเลือด
+  </div>
+  <div class="lab-grid" style="margin-bottom:36px;">
+
+    <a href="Dashboard Blood Processing.html" class="lab-card"
+       style="--card-color:#b45309; --card-bg:#fef3c7;">
+      <div class="lab-card-stripe"></div>
+      <div class="lab-card-body">
+        <div class="lab-card-icon-row">
+          <div class="lab-card-icon">⚗️</div>
+          <div class="lab-card-arrow">→</div>
+        </div>
+        <div class="lab-card-name">Blood Processing</div>
+        <div class="lab-card-desc">สถิติกระบวนการตรวจคัดกรองหมู่เลือด การเตรียมส่วนประกอบโลหิต และการติดตามเลือดหมดอายุ</div>
+      </div>
+      <div class="lab-card-footer">
+        <span class="lab-card-tag">⚗️ Processing</span>
+        <span class="lab-card-year">2564–2569</span>
+      </div>
+    </a>
+
+    <a href="Dashboard Blood Component.html" class="lab-card"
+       style="--card-color:#0284c7; --card-bg:#e0f2fe;">
+      <div class="lab-card-stripe"></div>
+      <div class="lab-card-body">
+        <div class="lab-card-icon-row">
+          <div class="lab-card-icon">🧴</div>
+          <div class="lab-card-arrow">→</div>
+        </div>
+        <div class="lab-card-name">Blood Component Preparation</div>
+        <div class="lab-card-desc">สถิติการเตรียม Blood Component ทุกชนิด ได้แก่ PRC, FFP, Platelet Concentrate และอื่นๆ</div>
+      </div>
+      <div class="lab-card-footer">
+        <span class="lab-card-tag">🧴 Component</span>
+        <span class="lab-card-year">2564–2569</span>
+      </div>
+    </a>
+
+    <a href="Dashboard Blood Prep Disp.html" class="lab-card"
+       style="--card-color:#0d9488; --card-bg:#ccfbf1;">
+      <div class="lab-card-stripe"></div>
+      <div class="lab-card-body">
+        <div class="lab-card-icon-row">
+          <div class="lab-card-icon">⚖️</div>
+          <div class="lab-card-arrow">→</div>
+        </div>
+        <div class="lab-card-name">เตรียม/จ่าย เลือดและส่วนประกอบของเลือด</div>
+        <div class="lab-card-desc">เปรียบเทียบยอดการผลิต (Blood Component Preparation) กับยอดเบิกจ่าย (Immunohematology) รายเดือน</div>
+      </div>
+      <div class="lab-card-footer">
+        <span class="lab-card-tag">⚖️ เตรียม/จ่าย</span>
+        <span class="lab-card-year">2564–2567</span>
+      </div>
+    </a>
+
+    <a href="Dashboard QC Blood Components.html" class="lab-card"
+       style="--card-color:#7c3aed; --card-bg:#f3e8ff;">
+      <div class="lab-card-stripe"></div>
+      <div class="lab-card-body">
+        <div class="lab-card-icon-row">
+          <div class="lab-card-icon">✅</div>
+          <div class="lab-card-arrow">→</div>
+        </div>
+        <div class="lab-card-name">QC Blood Components</div>
+        <div class="lab-card-desc">ผลการควบคุมคุณภาพ (% Pass) ส่วนประกอบโลหิตทุกชนิด WB, LDRC, LDPC, SDP, FFP, CRYO รายเดือน</div>
+      </div>
+      <div class="lab-card-footer">
+        <span class="lab-card-tag">✅ QC</span>
+        <span class="lab-card-year">2569</span>
+      </div>
+    </a>
+
+
+  </div>
+
+  <!-- GROUP 3: ห้องปฏิบัติการทดสอบ -->
+  <div class="group-label">
+    <span class="group-label-dot" style="background:#db2777;"></span>
+    ห้องปฏิบัติการทดสอบและจ่ายเลือด
+  </div>
+  <div class="lab-grid" style="margin-bottom:36px;">
+
+    <a href="Dashboard Immunohematology.html" class="lab-card"
+       style="--card-color:#db2777; --card-bg:#fce7f3;">
+      <div class="lab-card-stripe"></div>
+      <div class="lab-card-body">
+        <div class="lab-card-icon-row">
+          <div class="lab-card-icon">🔬</div>
+          <div class="lab-card-arrow">→</div>
+        </div>
+        <div class="lab-card-name">Immunohematology</div>
+        <div class="lab-card-desc">สถิติงานบริการเตรียมโลหิตและการทดสอบความสอดคล้องทางภูมิคุ้มกันวิทยา Crossmatch และ Antibody Screening</div>
+      </div>
+      <div class="lab-card-footer">
+        <span class="lab-card-tag">🔬 Immunohematology</span>
+        <span class="lab-card-year">2564–2569</span>
+      </div>
+    </a>
+
+    <a href="Dashboard Infection.html" class="lab-card"
+       style="--card-color:#f97316; --card-bg:#ffedd5;">
+      <div class="lab-card-stripe"></div>
+      <div class="lab-card-body">
+        <div class="lab-card-icon-row">
+          <div class="lab-card-icon">🦠</div>
+          <div class="lab-card-arrow">→</div>
+        </div>
+        <div class="lab-card-name">Infectious Serology</div>
+        <div class="lab-card-desc">สถิติการตรวจกรองการติดเชื้อ Serology & NAT ได้แก่ HBsAg, Anti-HIV, Anti-HCV, Syphilis, HBV/HCV/HIV NAT</div>
+      </div>
+      <div class="lab-card-footer">
+        <span class="lab-card-tag">🦠 Infection Screening</span>
+        <span class="lab-card-year">2564–2569</span>
+      </div>
+    </a>
+
+    <a href="Dashboard Standard Laboratory.html" class="lab-card"
+       style="--card-color:#0d9488; --card-bg:#ccfbf1;">
+      <div class="lab-card-stripe"></div>
+      <div class="lab-card-body">
+        <div class="lab-card-icon-row">
+          <div class="lab-card-icon">🧪</div>
+          <div class="lab-card-arrow">→</div>
+        </div>
+        <div class="lab-card-name">Standard Laboratory</div>
+        <div class="lab-card-desc">สถิติห้องปฏิบัติการมาตรฐาน ABO/Rh Grouping, Crossmatch, DAT, IAT, ANC และการเตรียม Standard Cells</div>
+      </div>
+      <div class="lab-card-footer">
+        <span class="lab-card-tag">🧪 Standard Lab</span>
+        <span class="lab-card-year">2564–2569</span>
+      </div>
+    </a>
+
+    <a href="Dashboard Reference Laboratory.html" class="lab-card"
+       style="--card-color:#0d7a5f; --card-bg:#e0f5ed;">
+      <div class="lab-card-stripe"></div>
+      <div class="lab-card-body">
+        <div class="lab-card-icon-row">
+          <div class="lab-card-icon">🔬</div>
+          <div class="lab-card-arrow">→</div>
+        </div>
+        <div class="lab-card-name">Reference Laboratory</div>
+        <div class="lab-card-desc">สถิติห้องปฏิบัติการอ้างอิง Antibody Identification, Weak D Testing, Special Immunohematology Techniques</div>
+      </div>
+      <div class="lab-card-footer">
+        <span class="lab-card-tag">🔬 Reference Lab</span>
+        <span class="lab-card-year">2569</span>
+      </div>
+    </a>
+
+  </div>
+
+  <!-- GROUP 4: ห้องปฏิบัติการเฉพาะทาง -->
+  <div class="group-label">
+    <span class="group-label-dot" style="background:#4f46e5;"></span>
+    ห้องปฏิบัติการเฉพาะทาง (Specialized Laboratory)
+  </div>
+  <div class="lab-grid" style="grid-template-columns: repeat(2,1fr); margin-bottom:0;">
+
+    <a href="Dashboard HLA Laboratory.html" class="lab-card"
+       style="--card-color:#4f46e5; --card-bg:#eef2ff;">
+      <div class="lab-card-stripe"></div>
+      <div class="lab-card-body">
+        <div class="lab-card-icon-row">
+          <div class="lab-card-icon">🧬</div>
+          <div class="lab-card-arrow">→</div>
+        </div>
+        <div class="lab-card-name">HLA Laboratory</div>
+        <div class="lab-card-desc">สถิติงาน HLA Typing, Lymphocyte Crossmatch (CDC/FCXM), Platelet Crossmatching, Serum Eye Drop และ Red Cell Genotyping</div>
+      </div>
+      <div class="lab-card-footer">
+        <span class="lab-card-tag">🧬 HLA Lab</span>
+        <span class="lab-card-year">2564–2569</span>
+      </div>
+    </a>
+
+    <a href="Dashboard DNA Laboratory.html" class="lab-card"
+       style="--card-color:#059669; --card-bg:#d1fae5;">
+      <div class="lab-card-stripe"></div>
+      <div class="lab-card-body">
+        <div class="lab-card-icon-row">
+          <div class="lab-card-icon">🔭</div>
+          <div class="lab-card-arrow">→</div>
+        </div>
+        <div class="lab-card-name">DNA Laboratory</div>
+        <div class="lab-card-desc">สถิติงาน HLA-DNA Typing (BMT & KT), ADR Typing, KIR Genotyping, NGS HLA Typing และ Luminex HLA Antibody Testing</div>
+      </div>
+      <div class="lab-card-footer">
+        <span class="lab-card-tag">🔭 DNA Lab</span>
+        <span class="lab-card-year">2564–2569</span>
+      </div>
+    </a>
+
+  </div>
+
+</main>
+
+<!-- ===== FOOTER ===== -->
+<footer class="footer">
+  ภาควิชาเวชศาสตร์การธนาคารเลือด · คณะแพทยศาสตร์ศิริราชพยาบาล · มหาวิทยาลัยมหิดล · Dashboard สถิติปีปฏิทิน 2564–2569
+</footer>
+
+<script>
+// เพิ่ม click sound เบาๆ
+document.querySelectorAll('.lab-card').forEach(card => {
+  card.addEventListener('click', () => {
+    try {
+      const AC = window.AudioContext || window.webkitAudioContext;
+      if (!AC) return;
+      const ctx = new AC();
+      const o = ctx.createOscillator(), g = ctx.createGain();
+      o.connect(g); g.connect(ctx.destination);
+      o.type = 'sine';
+      o.frequency.setValueAtTime(880, ctx.currentTime);
+      o.frequency.exponentialRampToValueAtTime(440, ctx.currentTime + 0.08);
+      g.gain.setValueAtTime(0.05, ctx.currentTime);
+      g.gain.exponentialRampToValueAtTime(0.0001, ctx.currentTime + 0.08);
+      o.start(); o.stop(ctx.currentTime + 0.08);
+    } catch(e) {}
+  });
+});
+</script>
+
+<!-- ===== ปุ่มเชื่อมโฟลเดอร์ให้ทุก Dashboard ===== -->
+<script src="dashboard_autoload.js"></script>
+<script src="autoload_hub.js"></script>
+</body>
+</html>

@@ -1,0 +1,3887 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
+  <meta http-equiv="Pragma" content="no-cache" />
+  <meta http-equiv="Expires" content="0" />
+  <title>Blood Collection Dashboard | ปีปฏิทิน 2569</title>
+  <meta name="description" content="Dashboard สถิติห้องรับบริจาคเลือด Blood Collection ปีปฏิทิน 2565 - 2569" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+
+  <style>
+    :root {
+      --bg: #f8fafc;
+      --bg-alt: #f1f5f9;
+      --surface: #ffffff;
+      --surface-hover: #f8fafc;
+      --surface-2: #f1f5f9;
+      --border: #e2e8f0;
+      --border-strong: #cbd5e1;
+
+      /* Premium Crimson Theme for Blood Donor dashboard */
+      --red:    #dc2626; 
+      --red-lt: #fee2e2;
+      --red-md: #fca5a5;
+
+      --blue:    #2563eb; 
+      --blue-lt: #dbeafe;
+      --blue-md: #bfdbfe;
+
+      --teal:    #0d9488; 
+      --teal-lt: #ccfbf1;
+      --teal-md: #99f6e4;
+
+      --purple:    #7c3aed; 
+      --purple-lt: #f3e8ff;
+      --purple-md: #e9d5ff;
+
+      --amber:    #d97706; 
+      --amber-lt: #fef3c7;
+      --amber-md: #fde68a;
+
+      --pink:    #db2777; 
+      --pink-lt: #fce7f3;
+
+      /* Premium Rose/Pink Theme for Immunohematology */
+      --rose:    #db2777; 
+      --rose-lt: #fce7f3;
+      --rose-md: #fbcfe8;
+
+      --orange:    #f97316; 
+      --orange-lt: #ffedd5;
+      --orange-md: #fed7aa;
+
+      --text-1: #0f172a;
+      --text-2: #334155;
+      --text-3: #64748b;
+      --text-4: #cbd5e1;
+
+      --shadow-sm: 0 1px 3px rgba(15,23,42,0.06), 0 1px 2px rgba(15,23,42,0.04);
+      --shadow-md: 0 4px 12px rgba(15,23,42,0.08), 0 2px 4px rgba(15,23,42,0.04);
+      --shadow-lg: 0 10px 25px -5px rgba(15,23,42,0.1), 0 8px 10px -6px rgba(15,23,42,0.1);
+      --shadow-focus: 0 0 0 3px rgba(220,38,38,0.18);
+
+      --radius: 16px;
+      --radius-sm: 10px;
+      --radius-xs: 6px;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: 'Sarabun', 'Inter', sans-serif;
+      background: var(--bg);
+      color: var(--text-1);
+      min-height: 100vh;
+      font-size: 14px;
+      line-height: 1.5;
+    }
+
+    /* ===== HEADER ===== */
+    .header {
+      background: var(--surface);
+      border-bottom: 1px solid var(--border);
+      box-shadow: var(--shadow-sm);
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+
+    .header-inner {
+      max-width: 1440px;
+      margin: 0 auto;
+      padding: 0 28px;
+      display: flex;
+      align-items: center;
+      gap: 20px;
+      height: 68px;
+    }
+
+    .logo-wrap {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      flex-shrink: 0;
+    }
+
+    .logo-icon {
+      width: 44px;
+      height: 44px;
+      border-radius: 12px;
+      background: linear-gradient(135deg, var(--red) 0%, #ef4444 50%, var(--pink) 100%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 22px;
+      box-shadow: 0 3px 12px rgba(220,38,38,0.25);
+      flex-shrink: 0;
+    }
+
+    .logo-info h1 {
+      font-size: 16px;
+      font-weight: 700;
+      color: var(--text-1);
+      line-height: 1.2;
+    }
+
+    .logo-info p {
+      font-size: 12px;
+      color: var(--text-3);
+      margin-top: 1px;
+    }
+
+    .header-divider {
+      width: 1px;
+      height: 32px;
+      background: var(--border);
+    }
+
+    .nav-menu {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin: 0 4px;
+    
+      overflow: visible;
+}
+
+    .nav-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 6px 14px;
+      border-radius: 20px;
+      color: var(--text-2);
+      font-weight: 500;
+      font-size: 12.5px;
+      text-decoration: none;
+      transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .nav-link:hover {
+      background: var(--bg-alt);
+      color: var(--text-1);
+    }
+
+    .nav-link svg {
+      opacity: 0.7;
+    }
+
+    .nav-link.active {
+      font-weight: 700;
+    }
+
+    /* Red theme for Blood Collection active tab */
+    .blood-theme .nav-link.active {
+      background: var(--red-lt);
+      color: var(--red);
+    }
+
+    /* Purple theme for Hemapheresis active tab */
+    .platelet-theme .nav-link.active {
+      background: var(--purple-lt);
+      color: var(--purple);
+    }
+
+    /* Orange theme for Infection active tab */
+    .infection-theme .nav-link.active {
+      background: var(--orange-lt);
+      color: var(--orange);
+    }
+
+    /* Rose theme for Immunohematology active tab */
+    .rose-theme .nav-link.active {
+      background: var(--rose-lt);
+      color: var(--rose);
+    }
+
+    .header-meta {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex: 1;
+    }
+
+    .pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      padding: 5px 12px;
+      border-radius: 20px;
+      font-size: 12px;
+      font-weight: 600;
+      border: 1.5px solid;
+      white-space: nowrap;
+    }
+
+    .pill-blue  { background: var(--blue-lt);   color: var(--blue);   border-color: var(--blue-md); }
+    .pill-teal  { background: var(--teal-lt);   color: var(--teal);   border-color: var(--teal-md); }
+    .pill-amber { background: var(--amber-lt);  color: var(--amber);  border-color: var(--amber-md); }
+    .pill-red   { background: var(--red-lt);    color: var(--red);    border-color: var(--red-md); }
+
+    .live-dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: var(--teal);
+      animation: blink 1.8s ease-in-out infinite;
+    }
+    @keyframes blink {
+      0%,100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.4; transform: scale(0.7); }
+    }
+
+    /* ===== MAIN ===== */
+    .main {
+      max-width: 1440px;
+      margin: 0 auto;
+      padding: 28px 28px 48px;
+    }
+
+    /* ===== MONTH SELECTOR BAR ===== */
+    .month-bar {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow-sm);
+      padding: 16px 20px;
+      margin-bottom: 24px;
+    }
+
+    .month-bar-top {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 14px;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    .month-bar-label {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .month-bar-title {
+      font-size: 15px;
+      font-weight: 700;
+      color: var(--text-1);
+    }
+
+    .month-bar-subtitle {
+      font-size: 12px;
+      color: var(--text-3);
+    }
+
+    .month-bar-actions {
+      display: flex;
+      gap: 8px;
+    }
+
+    .btn-action {
+      background: var(--surface-2);
+      border: 1px solid var(--border);
+      color: var(--text-2);
+      padding: 6px 14px;
+      border-radius: 20px;
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .btn-action:hover {
+      background: var(--border);
+      color: var(--text-1);
+    }
+
+    .month-tabs {
+      display: grid;
+      grid-template-columns: repeat(12, 1fr);
+      gap: 8px;
+    }
+
+    @media (max-width: 1024px) {
+      .month-tabs {
+        grid-template-columns: repeat(6, 1fr);
+      }
+    }
+
+    @media (max-width: 640px) {
+      .month-tabs {
+        grid-template-columns: repeat(4, 1fr);
+      }
+    }
+
+    .month-tab {
+      background: var(--surface);
+      border: 1.5px solid var(--border);
+      border-radius: var(--radius-sm);
+      padding: 10px 6px;
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+      position: relative;
+      user-select: none;
+    }
+
+    .month-tab:hover:not(.disabled) {
+      border-color: var(--red-md);
+      background: var(--surface-hover);
+      transform: translateY(-2px);
+    }
+
+    .month-tab.active {
+      background: var(--red-lt);
+      border-color: var(--red);
+      color: var(--red);
+    }
+
+    .month-tab.disabled {
+      opacity: 0.35;
+      cursor: not-allowed;
+      background: var(--bg-alt);
+    }
+
+    .month-tab-abbr {
+      font-size: 13px;
+      font-weight: 700;
+      line-height: 1.2;
+    }
+
+    .month-tab-num {
+      font-size: 10px;
+      font-weight: 500;
+      opacity: 0.7;
+      margin-top: 1px;
+    }
+
+    .month-tab-dot {
+      width: 5px;
+      height: 5px;
+      border-radius: 50%;
+      background: var(--red);
+      position: absolute;
+      bottom: 6px;
+      left: 50%;
+      transform: translateX(-50%);
+      display: none;
+    }
+
+    .month-tab.active .month-tab-dot {
+      display: block;
+    }
+
+    /* ===== MONTH DETAIL PANEL ===== */
+    .mdp {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow-sm);
+      padding: 20px;
+      margin-bottom: 24px;
+      display: flex;
+      align-items: center;
+      gap: 24px;
+      flex-wrap: wrap;
+    }
+
+    .mdp-month-badge {
+      padding: 12px 18px;
+      border-radius: var(--radius-sm);
+      background: var(--red-lt);
+      color: var(--red);
+      text-align: center;
+      flex-shrink: 0;
+    }
+
+    .mdp-month-name {
+      font-size: 18px;
+      font-weight: 800;
+      line-height: 1.1;
+    }
+
+    .mdp-month-year {
+      font-size: 11px;
+      font-weight: 600;
+      margin-top: 2px;
+      opacity: 0.8;
+    }
+
+    .mdp-divider {
+      width: 1px;
+      height: 48px;
+      background: var(--border);
+    }
+
+    @media (max-width: 768px) {
+      .mdp-divider { display: none; }
+      .mdp { flex-direction: column; align-items: stretch; text-align: center; }
+      .mdp-month-badge { width: 100%; }
+    }
+
+    .mdp-stats {
+      display: flex;
+      gap: 32px;
+      flex: 1;
+      justify-content: space-around;
+      flex-wrap: wrap;
+    }
+
+    .mdp-stat {
+      display: flex;
+      flex-direction: column;
+      position: relative;
+    }
+
+    .mdp-stat-val {
+      font-size: 24px;
+      font-weight: 800;
+      line-height: 1.1;
+    }
+
+    .mdp-stat-lbl {
+      font-size: 11px;
+      color: var(--text-3);
+      font-weight: 600;
+      margin-top: 3px;
+    }
+
+    /* ===== KPI GRID ===== */
+    .kpi-section-title {
+      font-size: 18px;
+      font-weight: 700;
+      color: var(--text-1);
+      margin-bottom: 16px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .kpi-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+      gap: 16px;
+      margin-bottom: 32px;
+    }
+
+    .kpi-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 18px 20px 16px;
+      box-shadow: var(--shadow-sm);
+      position: relative;
+      overflow: hidden;
+      transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .kpi-card:hover {
+      transform: translateY(-3px);
+      box-shadow: var(--shadow-md);
+      border-color: color-mix(in srgb, var(--kpi-color) 40%, var(--border));
+    }
+
+    /* top accent strip tinted to the card color */
+    .kpi-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 3px;
+      background: var(--kpi-color);
+      opacity: 0.85;
+    }
+
+    /* header: icon on the left, YoY badge pinned right */
+    .kpi-card-top {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 12px;
+    }
+
+    .kpi-icon-wrap {
+      width: 40px;
+      height: 40px;
+      border-radius: 12px;
+      background: var(--kpi-bg);
+      color: var(--kpi-color);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 19px;
+      flex: 0 0 40px;
+    }
+
+    .kpi-label {
+      font-size: 11.5px;
+      color: var(--text-3);
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.4px;
+      line-height: 1.35;
+      min-height: 2.7em;
+      display: flex;
+      align-items: flex-end;
+    }
+
+    .kpi-value {
+      font-size: 30px;
+      font-weight: 800;
+      color: var(--text-1);
+      margin: 3px 0 2px;
+      line-height: 1.05;
+      letter-spacing: -0.5px;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .kpi-value.big {
+      font-size: 22px;
+    }
+
+    .kpi-sub {
+      font-size: 11px;
+      color: var(--text-3);
+      font-weight: 500;
+      line-height: 1.4;
+      margin-bottom: 14px;
+    }
+
+    .kpi-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      padding: 3px 9px;
+      border-radius: 999px;
+      font-size: 10px;
+      font-weight: 700;
+      border: 1px solid;
+      white-space: nowrap;
+    }
+    /* badge sitting in the header row needs no top margin */
+    .kpi-card-top .kpi-badge { margin-top: 0; }
+
+    .kpi-badge.up { background: var(--teal-lt); color: var(--teal); border-color: var(--teal-md); }
+    .kpi-badge.down { background: var(--red-lt); color: var(--red); border-color: var(--red-md); }
+    .kpi-badge.same { background: var(--bg-alt); color: var(--text-3); border-color: var(--border); }
+    .kpi-badge.good { background: var(--teal-lt); color: var(--teal); border-color: var(--teal-md); }
+
+    /* ===== CHARTS SECTION ===== */
+    .charts-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 24px;
+      margin-bottom: 32px;
+    }
+
+    @media (max-width: 1024px) {
+      .charts-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .chart-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow-sm);
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      transition: box-shadow 0.25s;
+    }
+
+    .chart-card:hover {
+      box-shadow: var(--shadow-md);
+    }
+
+    .chart-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: 16px;
+      gap: 12px;
+    }
+
+    .chart-title h3 {
+      font-size: 15px;
+      font-weight: 700;
+      color: var(--text-1);
+    }
+
+    .chart-title p {
+      font-size: 11px;
+      color: var(--text-3);
+      margin-top: 1px;
+    }
+
+    .chart-legend {
+      display: flex;
+      gap: 10px;
+      font-size: 11px;
+      font-weight: 600;
+    }
+
+    .legend-item {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .legend-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+    }
+
+    .chart-wrap {
+      position: relative;
+      flex: 1;
+      min-height: 220px;
+    }
+
+    /* ===== QUALITY BARS ===== */
+    .q-container {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      margin-top: 8px;
+    }
+
+    .q-row {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .q-label {
+      width: 140px;
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--text-2);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .q-bar-wrap {
+      flex: 1;
+      height: 8px;
+      border-radius: 4px;
+      background: var(--bg-alt);
+      overflow: hidden;
+      position: relative;
+    }
+
+    .q-bar-fill {
+      height: 100%;
+      border-radius: 4px;
+      width: 0;
+      transition: width 0.8s cubic-bezier(0.1, 0.8, 0.25, 1);
+    }
+
+    .q-val {
+      width: 36px;
+      text-align: right;
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--text-1);
+    }
+
+    .q-pct {
+      width: 42px;
+      text-align: right;
+      font-size: 11px;
+      font-weight: 500;
+      color: var(--text-3);
+    }
+
+    /* ===== APH GRID (DONOR CHANNELS) ===== */
+    .kpi-split-row {
+      display: flex;
+      justify-content: space-between;
+      gap: 10px;
+      margin-top: auto;
+      padding-top: 12px;
+      border-top: 1px dashed var(--border-strong);
+    }
+
+    .kpi-split-col {
+      display: flex;
+      flex-direction: column;
+      flex: 1;
+      padding: 7px 10px;
+      border-radius: var(--radius-xs);
+      background: var(--bg-alt);
+    }
+    .kpi-split-col + .kpi-split-col { }
+
+    .kpi-split-label {
+      font-size: 9.5px;
+      color: var(--text-3);
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.3px;
+    }
+
+    .kpi-split-value {
+      font-size: 13px;
+      font-weight: 800;
+      color: var(--text-1);
+      margin-top: 3px;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .kpi-split-value small {
+      font-size: 10px;
+      font-weight: 500;
+      color: var(--text-3);
+      margin-left: 2px;
+    }
+
+    /* ===== DATA TABLE SECTION ===== */
+    .table-section {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow-sm);
+      padding: 24px;
+      margin-bottom: 32px;
+      overflow: hidden;
+    }
+
+    .table-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 16px;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    .table-title h3 {
+      font-size: 15px;
+      font-weight: 700;
+      color: var(--text-1);
+    }
+
+    .table-title p {
+      font-size: 11px;
+      color: var(--text-3);
+      margin-top: 1px;
+    }
+
+    .table-wrap {
+      overflow-x: auto;
+      margin: 0 -24px -24px;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 12px;
+      text-align: right;
+    }
+
+    th, td {
+      padding: 10px 14px;
+      border-bottom: 1px solid var(--border);
+      white-space: nowrap;
+    }
+
+    th {
+      font-weight: 700;
+      color: var(--text-2);
+      background: var(--bg-alt);
+      position: sticky;
+      top: 0;
+      z-index: 10;
+    }
+
+    th:first-child, td:first-child {
+      text-align: left;
+      position: sticky;
+      left: 0;
+      background: inherit;
+      z-index: 5;
+      font-weight: 600;
+      border-right: 1.5px solid var(--border);
+    }
+
+    tr:hover td {
+      background: var(--surface-hover);
+    }
+
+    td:first-child {
+      background: var(--surface);
+      color: var(--text-1);
+    }
+
+    tr:hover td:first-child {
+      background: var(--surface-hover);
+    }
+
+    .col-total {
+      font-weight: 700;
+      color: var(--blue);
+      background: var(--blue-lt) !important;
+      border-left: 1.5px solid var(--blue-md);
+    }
+
+    th.col-total {
+      background: var(--blue-md) !important;
+      color: var(--blue);
+    }
+
+    .active-month-col {
+      background: #fff8eb !important;
+      color: #b45309 !important;
+      border-left: 1.5px dashed var(--amber-md);
+      border-right: 1.5px dashed var(--amber-md);
+    }
+
+    tr.section-header td {
+      background: var(--bg-alt);
+      font-weight: 700;
+      text-align: left;
+      color: var(--text-1);
+      border-bottom: 1.5px solid var(--border-strong);
+      padding: 8px 14px;
+    }
+
+    .text-left { text-align: left; }
+
+    /* ===== FOOTER ===== */
+    .footer {
+      max-width: 1440px;
+      margin: 0 auto;
+      padding: 0 28px 28px;
+      display: flex;
+      justify-content: space-between;
+      font-size: 11px;
+      color: var(--text-3);
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
+    /* ===== ANIMATIONS ===== */
+    .fade-up {
+      animation: fadeUp 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+      opacity: 0;
+    }
+
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(12px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* ===== ANALYSIS SECTION ===== */
+    .analysis-section {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow-sm);
+      padding: 24px;
+      margin-bottom: 32px;
+    }
+
+    .analysis-header {
+      margin-bottom: 20px;
+    }
+
+    .analysis-title h3 {
+      font-size: 15px;
+      font-weight: 700;
+      color: var(--text-1);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .analysis-title p {
+      font-size: 12px;
+      color: var(--text-3);
+      margin-top: 4px;
+    }
+
+    .analysis-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+      margin-bottom: 20px;
+    }
+
+    @media (max-width: 768px) {
+      .analysis-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .analysis-card {
+      background: var(--bg-alt);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 18px 20px;
+    }
+
+    .analysis-card h4 {
+      font-size: 13.5px;
+      font-weight: 700;
+      color: var(--text-1);
+      margin-bottom: 12px;
+      border-bottom: 1px dashed var(--border-strong);
+      padding-bottom: 8px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .analysis-card ul {
+      list-style-type: none;
+      padding: 0;
+      margin: 0;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .analysis-card li {
+      font-size: 12.5px;
+      line-height: 1.6;
+      color: var(--text-2);
+      position: relative;
+      padding-left: 16px;
+    }
+
+    .analysis-card li::before {
+      content: "•";
+      color: var(--red);
+      font-weight: bold;
+      position: absolute;
+      left: 0;
+      top: 0;
+      font-size: 14px;
+    }
+
+    .recommendations-box {
+      background: var(--red-lt);
+      border: 1px solid var(--red-md);
+      border-radius: var(--radius);
+      padding: 18px 20px;
+    }
+
+    .recommendations-box h5 {
+      font-size: 13.5px;
+      font-weight: 700;
+      color: var(--red);
+      margin-bottom: 12px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .recommendations-box ol {
+      padding-left: 18px;
+      margin: 0;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .recommendations-box li {
+      font-size: 12.5px;
+      line-height: 1.6;
+      color: var(--text-2);
+    }
+
+    /* ===== EXPORT TO PDF BUTTON ===== */
+    .btn-export {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: var(--red);
+      color: #ffffff;
+      border: none;
+      padding: 8px 16px;
+      border-radius: 20px;
+      font-size: 12px;
+      font-weight: 700;
+      font-family: 'Sarabun', sans-serif;
+      cursor: pointer;
+      box-shadow: 0 4px 6px -1px rgba(220,38,38,0.2), 0 2px 4px -2px rgba(220,38,38,0.2);
+      transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .btn-export:hover {
+      background: #b91c1c;
+      transform: translateY(-1px);
+      box-shadow: 0 10px 15px -3px rgba(220,38,38,0.3), 0 4px 6px -4px rgba(220,38,38,0.3);
+    }
+
+    .btn-export:active {
+      transform: translateY(0);
+      box-shadow: 0 4px 6px -1px rgba(220,38,38,0.2);
+    }
+
+    .btn-refresh {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: transparent;
+      color: var(--text-2);
+      border: 1px solid var(--border-strong);
+      padding: 8px 16px;
+      border-radius: 20px;
+      font-size: 12px;
+      font-weight: 600;
+      font-family: 'Sarabun', sans-serif;
+      cursor: pointer;
+      transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .btn-refresh:hover {
+      background: var(--bg-alt);
+      color: var(--text-1);
+      border-color: var(--text-3);
+      transform: translateY(-1px);
+    }
+
+    .btn-refresh:active {
+      transform: translateY(0);
+    }
+
+    .btn-refresh svg {
+      transition: transform 0.4s ease;
+    }
+
+    .btn-refresh.spinning svg {
+      transform: rotate(360deg);
+    }
+
+    /* ===== PRINT STYLES ===== */
+    /* ── Page size for printing ── */
+    @page { size: A4 landscape; margin: 8mm 10mm 10mm 10mm; }
+
+    @media print {
+      /* ── Force color printing ── */
+      *, *::before, *::after {
+        -webkit-print-color-adjust: exact !important;
+        print-color-adjust: exact !important;
+        color-adjust: exact !important;
+      }
+
+      /* ── Base ── */
+      html, body { background: #ffffff !important; color: #000 !important; font-size: 10px !important; }
+
+      /* ── Hide interactive UI ── */
+      .btn-export, .btn-refresh, .btn-action, .btn-action-secondary,
+      #btnMusic, #btnRefresh, #btn-export-pdf,
+      .nav-menu, .nav-item-dropdown, .header-meta, .header-divider,
+      .month-bar, #monthDetailPanel, .mdp, .footer, .live-dot { display: none !important; }
+
+      /* ── Header compact ── */
+      .header { position: relative !important; box-shadow: none !important;
+        border-bottom: 2px solid #333 !important; height: auto !important; padding: 6px 0 8px !important; }
+      .header-inner { max-width: 100% !important; height: auto !important; padding: 0 10mm !important; }
+      .logo-info h1 { font-size: 13px !important; }
+      .logo-info p  { font-size: 9px !important; }
+
+      /* ── Main ── */
+      .main { max-width: 100% !important; width: 100% !important; padding: 0 !important; }
+
+      /* ── KPI ── */
+      .kpi-section-title { font-size: 10px !important; margin-bottom: 6px !important; break-after: avoid !important; }
+      .kpi-grid { display: grid !important; grid-template-columns: repeat(4, 1fr) !important; gap: 6px !important; margin-bottom: 8px !important; break-inside: avoid !important; }
+      #donorCatGrid { grid-template-columns: repeat(5, 1fr) !important; }
+      #kpiGrid2    { grid-template-columns: repeat(4, 1fr) !important; }
+      .kpi-card { break-inside: avoid !important; box-shadow: none !important; border: 1px solid #d1d5db !important; padding: 7px 9px !important; }
+      .kpi-value { font-size: 18px !important; }
+      .kpi-label, .kpi-sub, .kpi-split-label { font-size: 8px !important; }
+      .kpi-split-value { font-size: 10px !important; }
+      .kpi-badge { font-size: 8px !important; }
+      .kpi-icon-wrap { width: 26px !important; height: 26px !important; font-size: 14px !important; margin-bottom: 6px !important; }
+
+      /* ── Charts 2-col ── */
+      .charts-grid { display: grid !important; grid-template-columns: 1fr 1fr !important; gap: 8px !important; margin-bottom: 8px !important; break-inside: avoid !important; }
+      .chart-card { box-shadow: none !important; border: 1px solid #d1d5db !important; padding: 10px !important; break-inside: avoid !important; }
+      .chart-title h3 { font-size: 10px !important; }
+      .chart-title p  { font-size: 8.5px !important; }
+      .chart-wrap { position: relative !important; height: 210px !important; max-height: 210px !important; min-height: 210px !important; overflow: visible !important; }
+      .chart-wrap canvas { max-height: 210px !important; }
+      /* Pie / doughnut: centre the round canvas inside the wrap (JS keeps it square) */
+      #chartLocationShare, #chartDonorShare, #chartGenderShare {
+        display: block !important; margin: 0 auto !important;
+        width: auto !important; height: 200px !important; max-height: 200px !important;
+      }
+
+      /* ── Table new page ── */
+      .table-section { break-before: page !important; box-shadow: none !important; border: 1px solid #d1d5db !important; }
+      .table-header { padding: 10px 14px !important; }
+      .table-title h3 { font-size: 11px !important; }
+      table { font-size: 8px !important; }
+      thead th { padding: 5px 7px !important; font-size: 8px !important; }
+      tbody td { padding: 3px 7px !important; }
+      .sticky-col-1, .sticky-col-2 { position: relative !important; left: auto !important; }
+
+      /* ── Analysis new page ── */
+      .analysis-section { break-before: page !important; box-shadow: none !important; border: 1px solid #d1d5db !important; }
+      .analysis-grid { display: grid !important; grid-template-columns: 1fr 1fr !important; }
+      .analysis-card { padding: 12px !important; }
+      .analysis-card h4 { font-size: 10px !important; }
+      .analysis-card li { font-size: 8.5px !important; }
+      .recommendations-box { padding: 12px !important; }
+      .recommendations-box h5 { font-size: 10px !important; }
+      .recommendations-box li { font-size: 8.5px !important; }
+    }
+    .nav-dropdown-content {
+      display: none;
+      position: absolute;
+      top: 100%;
+      left: 0;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      box-shadow: var(--shadow-md);
+      z-index: 200;
+      min-width: 285px;
+      margin-top: 4px;
+      overflow: hidden;
+    }
+    .nav-dropdown-content a {
+      display: block;
+      padding: 10px 16px;
+      color: var(--text-2);
+      text-decoration: none;
+      font-size: 12px;
+      font-weight: 500;
+      transition: all 0.2s;
+      text-align: left;
+    }
+    .nav-dropdown-content a:hover {
+      background: var(--bg-alt);
+      color: var(--text-1);
+    }
+        .nav-dropdown-content.show {
+      display: block !important;
+    }    .nav-item-dropdown { position: relative; display: inline-block; }
+
+    /* ===== MODE / PERIOD TOGGLE ===== */
+    .mode-toggle {
+      display: inline-flex;
+      background: var(--surface-2);
+      border: 1px solid var(--border);
+      border-radius: 999px;
+      padding: 3px;
+      gap: 2px;
+    }
+    .mode-btn {
+      border: none;
+      background: transparent;
+      color: var(--text-2);
+      font-family: 'Sarabun', sans-serif;
+      font-size: 12px;
+      font-weight: 600;
+      padding: 6px 14px;
+      border-radius: 999px;
+      cursor: pointer;
+      white-space: nowrap;
+      transition: all 0.2s cubic-bezier(0.16,1,0.3,1);
+    }
+    .mode-btn:hover { color: var(--text-1); }
+    .mode-btn.active {
+      background: var(--red);
+      color: #fff;
+      box-shadow: 0 2px 6px rgba(220,38,38,0.28);
+    }
+    #periodYtdBtn.active, #periodFullBtn.active {
+      background: var(--blue);
+      box-shadow: 0 2px 6px rgba(37,99,235,0.28);
+    }
+
+    .compare-hint {
+      font-size: 11.5px;
+      color: var(--text-3);
+      margin-top: 12px;
+      text-align: center;
+      font-weight: 500;
+    }
+
+    /* Multi-year toggle chip (compare mode) */
+    .year-chip { position: relative; }
+    .year-chip .chip-swatch {
+      width: 9px; height: 9px; border-radius: 50%;
+      display: inline-block; margin-right: 5px; vertical-align: middle;
+      background: var(--chip-color, var(--text-4));
+      opacity: 0.35;
+      transition: opacity 0.2s;
+    }
+    .year-chip.selected {
+      border-color: var(--chip-color, var(--red));
+      background: color-mix(in srgb, var(--chip-color, var(--red)) 12%, var(--surface));
+      color: var(--chip-color, var(--red));
+    }
+    .year-chip.selected .chip-swatch { opacity: 1; }
+    .year-chip .chip-check { font-size: 10px; opacity: 0; margin-left: 4px; }
+    .year-chip.selected .chip-check { opacity: 1; }
+
+    /* Compare table: colored year header + change column */
+    #compareTable td.cmp-metric { text-align: left; font-weight: 600; }
+    #compareTable th.cmp-year { color: #fff; font-weight: 700; }
+    #compareTable td.cmp-change.up   { color: var(--teal); font-weight: 700; }
+    #compareTable td.cmp-change.down { color: var(--red);  font-weight: 700; }
+    #compareTable td.cmp-change.same { color: var(--text-3); }
+    #compareTable tr.cmp-rate td { background: var(--bg-alt); font-style: italic; }
+
+    @media print {
+      .mode-toggle { display: none !important; }
+    }
+</style>
+</head>
+<body>
+<script>
+if (sessionStorage.getItem('auth') !== 'ok') { location.replace('login.html'); }
+</script>
+
+
+<!-- ===== HEADER ===== -->
+<header class="header blood-theme">
+  <div class="header-inner">
+    <div class="logo-wrap">
+      <img src="F_01_png_v-logo_si_th.png" alt="Siriraj Logo" style="height: 54px; width: auto; object-fit: contain; margin-right: 2px;">
+      <div class="header-divider" style="height: 32px; margin: 0 10px;"></div>
+      <div class="logo-info">
+        <h1>Blood Collection</h1>
+        <p>ภาควิชาเวชศาสตร์การธนาคารเลือด</p>
+      </div>
+    </div>
+    
+    <div class="header-divider"></div>
+
+        <nav class="nav-menu">
+      <div class="nav-item-dropdown">
+        <a href="#" class="nav-link active" onclick="toggleNavDropdown(event)">
+          &#127979; Lab: Blood Collection &#9662;
+        </a>
+                <div class="nav-dropdown-content">
+            <a href="Dashboard Blood Collection.html" style="font-weight:700; background:var(--bg-alt); color:var(--text-1);">Blood Collection</a>
+            <a href="Dashboard Hemapheresis.html">Hemapheresis</a>
+            <a href="Dashboard Blood Processing.html">Blood Processing</a>
+            <a href="Dashboard Infection.html">Infectious Serology</a>
+            <a href="Dashboard Blood Component.html">Blood Component Preparation</a>
+            <a href="Dashboard QC Blood Components.html">QC Blood Components</a>
+            <a href="Dashboard Immunohematology.html">Immunohematology</a>
+            <a href="Dashboard Blood Prep Disp.html">&#3612;&#3621;&#3636;&#3605; &amp; &#3592;&#3656;&#3634;&#3618;&#3648;&#3621;&#3639;&#3629;&#3604;</a>
+            <a href="Dashboard Standard Laboratory.html">Standard Laboratory</a>
+        <a href="Dashboard Reference Laboratory.html">Reference Laboratory</a>
+            <a href="Dashboard HLA Laboratory.html">HLA Laboratory</a>
+            <a href="Dashboard DNA Laboratory.html">DNA Laboratory</a>
+        
+          </div>
+      </div>
+    </nav>
+
+    <div class="header-divider"></div>
+
+    <div class="header-meta">
+      <div class="pill pill-red" id="headerYearPill">📅 ปี 2569</div>
+      <div class="pill pill-teal" id="headerMonthsPill"><span class="live-dot"></span> ข้อมูล ม.ค.–พ.ค. 2569</div>
+      <div class="pill pill-blue" id="headerFilePill">📄 สถิติ 69.xlsx</div>
+    </div>
+
+    <div style="display: inline-flex; gap: 8px;">
+      <a href="index.html" class="btn-refresh" style="text-decoration:none;">🏠 หน้าแรก</a>
+      <button class="btn-refresh" id="btnRefresh" onclick="triggerSoftRefresh()">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="margin-right: 2px;"><path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"/></svg>
+        รีเฟรชข้อมูล
+      </button>
+              <button class="btn-action btn-action-secondary" id="btnMusic" onclick="toggleMusic()" style="margin-right: 8px;">
+          <span class="music-icon" style="font-size:14px; line-height:1;">🎵</span> <span id="musicText">BGM</span>
+        </button>
+        <button class="btn-export" onclick="exportToPDF()">
+        📥 Export to PDF
+      </button>
+    </div>
+  </div>
+</header>
+
+<!-- ===== MAIN ===== -->
+<main class="main">
+
+  <!-- ===== YEAR SELECTION CARD ===== -->
+  <div class="month-bar fade-up" style="animation-delay: 0.05s;">
+    <div class="month-bar-top">
+      <div class="month-bar-label">
+        <span class="month-bar-title" id="yearCardTitle">เลือกปีปฏิทินย้อนหลัง 4 ปี</span>
+        <span class="month-bar-subtitle" id="selectedYearTag">ปี 2569</span>
+      </div>
+      <div class="mode-toggle" role="tablist" aria-label="เลือกมุมมอง">
+        <button class="mode-btn active" id="modeMonthlyBtn" onclick="setViewMode('monthly')" role="tab">📅 มุมมองรายเดือน</button>
+        <button class="mode-btn" id="modeCompareBtn" onclick="setViewMode('compare')" role="tab">📊 เปรียบเทียบหลายปี</button>
+      </div>
+    </div>
+
+    <!-- Single-year tabs (monthly mode) -->
+    <div class="month-tabs" id="yearTabs" style="grid-template-columns: repeat(4, 1fr);">
+      <!-- Year tabs generated by JS -->
+    </div>
+
+    <!-- Multi-year chips (compare mode) -->
+    <div id="compareYearChips" style="display:none;">
+      <div class="month-tabs" id="yearMultiTabs" style="grid-template-columns: repeat(6, 1fr);">
+        <!-- Multi-year toggle chips generated by JS -->
+      </div>
+      <div class="compare-hint">✔️ แตะเพื่อเลือก/ยกเลิกปี (เลือกได้ 2–6 ปี) เพื่อนำมาซ้อนเปรียบเทียบกัน</div>
+    </div>
+  </div>
+
+  <!-- ============================================================= -->
+  <!-- ===============  MONTHLY VIEW (single year)  ================= -->
+  <!-- ============================================================= -->
+  <div id="monthlyView">
+
+  <!-- ===== MONTH SELECTION CARD (monthly view) ===== -->
+  <div class="month-bar fade-up" style="animation-delay: 0.1s;">
+    <div class="month-bar-top">
+      <div class="month-bar-label">
+        <span class="month-bar-title">เลือกเดือนเปรียบเทียบสถิติ</span>
+        <span class="month-bar-subtitle" id="selectedMonthTag">รวมทุกเดือน</span>
+      </div>
+      <div class="month-bar-actions">
+        <button class="btn-action" onclick="selectAll()">รวมทุกเดือน</button>
+      </div>
+    </div>
+    <div class="month-tabs" id="monthTabs">
+      <!-- Month tabs generated by JS -->
+    </div>
+  </div>
+
+  <!-- ===== MONTH DETAIL PANEL ===== -->
+  <div class="mdp fade-up" id="monthDetailPanel" style="animation-delay: 0.15s;">
+    <!-- Rendered dynamically -->
+  </div>
+
+  <!-- ===== KPI GRID ===== -->
+  <div class="kpi-section-title fade-up" style="animation-delay: 0.2s;">
+    <span>📈 ดัชนีชี้วัดหลัก (Key Performance Indicators)</span>
+    <span style="font-size:12px; font-weight:normal; color:var(--text-3); margin-left:auto;" id="kpiPeriodNote">รวม 5 เดือน (ม.ค., ก.พ., มี.ค., เม.ย., พ.ค.)</span>
+  </div>
+  <div class="kpi-grid" id="kpiGrid">
+    <!-- KPI cards rendered dynamically -->
+  </div>
+
+  <!-- ===== DONOR CATEGORIES SECTION ===== -->
+  <div class="kpi-section-title fade-up" style="animation-delay: 0.23s;">
+    <span>🩸 ประเภทผู้บริจาคโลหิต (Donor Categories)</span>
+  </div>
+  <div class="kpi-grid" id="donorCatGrid" style="margin-bottom: 32px;">
+    <!-- Donor Category cards rendered dynamically -->
+  </div>
+
+  <!-- ===== CHARTS ROW 1 ===== -->
+  <div class="charts-grid">
+    <!-- Chart 1: Monthly Donation Trends -->
+    <div class="chart-card fade-up" style="animation-delay: 0.25s;">
+      <div class="chart-header">
+        <div class="chart-title">
+          <h3>ปริมาณโลหิตบริจาคจำแนกตามสถานที่</h3>
+          <p>เปรียบเทียบในสถานที่ vs หน่วยเคลื่อนที่ (ยูนิท)</p>
+        </div>
+      </div>
+      <div class="chart-wrap">
+        <canvas id="chartDonationMonthly" height="320"></canvas>
+      </div>
+    </div>
+
+    <!-- Chart 4: Location Share -->
+    <div class="chart-card fade-up" style="animation-delay: 0.3s;">
+      <div class="chart-header">
+        <div class="chart-title">
+          <h3>สัดส่วนสถานที่บริจาคโลหิต</h3>
+          <p>In-site vs Mobile Unit</p>
+        </div>
+      </div>
+      <div class="chart-wrap">
+        <canvas id="chartLocationShare" height="220"></canvas>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== CHARTS ROW 2 ===== -->
+  <div class="charts-grid">
+    <!-- Chart 3: Reaction Trends -->
+    <div class="chart-card fade-up" style="animation-delay: 0.35s;">
+      <div class="chart-header">
+        <div class="chart-title">
+          <h3>แนวโน้มอัตราการเกิดอาการข้างเคียง (Reaction Rate)</h3>
+          <p>เปรียบเทียบในสถานที่ vs หน่วยเคลื่อนที่ (%)</p>
+        </div>
+      </div>
+      <div class="chart-wrap">
+        <canvas id="chartReactionTrends" height="220"></canvas>
+      </div>
+    </div>
+
+    <!-- Chart 2: Defer Trends -->
+    <div class="chart-card fade-up" style="animation-delay: 0.38s;">
+      <div class="chart-header">
+        <div class="chart-title">
+          <h3>แนวโน้มอัตราคัดกรองไม่ผ่าน (Defer Rate)</h3>
+          <p>เปรียบเทียบในสถานที่ vs หน่วยเคลื่อนที่ (%)</p>
+        </div>
+      </div>
+      <div class="chart-wrap">
+        <canvas id="chartDeferTrends" height="220"></canvas>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== CHARTS ROW 3 ===== -->
+  <div class="charts-grid">
+    <!-- Chart 5: Donor Profile Share -->
+    <div class="chart-card fade-up" style="animation-delay: 0.4s;">
+      <div class="chart-header">
+        <div class="chart-title">
+          <h3>ประเภทของผู้บริจาคโลหิต</h3>
+          <p>สัดส่วนผู้บริจาคเก่า (Repeat) vs ผู้บริจาคใหม่ (New)</p>
+        </div>
+      </div>
+      <div class="chart-wrap">
+        <canvas id="chartDonorShare" height="220"></canvas>
+      </div>
+    </div>
+
+    <!-- Chart 6: Donor Gender Share -->
+    <div class="chart-card fade-up" style="animation-delay: 0.45s;">
+      <div class="chart-header">
+        <div class="chart-title">
+          <h3>สัดส่วนเพศผู้บริจาคโลหิต</h3>
+          <p>เพศชาย (Male) vs เพศหญิง (Female)</p>
+        </div>
+      </div>
+      <div class="chart-wrap">
+        <canvas id="chartGenderShare" height="220"></canvas>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== CHARTS ROW 4 ===== -->
+  <div class="charts-grid">
+    <!-- Chart 7: Online Appointment & Siriraj Staff Trends (Count) -->
+    <div class="chart-card fade-up" style="animation-delay: 0.47s;">
+      <div class="chart-header">
+        <div class="chart-title">
+          <h3>แนวโน้มการนัดหมายออนไลน์ & ผู้บริจาคบุคลากรศิริราช</h3>
+          <p>จำนวนรายเดือนเปรียบเทียบผู้ตรวจที่นัดออนไลน์ และผู้บริจาคที่เป็นบุคลากรศิริราช (ราย)</p>
+        </div>
+      </div>
+      <div class="chart-wrap">
+        <canvas id="chartOnlineSirirajCount" height="220"></canvas>
+      </div>
+    </div>
+
+    <!-- Chart 8: Online Appointment & Siriraj Staff Trends (Percent) -->
+    <div class="chart-card fade-up" style="animation-delay: 0.49s;">
+      <div class="chart-header">
+        <div class="chart-title">
+          <h3>สัดส่วนการนัดหมายออนไลน์ & ผู้บริจาคบุคลากรศิริราช</h3>
+          <p>สัดส่วนร้อยละรายเดือนเปรียบเทียบกับยอดรวมในแต่ละด้าน (%)</p>
+        </div>
+      </div>
+      <div class="chart-wrap">
+        <canvas id="chartOnlineSirirajPercent" height="220"></canvas>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== DETAILED DATA TABLE ===== -->
+  <div class="table-section fade-up" style="animation-delay: 0.5s;">
+    <div class="table-header">
+      <div class="table-title">
+        <h3>รายงานตารางสถิติตัวเลขรายเดือนอย่างละเอียด</h3>
+        <p>แสดงตัวเลขรายเดือนของปีที่เลือกและยอดสะสมประจำปี</p>
+      </div>
+    </div>
+    <div class="table-wrap">
+      <table id="dataTable">
+        <!-- Rendered dynamically -->
+      </table>
+    </div>
+  </div>
+
+  </div>
+  <!-- ===============  END MONTHLY VIEW  ================= -->
+
+  <!-- ============================================================= -->
+  <!-- ===============  COMPARE VIEW (multi-year)  ================= -->
+  <!-- ============================================================= -->
+  <div id="compareView" style="display:none;">
+
+    <!-- Period control bar -->
+    <div class="month-bar fade-up" style="margin-bottom:24px;">
+      <div class="month-bar-top" style="margin-bottom:0;">
+        <div class="month-bar-label">
+          <span class="month-bar-title">ช่วงเวลาที่นำมาเปรียบเทียบ</span>
+          <span class="month-bar-subtitle" id="comparePeriodTag">เทียบช่วงเดียวกันทุกปี (YTD)</span>
+        </div>
+        <div class="mode-toggle" id="periodToggle" role="tablist" aria-label="เลือกช่วงเปรียบเทียบ">
+          <button class="mode-btn active" id="periodYtdBtn" onclick="setComparePeriod('ytd')" role="tab">⚖️ ช่วงเดียวกันทุกปี (YTD)</button>
+          <button class="mode-btn" id="periodFullBtn" onclick="setComparePeriod('full')" role="tab">🗓️ เต็มปี (ตามข้อมูลจริง)</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Month selection bar (compare one month across years) -->
+    <div class="month-bar fade-up" style="margin-bottom:24px;">
+      <div class="month-bar-top">
+        <div class="month-bar-label">
+          <span class="month-bar-title">เจาะจงรายเดือน (เทียบเดือนเดียวข้ามปี)</span>
+          <span class="month-bar-subtitle" id="compareMonthTag">รวมทุกเดือน (ดูภาพรวมทั้งช่วง)</span>
+        </div>
+        <div class="month-bar-actions">
+          <button class="btn-action" onclick="setCompareMonth(null)">รวมทุกเดือน</button>
+        </div>
+      </div>
+      <div class="month-tabs" id="compareMonthTabs">
+        <!-- Month tabs generated by JS -->
+      </div>
+    </div>
+
+    <!-- Headline: screening & donation totals per year (separated) -->
+    <div class="kpi-section-title fade-up">
+      <span>🏆 ภาพรวมเทียบรายปี: การคัดกรอง &amp; การบริจาค</span>
+      <span style="font-size:12px; font-weight:normal; color:var(--text-3); margin-left:auto;" id="compareHeadlineNote"></span>
+    </div>
+    <div class="charts-grid">
+      <div class="chart-card fade-up">
+        <div class="chart-header">
+          <div class="chart-title">
+            <h3>👥 ผู้เข้ารับการคัดกรองรวม จำแนกรายปี</h3>
+            <p id="compareScreenSub">ยอดผู้เข้าคัดกรองสะสมของแต่ละปีที่เลือก (ราย)</p>
+          </div>
+        </div>
+        <div class="chart-wrap" style="min-height:280px;">
+          <canvas id="chartCmpScreenTotals" height="280"></canvas>
+        </div>
+      </div>
+      <div class="chart-card fade-up">
+        <div class="chart-header">
+          <div class="chart-title">
+            <h3>💉 ยอดบริจาคโลหิตรวม จำแนกรายปี</h3>
+            <p id="compareDonSub">ยอดบริจาคโลหิตสะสมของแต่ละปีที่เลือก (ยูนิท)</p>
+          </div>
+        </div>
+        <div class="chart-wrap" style="min-height:280px;">
+          <canvas id="chartCmpDonTotals" height="280"></canvas>
+        </div>
+      </div>
+    </div>
+
+    <!-- Monthly overlay trend charts -->
+    <div class="kpi-section-title fade-up">
+      <span id="compareTrendTitle">📈 แนวโน้มรายเดือนซ้อนเปรียบเทียบหลายปี</span>
+      <span style="font-size:12px; font-weight:normal; color:var(--text-3); margin-left:auto;" id="compareTrendNote">เส้นแต่ละสี = แต่ละปี (เดือน ม.ค. – ธ.ค.)</span>
+    </div>
+    <div class="charts-grid">
+      <div class="chart-card fade-up">
+        <div class="chart-header">
+          <div class="chart-title">
+            <h3 id="cmpDonationTitle">ยอดบริจาคโลหิตรวมรายเดือน</h3>
+            <p id="cmpDonationSub">Total Donations ต่อเดือน เปรียบเทียบระหว่างปี (ยูนิท)</p>
+          </div>
+        </div>
+        <div class="chart-wrap"><canvas id="chartCmpDonation" height="240"></canvas></div>
+      </div>
+      <div class="chart-card fade-up">
+        <div class="chart-header">
+          <div class="chart-title">
+            <h3 id="cmpVisitTitle">ผู้เข้ารับการคัดกรองรวมรายเดือน</h3>
+            <p id="cmpVisitSub">Total Screened ต่อเดือน เปรียบเทียบระหว่างปี (ราย)</p>
+          </div>
+        </div>
+        <div class="chart-wrap"><canvas id="chartCmpVisit" height="240"></canvas></div>
+      </div>
+    </div>
+    <div class="charts-grid">
+      <div class="chart-card fade-up">
+        <div class="chart-header">
+          <div class="chart-title">
+            <h3 id="cmpDeferTitle">อัตราการคัดกรองไม่ผ่านรายเดือน (Defer Rate)</h3>
+            <p id="cmpDeferSub">Defer รวม ÷ ผู้คัดกรองรวม ในแต่ละเดือน (%)</p>
+          </div>
+        </div>
+        <div class="chart-wrap"><canvas id="chartCmpDefer" height="240"></canvas></div>
+      </div>
+      <div class="chart-card fade-up">
+        <div class="chart-header">
+          <div class="chart-title">
+            <h3 id="cmpReactionTitle">อัตราการเกิดอาการข้างเคียงรายเดือน (Reaction Rate)</h3>
+            <p id="cmpReactionSub">Reaction รวม ÷ ยอดบริจาครวม ในแต่ละเดือน (%)</p>
+          </div>
+        </div>
+        <div class="chart-wrap"><canvas id="chartCmpReaction" height="240"></canvas></div>
+      </div>
+    </div>
+    <div class="charts-grid">
+      <div class="chart-card fade-up">
+        <div class="chart-header">
+          <div class="chart-title">
+            <h3 id="cmpNewTitle">ผู้บริจาครายใหม่รายเดือน (New Donors)</h3>
+            <p id="cmpNewSub">จำนวนผู้บริจาคหน้าใหม่ต่อเดือน เปรียบเทียบระหว่างปี (ราย)</p>
+          </div>
+        </div>
+        <div class="chart-wrap"><canvas id="chartCmpNew" height="240"></canvas></div>
+      </div>
+      <div class="chart-card fade-up">
+        <div class="chart-header">
+          <div class="chart-title">
+            <h3 id="cmpOldTitle">ผู้บริจาครายเก่า/ประจำรายเดือน (Repeat Donors)</h3>
+            <p id="cmpOldSub">จำนวนผู้บริจาคประจำต่อเดือน เปรียบเทียบระหว่างปี (ราย)</p>
+          </div>
+        </div>
+        <div class="chart-wrap"><canvas id="chartCmpOld" height="240"></canvas></div>
+      </div>
+    </div>
+    <div class="charts-grid">
+      <div class="chart-card fade-up">
+        <div class="chart-header">
+          <div class="chart-title">
+            <h3 id="cmpOnsiteTitle">ยอดบริจาค ณ สถานที่รายเดือน (On-site)</h3>
+            <p id="cmpOnsiteSub">จำนวนบริจาคในสถานที่ต่อเดือน เปรียบเทียบระหว่างปี (ยูนิท)</p>
+          </div>
+        </div>
+        <div class="chart-wrap"><canvas id="chartCmpOnsite" height="240"></canvas></div>
+      </div>
+      <div class="chart-card fade-up">
+        <div class="chart-header">
+          <div class="chart-title">
+            <h3 id="cmpMobileTitle">ยอดบริจาคหน่วยเคลื่อนที่รายเดือน (Mobile)</h3>
+            <p id="cmpMobileSub">จำนวนบริจาคหน่วยเคลื่อนที่ต่อเดือน เปรียบเทียบระหว่างปี (ยูนิท)</p>
+          </div>
+        </div>
+        <div class="chart-wrap"><canvas id="chartCmpMobile" height="240"></canvas></div>
+      </div>
+    </div>
+
+    <!-- Comparison summary table -->
+    <div class="table-section fade-up">
+      <div class="table-header">
+        <div class="table-title">
+          <h3>ตารางสรุปเปรียบเทียบสถิติรายปี</h3>
+          <p id="compareTableSub">ยอดสะสมของแต่ละตัวชี้วัด จำแนกตามปีที่เลือก</p>
+        </div>
+      </div>
+      <div class="table-wrap">
+        <table id="compareTable">
+          <!-- Rendered dynamically -->
+        </table>
+      </div>
+    </div>
+
+  </div>
+  <!-- ===============  END COMPARE VIEW  ================= -->
+
+  <!-- ===== EXECUTIVE SUMMARY & RECOMMENDATIONS ===== -->
+  <div class="analysis-section fade-up" style="animation-delay: 0.52s; margin-bottom: 32px;">
+    <div class="analysis-header">
+      <div class="analysis-title">
+        <h3>🧠 บทวิเคราะห์แนวโน้มการบริจาคโลหิตและการบริหารคลังเลือดเชิงยุทธศาสตร์ (2564 - ปัจจุบัน)</h3>
+        <p>วิเคราะห์เปรียบเทียบสถิติผลงานห้องรับบริจาคเลือดกับทิศทางและแคมเปญรณรงค์ระดับประเทศ (สภากาชาดไทย)</p>
+      </div>
+    </div>
+    <div class="analysis-grid">
+      <!-- Card 1: Local Statistical Analysis -->
+      <div class="analysis-card">
+        <h4>📊 บทวิเคราะห์จากฐานข้อมูลสถิติห้องรับบริจาคเลือด (2564 - 2569)</h4>
+        <ul>
+          <li><strong>อัตราการเติบโตและการฟื้นตัว:</strong> ยอดผู้บริจาคโลหิตจริงมีทิศทางเติบโตอย่างมั่นคงหลังการระบาดของโควิด-19 โดยเพิ่มขึ้นจาก 48,154 ยูนิทในปี 2564 สู่ 55,892 ยูนิทในปี 2568 (อัตราเติบโตสะสมเฉลี่ยประมาณ <b>+3.8% ต่อปี</b>)</li>
+          <li><strong>บทบาทสำคัญของหน่วยเคลื่อนที่ (Mobile Units):</strong> สัดส่วนยอดบริจาคของหน่วยเคลื่อนที่ขยายตัวอย่างต่อเนื่องจาก 22.0% ในปี 2564 มาเสถียรอยู่ที่ 25.3% - 26.5% ในปี 2568-2569 สะท้อนว่าเป็นกลยุทธ์สำคัญในการเข้าถึงผู้บริจาค</li>
+          <li><strong>ความผันผวนของอัตรา Defer (คัดกรองไม่ผ่าน):</strong> อัตราการปฏิเสธผู้บริจาคยังคงสูงต่อเนื่องเฉลี่ยอยู่ที่ <b>22% - 24%</b> (สูงสุดในปี 2564 ที่ 24.6% และต้นปี 2569 อยู่ที่ 24.0% หรือเฉลี่ยผู้คัดกรอง 1 ใน 4 รายไม่ผ่านเกณฑ์) ซึ่งเป็นข้อจำกัดหลักในการเปลี่ยนยอดผู้มาตรวจคัดกรองเป็นยอดผู้บริจาคจริง</li>
+        </ul>
+      </div>
+
+      <!-- Card 2: National Trends & Insights -->
+      <div class="analysis-card">
+        <h4>🌐 วิเคราะห์เชื่อมโยงกับสถานการณ์และข้อมูลในอินเทอร์เน็ต</h4>
+        <ul>
+          <li><strong>วิกฤตความถี่ในการบริจาคระดับประเทศ:</strong> ข้อมูลสภากาชาดไทยระบุว่าประชากรกว่า 67% บริจาคโลหิตเพียงปีละ 1 ครั้ง ซึ่งเป็นสาเหตุให้เลือดสำรองขาดแคลนเป็นช่วงๆ การสร้างความสม่ำเสมอในการบริจาคจึงเป็นกุญแจสำคัญยิ่งกว่าการหาผู้บริจาครายใหม่</li>
+          <li><strong>แนวโน้มการขาดแคลนตามฤดูกาล (Seasonal Shortage):</strong> สถิติสภากาชาดชี้ว่าในช่วงเทศกาลหยุดยาว (เช่น เมษายน สงกรานต์) และช่วงปิดภาคเรียน อัตราการบริจาคจะลดลงอย่างมีนัยสำคัญ ส่งผลกระทบอย่างสูงต่อกลุ่มผู้ป่วยที่จำเป็นต้องใช้เลือดเป็นประจำ เช่น ธาลัสซีเมียและผู้ป่วยมะเร็งเม็ดเลือดขาว</li>
+          <li><strong>มาตรการรณรงค์ระดับประเทศ (ปี 2569):</strong> มีการผลักดันโครงการภายใต้แคมเปญ <i>"Give Blood Now – ให้เลือด ให้ได้ ให้เลย"</i> ของศูนย์บริการโลหิตแห่งชาติ มุ่งเน้นการรณรงค์ให้บริจาคสม่ำเสมอทุก 3 เดือน เพื่อเป้าหมายมีผู้บริจาคไม่ต่ำกว่าร้อยละ 3 ของประชากรตามเกณฑ์ WHO</li>
+        </ul>
+      </div>
+    </div>
+    
+    <!-- Actionable Recommendations Box -->
+    <div class="recommendations-box">
+      <h5>💡 ข้อเสนอแนะเชิงยุทธศาสตร์เพื่อการพัฒนาประสิทธิภาพเชิงรุก (Strategic Recommendations)</h5>
+      <ol>
+        <li><strong>การเปลี่ยนผู้บริจาครายครั้งเป็นผู้บริจาคประจำ (Retention Campaign):</strong> นำระบบส่งข้อความแจ้งเตือน SMS หรือ Line Official ประชาสัมพันธ์เมื่อครบกำหนด 3 เดือน (อย่างน้อย 3 ครั้งต่อปี) สอดคล้องกับแนวทางสภากาชาด เพื่อสร้างความถี่ในการบริจาค</li>
+        <li><strong>มาตรการเชิงรุกเพื่อลด Defer Rate (อัตราปฏิเสธ):</strong> จัดทำสื่อให้ความรู้ล่วงหน้าในการเตรียมตัวคัดกรอง เช่น การนอนหลับพักผ่อนมากกว่า 5 ชั่วโมง, การเลี่ยงยาปฏิชีวนะบางประเภท และการบริโภคอาหารเสริมธาตุเหล็ก เพื่อแก้ปัญหาอัตราปฏิเสธที่สูงถึง 24%</li>
+        <li><strong>กระจายการออกหน่วยเคลื่อนที่ในช่วงวิกฤตคลังเลือดขาดแคลน:</strong> วางแผนร่วมกับองค์กรเอกชนหรือนิคมอุตสาหกรรมในพื้นที่ เพื่อออกหน่วยเคลื่อนที่ทดแทนในช่วงปิดภาคเรียนของสถาบันอุดมศึกษา และเตรียมพร้อมคลังเลือดรองรับอุบัติเหตุช่วงวันหยุดยาว</li>
+      </ol>
+    </div>
+  </div>
+
+</main>
+
+<!-- ===== FOOTER ===== -->
+<footer class="footer">
+  <div>ห้องรับบริจาคเลือด Blood Collection · สถิติปีปฏิทิน 2565 - 2569 · อ้างอิงสถิติมหาวิทยาลัยมหิดล</div>
+  <div id="monthSelectorFootnote">Dashboard สร้างจาก: สถิติ 69.xlsx · อัปเดตล่าสุด: มิถุนายน 2569</div>
+</footer>
+
+<script>
+// =====================================================
+//  DATA DEFINITIONS (CY 2564 - 2569)
+// =====================================================
+const BC64 = {
+  visitOnsite:      [5214,5008,4246,3577,3860,4102,3733,3517,4497,4108,4264,4859],
+  visitMobile:      [444,1800,1442,406,904,640,687,490,640,1137,1317,2054],
+  visitTotal:       [5658,6808,5688,3983,4764,4742,4420,4007,5137,5245,5581,6913],
+  deferOnsite:      [1242,1178,854,893,845,871,763,806,927,789,953,1031],
+  deferMobile:      [108,614,396,93,213,133,201,175,216,277,321,818],
+  deferTotal:       [1373.8204833141542,1815.5223642172523,1270.1130475741875,1010.9650545149567,1079.8911917098444,1025.2335446123843,984.4393249397267,1003.9172590275804,1163.6137424949966,1085.2064264849075,1296.3499061913697,1870.2183576867669],
+  donationOnsite:   [3972,3830,3392,2684,3015,3231,2970,2711,3570,3319,3311,3828],
+  donationMobile:   [336,1186,1046,313,691,507,486,315,424,860,996,1236],
+  donationTotal:    [4308,5016,4438,2997,3706,3738,3456,3026,3994,4179,4307,5064],
+  newOnsite:        [1259,1251,776,752,1028,901,1050,822,988,837,868,923],
+  newMobile:        [170,846,411,102,346,194,353,85,318,452,252,800],
+  newTotal:         [1429,2097,1187,854,1374,1095,1403,907,1306,1289,1120,1723],
+  oldOnsite:        [2713,2579,2616,1932,1987,2330,1920,1889,2582,2482,2443,2905],
+  oldMobile:        [166,340,635,211,345,313,133,230,106,408,744,436],
+  oldTotal:         [2879,2919,3251,2143,2332,2643,2053,2119,2688,2890,3187,3341],
+  replaceOnsite:    [518,199,311,315,397,425,413,292,374,243,337,384],
+  replaceMobile:    [0,0,0,0,0,0,0,0,0,0,0,0],
+  replaceTotal:     [null,null,null,null,null,null,null,null,null,null,null,null],
+  directOnsite:     [null,null,null,null,null,null,null,null,null,null,null,null],
+  autologous:       [0,0,3,2,0,0,2,0,1,2,2,2],
+  voluntary:        [3790,4816,4123,2675,3309,3313,3041,2734,3617,3934,3968,4678],
+  voluntaryExclMobile: [null,null,null,null,null,null,null,null,null,null,null,null],
+  bloodLetting:     [8,6,15,17,8,5,8,7,7,12,10,10],
+  reactionOnsite:   [71,64,52,45,45,58,38,36,56,62,56,68],
+  reactionMobile:   [21,56,29,16,35,21,15,14,26,37,65,88],
+  reactionTotal:    [92,120,81,61,80,79,53,50,82,99,121,156],
+  oldMaleOnsite:    [1444,1405,1396,1087,1136,1252,1087,1081,1401,1382,1345,1514],
+  oldFemaleOnsite:  [1269,1174,1220,845,851,1078,833,808,1181,1100,1098,1391],
+  oldMaleMobile:    [736,214,396,123,228,170,89,134,80,251,487,261],
+  oldFemaleMobile:  [523,126,239,88,117,143,44,96,26,157,381,175],
+  newMaleOnsite:    [736,844,473,512,702,552,604,489,567,454,440,501],
+  newFemaleOnsite:  [523,407,303,240,326,349,446,333,421,383,304,422],
+  newMaleMobile:    [137,768,310,44,288,104,302,63,290,334,151,520],
+  newFemaleMobile:  [33,78,101,58,58,90,51,22,28,118,101,280],
+  drivesConducted:  [null,null,null,null,null,null,null,null,null,null,null,null],
+  drivesMeetingTarget:[null,null,null,null,null,null,null,null,null,null,null,null],
+  facultyDonors:    [null,null,null,null,null,null,null,null,null,null,null,null],
+  externalDonors:   [null,null,null,null,null,null,null,null,null,null,null,null]
+};
+
+const BC65 = {
+  visitOnsite:      [3881,3918,4146,3898,5061,4006,4446,4149,3876,3914,4065,4087],
+  visitMobile:      [740,1680,1036,769,1542,1786,1333,2162,1558,1760,1619,1566],
+  visitTotal:       [4621,5598,5182,4667,6603,5792,5779,6311,5434,5674,5684,5653],
+  deferOnsite:      [846,854,850,823,1033,762,903,890,795,745,868,828],
+  deferMobile:      [260,526,265,260,396,564,470,724,471,577,572,486],
+  deferTotal:       [1127.7985055398094,1401.7968351199593,1135.5016883743367,1104.1133914828117,1449.4109859711521,1345.0214677983026,1393.310391363023,1635.4509520366355,1286.5108359133128,1341.0342360756258,1461.3530135301353,1334.2593589429898],
+  donationOnsite:   [3035,3064,3296,3075,4028,3244,3543,3259,3081,3169,3197,3259],
+  donationMobile:   [480,1154,771,509,1146,1222,863,1438,1087,1183,1047,1080],
+  donationTotal:    [3515,4218,4067,3584,5174,4466,4406,4697,4168,4352,4244,4339],
+  newOnsite:        [774,868,1020,770,1205,850,922,1123,701,547,829,545],
+  newMobile:        [223,477,289,287,677,500,458,891,387,605,465,597],
+  newTotal:         [997,1345,1309,1057,1882,1350,1380,2014,1088,1152,1294,1142],
+  oldOnsite:        [2261,2196,2276,2305,2823,2394,2621,2136,2380,2622,2368,2714],
+  oldMobile:        [257,677,482,222,469,722,405,547,700,578,582,483],
+  oldTotal:         [2518,2873,2758,2527,3292,3116,3026,2683,3080,3200,2950,3197],
+  replaceOnsite:    [355,558,649,444,442,347,344,675,422,254,541,264],
+  replaceMobile:    [0,0,0,0,0,0,0,0,0,0,0,30],
+  replaceTotal:     [null,null,null,null,null,null,null,null,null,null,null,null],
+  directOnsite:     [null,null,null,null,null,null,null,null,null,null,null,null],
+  autologous:       [0,3,3,5,1,0,2,4,3,4,3,3],
+  voluntary:        [3160,3657,3415,3135,4728,4118,4058,4018,3743,4094,3700,4072],
+  voluntaryExclMobile: [null,null,null,null,null,null,null,null,null,null,null,null],
+  bloodLetting:     [10,15,6,6,5,2,5,10,13,6,10,14],
+  reactionOnsite:   [66,45,54,56,103,62,59,43,49,32,47,29],
+  reactionMobile:   [27,79,32,39,80,73,34,88,52,92,69,66],
+  reactionTotal:    [93,124,86,95,183,135,93,131,101,124,116,95],
+  oldMaleOnsite:    [1306,1263,1247,1266,1542,1304,1456,1229,1347,1441,1324,1519],
+  oldFemaleOnsite:  [955,933,1029,1039,1281,1090,1165,907,1033,1181,1044,1195],
+  oldMaleMobile:    [134,432,305,438,256,458,506,762,437,298,313,285],
+  oldFemaleMobile:  [123,245,177,332,213,264,416,361,263,249,269,198],
+  newMaleOnsite:    [400,524,633,127,729,500,234,266,375,304,470,311],
+  newFemaleOnsite:  [374,344,387,95,476,350,171,281,326,274,359,234],
+  newMaleMobile:    [170,299,203,207,481,308,347,633,196,314,250,401],
+  newFemaleMobile:  [53,178,86,80,196,192,111,258,191,291,215,196],
+  drivesConducted:  [11,13,15,10,17,21,15,22,20,18,18,17],
+  drivesMeetingTarget:[159,138,308,250,379,242,264,288,263,256,270,196],
+  facultyDonors:    [null,null,null,null,null,null,null,null,null,null,null,null],
+  externalDonors:   [null,null,null,null,null,null,null,null,null,null,null,null]
+};
+
+const BC66 = {
+  visitOnsite:      [3669,3320,3795,3645,3642,3868,3756,3767,3752,3578,3287,4489],
+  visitMobile:      [1731,2005,1955,1278,1670,1576,2312,1894,1825,2039,2554,1391],
+  visitTotal:       [5400,5325,5750,4923,5312,5444,6068,5661,5577,5617,5841,5880],
+  deferOnsite:      [766,713,836,823,744,860,765,734,682,737,695,919],
+  deferMobile:      [544,618,705,475,653,392,715,557,630,615,797,438],
+  deferTotal:       [1310,1331,1541,1298,1397,1252,1480,1291,1312,1352,1492,1357],
+  donationOnsite:   [2903,2607,2959,2822,2898,3008,2991,3033,3070,2841,2592,3570],
+  donationMobile:   [1187,1387,1250,803,1017,1184,1597,1337,1195,1424,1757,953],
+  donationTotal:    [4090,3994,4209,3625,3915,4192,4588,4370,4265,4265,4349,4523],
+  newOnsite:        [522,543,603,541,595,658,577,629,667,568,528,739],
+  newMobile:        [379,522,436,223,395,431,869,548,528,609,751,382],
+  newTotal:         [901,1065,1039,764,990,1089,1446,1177,1195,1177,1279,1121],
+  oldOnsite:        [2381,2064,2356,2281,2303,2350,2414,2404,2403,2273,2064,2831],
+  oldMobile:        [808,865,814,580,622,753,728,789,667,815,1006,571],
+  oldTotal:         [3189,2929,3170,2861,2925,3103,3142,3193,3070,3088,3070,3402],
+  replaceOnsite:    [177,274,286,346,379,284,289,338,425,290,276,430],
+  replaceMobile:    [11,0,0,0,0,0,0,0,0,0,0,0],
+  replaceTotal:     [188,274,286,346,379,284,289,338,425,290,276,430],
+  directOnsite:     [null,null,null,null,null,null,null,null,null,null,null,null],
+  autologous:       [0,0,3,1,0,0,2,1,4,3,2,3],
+  voluntary:        [3902,3720,3920,3275,3535,3907,4294,4031,3836,3971,4070,4089],
+  voluntaryExclMobile: [null,null,null,null,null,null,null,null,null,null,null,null],
+  bloodLetting:     [7,16,12,7,7,14,7,10,3,10,10,15],
+  reactionOnsite:   [57,45,49,40,49,62,32,30,31,54,38,39],
+  reactionMobile:   [46,77,66,25,57,67,91,75,82,77,112,51],
+  reactionTotal:    [103,122,115,65,106,129,123,105,113,131,150,90],
+  oldMaleOnsite:    [1335,1168,1421,1328,1300,1301,1407,1405,1309,1321,1162,1570],
+  oldFemaleOnsite:  [1046,896,935,953,1003,1049,1007,999,1094,952,902,1261],
+  oldMaleMobile:    [502,467,513,345,352,496,318,436,368,466,538,308],
+  oldFemaleMobile:  [306,398,301,235,270,257,259,353,299,349,468,263],
+  newMaleOnsite:    [269,292,312,290,329,370,397,366,368,366,290,441],
+  newFemaleOnsite:  [253,251,291,251,266,288,331,263,299,202,238,298],
+  newMaleMobile:    [202,250,222,127,234,297,471,380,234,347,466,298],
+  newFemaleMobile:  [177,272,214,96,161,134,398,168,294,262,285,84],
+  drivesConducted:  [20,20,22,15,18,20,21,20,21,20,24,18],
+  drivesMeetingTarget:[156,185,169,165,215,248,198,210,208,254,186,264],
+  facultyDonors:    [null,null,null,null,null,null,null,null,null,null,null,null],
+  externalDonors:   [null,null,null,null,null,null,null,null,null,null,null,null]
+};
+
+const BC67 = {
+  visitOnsite:      [3560,3357,3486,3543,4043,3831,3506,3544,3363,3368,3096,3813],
+  visitMobile:      [1547,2504,1699,1406,1670,1831,2224,1954,2378,1747,1994,1238],
+  visitTotal:       [5107,5861,5185,4949,5713,5662,5730,5498,5741,5115,5090,5051],
+  deferOnsite:      [747,691,709,720,845,835,815,841,688,817,713,813],
+  deferMobile:      [500,930,509,336,482,504,647,655,772,503,581,307],
+  deferTotal:       [1247,1621,1218,1056,1327,1339,1462,1496,1460,1320,1294,1120],
+  donationOnsite:   [2813,2666,2777,2823,3198,2996,2691,2703,2675,2551,2383,3000],
+  donationMobile:   [1047,1574,1190,1070,1188,1327,1577,1298,1606,1244,1413,931],
+  donationTotal:    [3860,4240,3967,3893,4386,4323,4268,4001,4281,3795,3796,3931],
+  newOnsite:        [444,421,469,502,745,654,434,496,429,407,442,418],
+  newMobile:        [318,782,364,325,326,413,674,544,638,458,522,192],
+  newTotal:         [762,1203,833,827,1071,1067,1108,1040,1067,865,964,610],
+  oldOnsite:        [2369,2245,2308,2321,2453,2342,2257,2207,2246,2144,1941,2582],
+  oldMobile:        [729,792,826,745,862,914,903,754,968,786,891,739],
+  oldTotal:         [3098,3037,3134,3066,3315,3256,3160,2961,3214,2930,2832,3321],
+  replaceOnsite:    [212,174,256,269,462,361,217,275,234,184,232,111],
+  replaceMobile:    [0,0,0,0,12,0,0,0,0,0,0,0],
+  replaceTotal:     [212,174,256,269,474,361,217,275,234,184,232,111],
+  directOnsite:     [null,null,null,null,null,null,null,null,null,null,null,null],
+  autologous:       [0,2,2,3,2,2,0,1,2,1,2,0],
+  voluntary:        [3648,4064,3709,3621,3921,3960,4051,3725,4045,3610,3562,3817],
+  voluntaryExclMobile: [null,null,null,null,null,null,null,null,null,null,null,null],
+  bloodLetting:     [16,10,17,6,7,6,3,8,9,10,8,7],
+  reactionOnsite:   [42,20,29,29,41,43,27,32,28,37,36,21],
+  reactionMobile:   [55,67,55,39,47,63,75,71,87,68,59,30],
+  reactionTotal:    [97,87,84,68,88,106,102,103,115,105,95,51],
+  oldMaleOnsite:    [1326,1265,1306,1264,1398,1295,1325,1277,1313,1249,1131,1425],
+  oldFemaleOnsite:  [1043,980,1002,1057,1055,1047,932,930,933,895,810,1157],
+  oldMaleMobile:    [439,440,418,270,442,504,476,418,510,452,452,407],
+  oldFemaleMobile:  [290,352,408,232,420,410,427,337,458,334,439,332],
+  newMaleOnsite:    [241,211,274,270,393,340,218,296,221,218,245,216],
+  newFemaleOnsite:  [203,210,195,232,352,314,216,200,208,189,197,202],
+  newMaleMobile:    [161,535,177,134,187,226,434,275,272,269,351,81],
+  newFemaleMobile:  [157,247,187,191,139,187,240,269,366,189,171,111],
+  drivesConducted:  [21,21,21,17,23,19,21,23,23,22,24,24],
+  drivesMeetingTarget:[134,228,164,202,241,213,193,169,201,210,147,298],
+  facultyDonors:    [null,null,null,null,null,256,207,212,214,230,154,288],
+  externalDonors:   [null,null,null,null,null,null,null,null,null,null,null,null]
+};
+
+const BC68 = {
+  visitOnsite:      [3503,4068,3216,3721,3171,3688,3943,3350,2917,3006,3246,3729],
+  visitMobile:      [1443,1512,2994,1182,1444,1928,1743,1801,1898,1626,1791,2071],
+  visitTotal:       [4946,5580,6210,4903,4615,5616,5686,5151,4815,4632,5037,5800],
+  deferOnsite:      [727,1006,792,806,610,783,724,686,523,652,670,611],
+  deferMobile:      [416,525,1125,439,431,611,518,635,666,500,566,655],
+  deferTotal:       [1143,1531,1917,1245,1041,1394,1242,1321,1189,1152,1236,1266],
+  donationOnsite:   [2776,3092,2424,2915,2561,2905,3219,2664,2394,2354,2576,3118],
+  donationMobile:   [1027,987,1869,743,1013,1317,1225,1166,1232,1126,1225,1416],
+  donationTotal:    [3803,4079,4293,3658,3574,4222,4444,3830,3626,3480,3801,4534],
+  newOnsite:        [550,746,415,426,384,567,575,374,351,344,501,425],
+  newMobile:        [318,252,808,183,261,491,420,356,398,312,372,553],
+  newTotal:         [868,998,1223,609,645,1058,995,730,749,656,873,978],
+  oldOnsite:        [2226,2346,2009,2489,2177,2338,2644,2290,2043,2010,2075,2693],
+  oldMobile:        [709,735,1061,560,752,826,805,810,834,814,853,863],
+  oldTotal:         [2935,3081,3070,3049,2929,3164,3449,3100,2877,2824,2928,3556],
+  replaceOnsite:    [306,280,225,129,136,271,143,110,206,140,283,192],
+  replaceMobile:    [0,0,0,0,0,0,0,0,0,0,0,0],
+  replaceTotal:     [306,280,225,129,136,271,143,110,206,140,283,283],
+  directOnsite:     [null,null,null,null,null,null,null,null,null,null,null,null],
+  autologous:       [1,3,3,1,0,3,2,2,6,0,0,0],
+  voluntary:        [3496,3796,4065,3526,3437,3948,4298,3718,3414,3340,3518,4341],
+  voluntaryExclMobile: [null,null,null,null,null,null,null,null,null,null,null,null],
+  bloodLetting:     [12,9,15,9,9,7,15,5,9,8,10,12],
+  reactionOnsite:   [17,39,25,32,27,54,32,27,14,19,28,30],
+  reactionMobile:   [44,28,83,22,43,39,45,45,36,40,40,60],
+  reactionTotal:    [61,61,108,34.960969044414533,70,93,77,72,50,59,68,90],
+  oldMaleOnsite:    [1233,1273,1140,1400,1250,1325,1460,1300,1165,1155,1181,1476],
+  oldFemaleOnsite:  [993,1073,869,1089,927,1013,1184,990,878,855,894,1217],
+  oldMaleMobile:    [297,403,624,280,441,467,505,477,505,458,462,494],
+  oldFemaleMobile:  [253,332,437,280,311,359,300,333,329,356,391,369],
+  newMaleOnsite:    [397,349,203,223,209,299,246,204,194,217,307,223],
+  newFemaleOnsite:  [312,397,212,203,175,268,329,170,157,127,194,202],
+  newMaleMobile:    [188,115,449,73,130,358,282,207,240,173,181,385],
+  newFemaleMobile:  [130,137,359,110,131,133,138,149,158,139,191,168],
+  drivesConducted:  [21,21,27,16,23,21,23,21,22,21,20,18],
+  drivesMeetingTarget:[158,281,167,183,158,289,366,192,163,168,165,209],
+  facultyDonors:    [236,289,186,259,156,259,237,190,195,187,174,229],
+  externalDonors:   [0,21,0,14,0,117,0,15,0,23,1,21]
+};
+
+const BC69 = {
+  visitOnsite:      [3000,3271,3569,3699,3230,null,null,null,null,null,null,null],
+  visitMobile:      [1696,2107,1982,1449,1742,null,null,null,null,null,null,null],
+  visitTotal:       [4696,5378,5551,5148,4972,0,0,0,0,0,0,null],
+  deferOnsite:      [515,635,759,767,747,null,null,null,null,null,null,null],
+  deferMobile:      [589,748,581,387,510,null,null,null,null,null,null,null],
+  deferTotal:       [1104,1383,1340,1154,1257,0,0,0,0,0,0,null],
+  donationOnsite:   [2485,2636,2810,2932,2483,null,null,null,null,null,null,null],
+  donationMobile:   [1107,1359,1401,1062,1232,null,null,null,null,null,null,null],
+  donationTotal:    [3592,3995,4211,3994,3715,0,0,0,0,0,0,null],
+  newOnsite:        [346,616,436,447,435,null,null,null,null,null,null,null],
+  newMobile:        [421,624,454,315,453,null,null,null,null,null,null,null],
+  newTotal:         [767,1240,890,762,888,0,0,0,0,0,0,null],
+  oldOnsite:        [2139,2020,2374,2485,2048,null,null,null,null,null,null,null],
+  oldMobile:        [686,735,947,747,779,null,null,null,null,null,null,null],
+  oldTotal:         [2825,2755,3321,3232,2827,0,0,0,0,0,0,null],
+  replaceOnsite:    [123,283,162,174,187,null,null,null,null,null,null,null],
+  replaceMobile:    [0,0,0,0,0,null,null,null,null,null,null,null],
+  replaceTotal:     [123,283,162,174,187,null,null,null,null,null,null,null],
+  directOnsite:     [null,null,null,null,2,null,null,null,null,null,null,null],
+  autologous:       [1,3,6,2,3,null,null,null,null,null,null,null],
+  voluntary:        [3467,3708,4043,3816,3523,null,null,null,null,null,null,null],
+  voluntaryExclMobile: [null,null,null,null,null,null,null,null,null,null,null,null],
+  bloodLetting:     [8,9,11,6,12,null,null,null,null,null,null,null],
+  reactionOnsite:   [33,35,37,33,31,null,null,null,null,null,null,null],
+  reactionMobile:   [53,70,47,37,45,null,null,null,null,null,null,null],
+  reactionTotal:    [86,105,84,70,76,null,null,null,null,null,null,null],
+  oldMaleOnsite:    [1167,1122,1323,1381,1189,null,null,null,null,null,null,null],
+  oldFemaleOnsite:  [972,898,1051,1104,859,null,null,null,null,null,null,null],
+  oldMaleMobile:    [449,354,530,408,387,null,null,null,null,null,null,null],
+  oldFemaleMobile:  [237,381,417,339,392,null,null,null,null,null,null,null],
+  newMaleOnsite:    [169,332,234,240,285,null,null,null,null,null,null,null],
+  newFemaleOnsite:  [177,284,202,207,150,null,null,null,null,null,null,null],
+  newMaleMobile:    [284,325,231,180,192,null,null,null,null,null,null,null],
+  newFemaleMobile:  [137,299,223,135,261,null,null,null,null,null,null,null],
+  drivesConducted:  [null,null,null,null,null,null,null,null,null,null,null,null],
+  drivesMeetingTarget:[170,163,169,258,165,null,null,null,null,null,null,null],
+  facultyDonors:    [196,207,327,353,210,null,null,null,null,null,null,null],
+  externalDonors:   [0,3,0,29,24,null,null,null,null,null,null,null]
+};
+
+// =====================================================
+//  STATE & SWITCHING LOGIC
+// =====================================================
+let selectedYear = 2569;
+let selectedMonth = null; // null = all months
+
+const MONTHS_FY = ['ม.ค.','ก.พ.','มี.ค.','เม.ย.','พ.ค.','มิ.ย.','ก.ค.','ส.ค.','ก.ย.','ต.ค.','พ.ย.','ธ.ค.'];
+const MONTHS_FULL_FY = [
+  'มกราคม','กุมภาพันธ์','มีนาคม',
+  'เมษายน','พฤษภาคม','มิถุนายน',
+  'กรกฎาคม','สิงหาคม','กันยายน',
+  'ตุลาคม','พฤศจิกายน','ธันวาคม'
+];
+
+const getYearData = (year) => {
+  if (year === 2569) return BC69;
+  if (year === 2568) return BC68;
+  if (year === 2567) return BC67;
+  if (year === 2566) return BC66;
+  if (year === 2565) return BC65;
+  if (year === 2564) return BC64;
+  return null;
+};
+
+const currentData = () => getYearData(selectedYear);
+const prevData = () => getYearData(selectedYear - 1);
+
+function getAvailableIdx(year) {
+  if (year === 2569) return [0, 1, 2, 3, 4]; // ม.ค. - พ.ค. 2569 (5 เดือน)
+  return [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11]; // ม.ค. - ธ.ค.
+}
+
+const getAvailableIdxs = () => getAvailableIdx(selectedYear);
+const hasData = i => getAvailableIdxs().includes(i);
+
+// =====================================================
+//  HELPERS
+// =====================================================
+const sum = (arr, idxs) => {
+  if (!arr) return 0;
+  if (!idxs) idxs = getAvailableIdxs();
+  return idxs.reduce((acc, i) => acc + (arr[i] || 0), 0);
+};
+
+const sumOf = (key, idxs) => sum(currentData()[key], idxs);
+
+const fmt = (v, dec = 0) => {
+  if (v == null || isNaN(v)) return '–';
+  return Number(v).toLocaleString('th-TH', {minimumFractionDigits: dec, maximumFractionDigits: dec});
+};
+
+const pct = (a, b) => b ? Math.round((a / b) * 100) : 0;
+const pctDec = (a, b) => b ? ((a / b) * 100) : 0;
+
+const delta = (a, b) => {
+  if (b == null || b === 0 || a == null) return null;
+  return Math.round(((a - b) / b) * 100);
+};
+
+// =====================================================
+//  TABS & NAVIGATION
+// =====================================================
+const YEARS = [2569, 2568, 2567, 2566];
+
+function buildYearTabs() {
+  const container = document.getElementById('yearTabs');
+  container.innerHTML = '';
+  YEARS.forEach(y => {
+    const active = selectedYear === y;
+    const tab = document.createElement('div');
+    tab.className = 'month-tab' + (active ? ' active' : '');
+    let info = y === 2569 ? 'ม.ค. - พ.ค. (5 เดือน)' : 'ม.ค. - ธ.ค. (12 เดือน)';
+    tab.innerHTML = `
+      <div class="month-tab-abbr">ปี ${y}</div>
+      <div class="month-tab-num">${info}</div>
+      <div class="month-tab-dot"></div>
+    `;
+    tab.addEventListener('click', () => {
+      if (selectedYear === y) return;
+      selectedYear = y;
+      if (selectedMonth !== null && !getAvailableIdxs().includes(selectedMonth)) {
+        selectedMonth = null;
+      }
+      refresh();
+      buildCharts();
+    });
+    container.appendChild(tab);
+  });
+
+  document.getElementById('selectedYearTag').textContent = `ปีปฏิทิน ${selectedYear}`;
+  document.getElementById('headerYearPill').innerHTML = `📅 ปี ${selectedYear}`;
+  
+  const totalMonthsStr = selectedYear === 2569 ? 'ม.ค.–พ.ค.' : 'ม.ค.–ธ.ค.';
+  document.getElementById('headerMonthsPill').innerHTML = `<span class="live-dot"></span> ข้อมูล ${totalMonthsStr} ${selectedYear}`;
+  document.getElementById('headerFilePill').textContent = `📄 สถิติ ${selectedYear - 2500}.xlsx`;
+  
+  document.getElementById('monthSelectorFootnote').innerHTML = `
+    ปีปฏิทิน ${selectedYear} (${totalMonthsStr} ${selectedYear}) · แหล่งข้อมูล: สถิติ ${selectedYear - 2500}.xlsx (Tab: Blood Collection)
+  `;
+}
+
+function buildMonthTabs() {
+  const container = document.getElementById('monthTabs');
+  container.innerHTML = '';
+  MONTHS_FY.forEach((m, i) => {
+    const tab = document.createElement('div');
+    const isAvail = hasData(i);
+    tab.className = 'month-tab' +
+      (isAvail ? ' has-data' : ' disabled') +
+      (selectedMonth === i ? ' active' : '');
+    tab.innerHTML = `
+      <div class="month-tab-abbr">${m}</div>
+      <div class="month-tab-num">${selectedYear}</div>
+      <div class="month-tab-dot"></div>
+    `;
+    tab.addEventListener('click', () => {
+      if (!isAvail) return;
+      if (selectedMonth === i) {
+        selectedMonth = null;
+      } else {
+        selectedMonth = i;
+      }
+      refresh();
+    });
+    container.appendChild(tab);
+  });
+
+  const tag = document.getElementById('selectedMonthTag');
+  if (selectedMonth === null) {
+    const totalMonthsStr = selectedYear === 2569 ? 'ม.ค.–พ.ค.' : 'ม.ค.–ธ.ค.';
+    tag.textContent = `รวมทุกเดือน (${totalMonthsStr} ${selectedYear})`;
+  } else {
+    tag.textContent = `${MONTHS_FULL_FY[selectedMonth]} ${selectedYear}`;
+  }
+}
+
+function selectAll() {
+  selectedMonth = null;
+  refresh();
+}
+
+function getCurrentIdxs() {
+  return selectedMonth !== null ? [selectedMonth] : getAvailableIdxs();
+}
+
+// =====================================================
+//  MONTH DETAIL PANEL
+// =====================================================
+function renderMonthPanel() {
+  const panel = document.getElementById('monthDetailPanel');
+  const idxs = getCurrentIdxs();
+
+  if (selectedMonth === null) {
+    const visits = sumOf('visitTotal', idxs);
+    const donation = sumOf('donationTotal', idxs);
+    const defVal = sumOf('deferTotal', idxs);
+    const reactVal = sumOf('reactionTotal', idxs);
+    
+    const defRate = visits ? (defVal / visits * 100) : 0;
+    const reactRate = donation ? (reactVal / donation * 100) : 0;
+
+    const totalMonthsStr = selectedYear === 2569 ? 'ม.ค.–พ.ค.' : 'ม.ค.–ธ.ค.';
+    const quartersStr = selectedYear === 2569 ? 'ไตรมาส 1 - 2 (ม.ค.–พ.ค.)' : 'ทั้งปี';
+    const monthsCount = selectedYear === 2569 ? '5 เดือน' : '12 เดือน';
+    
+    panel.innerHTML = `
+      <div class="mdp-month-badge" style="background: linear-gradient(135deg, var(--red) 0%, var(--pink) 100%); width:120px;">
+        <div class="mdp-month-name" style="font-size:15px; color:#fff;">${totalMonthsStr}</div>
+        <div class="mdp-month-year" style="color:#fff; opacity:0.9;">${selectedYear} · ${quartersStr}</div>
+        <div style="font-size:10px; color:#fff; opacity:.7; margin-top:4px;">${monthsCount}</div>
+      </div>
+      <div class="mdp-divider"></div>
+      <div class="mdp-stats">
+        <div class="mdp-stat">
+          <div class="mdp-stat-val" style="color:var(--text-1);">${fmt(visits)}</div>
+          <div class="mdp-stat-lbl">Donor Visit (ราย)</div>
+        </div>
+        <div class="mdp-stat">
+          <div class="mdp-stat-val" style="color:var(--red);">${fmt(donation)}</div>
+          <div class="mdp-stat-lbl">Donation (ยูนิท)</div>
+        </div>
+        <div class="mdp-stat">
+          <div class="mdp-stat-val" style="color:var(--amber);">${defRate.toFixed(1)}%</div>
+          <div class="mdp-stat-lbl">อัตรา Defer Rate</div>
+        </div>
+        <div class="mdp-stat">
+          <div class="mdp-stat-val" style="color:var(--purple);">${reactRate.toFixed(2)}%</div>
+          <div class="mdp-stat-lbl">อัตรา Reaction Rate</div>
+        </div>
+        <div class="mdp-stat">
+          <div class="mdp-stat-val" style="color:var(--teal);">${pct(donation, visits)}%</div>
+          <div class="mdp-stat-lbl">Donation Success</div>
+        </div>
+      </div>
+    `;
+  } else {
+    const i = selectedMonth;
+    const donCurr = currentData().donationTotal[i];
+    const donPrev = prevData() ? prevData().donationTotal[i] : null;
+    const d = delta(donCurr, donPrev);
+    const compText = donPrev !== null 
+      ? `<div class="kpi-badge ${d >= 0 ? 'up' : 'down'}" style="margin-top:4px; font-size:9px;">${d >= 0 ? '↑' : '↓'} ${Math.abs(d)}% vs ปี ${selectedYear - 1}</div>` 
+      : '';
+
+    const visits = currentData().visitTotal[i];
+    const donation = currentData().donationTotal[i];
+    const defVal = currentData().deferTotal[i];
+    const reactVal = currentData().reactionTotal[i];
+
+    const defRate = visits ? (defVal / visits * 100) : 0;
+    const reactRate = donation ? (reactVal / donation * 100) : 0;
+
+    panel.innerHTML = `
+      <div class="mdp-month-badge">
+        <div class="mdp-month-name">${MONTHS_FY[i]}</div>
+        <div class="mdp-month-year">${selectedYear}</div>
+      </div>
+      <div class="mdp-divider"></div>
+      <div class="mdp-stats">
+        <div class="mdp-stat">
+          <div class="mdp-stat-val" style="color:var(--text-1);">${fmt(visits)}</div>
+          <div class="mdp-stat-lbl">Donor Visit (ราย)</div>
+        </div>
+        <div class="mdp-stat">
+          <div class="mdp-stat-val" style="color:var(--red);">${fmt(donation)}</div>
+          <div class="mdp-stat-lbl">Donation (ยูนิท)</div>
+          ${compText}
+        </div>
+        <div class="mdp-stat">
+          <div class="mdp-stat-val" style="color:var(--amber);">${defRate.toFixed(1)}%</div>
+          <div class="mdp-stat-lbl">อัตรา Defer Rate</div>
+        </div>
+        <div class="mdp-stat">
+          <div class="mdp-stat-val" style="color:var(--purple);">${reactRate.toFixed(2)}%</div>
+          <div class="mdp-stat-lbl">อัตรา Reaction Rate</div>
+        </div>
+        <div class="mdp-stat">
+          <div class="mdp-stat-val" style="color:var(--teal);">${pct(donation, visits)}%</div>
+          <div class="mdp-stat-lbl">Donation Success</div>
+        </div>
+      </div>
+    `;
+  }
+}
+
+// =====================================================
+//  KPI GRID
+// =====================================================
+function d2badge(d, prevYear) {
+  if (d === null || isNaN(d)) return '';
+  if (d > 0) return `<span class="kpi-badge up">↑ ${d}% vs ปี ${prevYear}</span>`;
+  if (d < 0) return `<span class="kpi-badge down">↓ ${Math.abs(d)}% vs ปี ${prevYear}</span>`;
+  return `<span class="kpi-badge same">→ เท่ากัน</span>`;
+}
+
+function renderKPI() {
+  const idxs = getCurrentIdxs();
+  const note = document.getElementById('kpiPeriodNote');
+  note.textContent = selectedMonth !== null
+    ? `ข้อมูลเดือน ${MONTHS_FULL_FY[selectedMonth]} ${selectedYear}`
+    : `รวม ${idxs.length} เดือน (${idxs.map(i=>MONTHS_FY[i]).join(', ')})`;
+
+  const visits = sumOf('visitTotal', idxs);
+  const vOnsite = sumOf('visitOnsite', idxs);
+  const vMobile = sumOf('visitMobile', idxs);
+
+  const donation = sumOf('donationTotal', idxs);
+  const dOnsite = sumOf('donationOnsite', idxs);
+  const dMobile = sumOf('donationMobile', idxs);
+
+  const defer = sumOf('deferTotal', idxs);
+  const defOnsite = sumOf('deferOnsite', idxs);
+  const defMobile = sumOf('deferMobile', idxs);
+
+  const reaction = sumOf('reactionTotal', idxs);
+  const rOnsite = sumOf('reactionOnsite', idxs);
+  const rMobile = sumOf('reactionMobile', idxs);
+
+  const onlineAppts = sumOf('drivesMeetingTarget', idxs);
+  const facultyStaff = sumOf('facultyDonors', idxs);
+
+  const newDonors = sumOf('newTotal', idxs);
+  const newOnsite = sumOf('newOnsite', idxs);
+  const newMobile = sumOf('newMobile', idxs);
+
+  const oldDonors = sumOf('oldTotal', idxs);
+  const oldOnsite = sumOf('oldOnsite', idxs);
+  const oldMobile = sumOf('oldMobile', idxs);
+
+  // Compare with same period in previous year
+  const pData = prevData();
+  const visitsPrev = pData ? sum(pData.visitTotal, idxs) : null;
+  const donPrev = pData ? sum(pData.donationTotal, idxs) : null;
+  const defPrev = pData ? sum(pData.deferTotal, idxs) : null;
+  const reactPrev = pData ? sum(pData.reactionTotal, idxs) : null;
+  const onlinePrev = pData ? sum(pData.drivesMeetingTarget, idxs) : null;
+  const facultyPrev = pData ? sum(pData.facultyDonors, idxs) : null;
+  const newPrev = pData ? sum(pData.newTotal, idxs) : null;
+  const oldPrev = pData ? sum(pData.oldTotal, idxs) : null;
+
+  const kpis = [
+    {
+      icon: '👥', label: 'Donor Visit', val: fmt(visits), sub: 'จำนวนคัดกรองรวมทั้งหมด', color: 'var(--blue)', bg: 'var(--blue-lt)',
+      badge: d2badge(delta(visits, visitsPrev), selectedYear - 1),
+      split1Label: 'On-site', split1Val: `${fmt(vOnsite)} <small>(${pct(vOnsite, visits)}%)</small>`,
+      split2Label: 'Mobile', split2Val: `${fmt(vMobile)} <small>(${pct(vMobile, visits)}%)</small>`
+    },
+    {
+      icon: '💉', label: 'Donation', val: fmt(donation), sub: 'จำนวนโลหิตบริจาครวม', color: 'var(--red)', bg: 'var(--red-lt)',
+      badge: d2badge(delta(donation, donPrev), selectedYear - 1),
+      split1Label: 'On-site', split1Val: `${fmt(dOnsite)} <small>(${pct(dOnsite, donation)}%)</small>`,
+      split2Label: 'Mobile', split2Val: `${fmt(dMobile)} <small>(${pct(dMobile, donation)}%)</small>`
+    },
+    {
+      icon: '🛑', label: 'Defer (ผู้ถูกปฏิเสธ/เลื่อนบริจาค)', val: fmt(defer), sub: `คิดเป็น ${visits ? (defer / visits * 100).toFixed(1) : 0}% ของคัดกรองรวม`, color: 'var(--amber)', bg: 'var(--amber-lt)',
+      badge: d2badge(delta(defer, defPrev), selectedYear - 1),
+      split1Label: 'On-site Defer', split1Val: `${fmt(defOnsite)} <small>(${vOnsite ? (defOnsite / vOnsite * 100).toFixed(1) : 0}%)</small>`,
+      split2Label: 'Mobile Defer', split2Val: `${fmt(defMobile)} <small>(${vMobile ? (defMobile / vMobile * 100).toFixed(1) : 0}%)</small>`
+    },
+    {
+      icon: '🆕', label: 'ผู้บริจาคใหม่ (New Donors)', val: fmt(newDonors), sub: `คิดเป็น ${donation ? (newDonors / donation * 100).toFixed(1) : 0}% ของผู้บริจาครวม`, color: 'var(--teal)', bg: 'var(--teal-lt)',
+      badge: d2badge(delta(newDonors, newPrev), selectedYear - 1),
+      split1Label: 'On-site', split1Val: `${fmt(newOnsite)} <small>(${pct(newOnsite, newDonors)}%)</small>`,
+      split2Label: 'Mobile', split2Val: `${fmt(newMobile)} <small>(${pct(newMobile, newDonors)}%)</small>`
+    },
+    {
+      icon: '🔄', label: 'ผู้บริจาคเก่า (Returning Donors)', val: fmt(oldDonors), sub: `คิดเป็น ${donation ? (oldDonors / donation * 100).toFixed(1) : 0}% ของผู้บริจาครวม`, color: 'var(--blue)', bg: 'var(--blue-lt)',
+      badge: d2badge(delta(oldDonors, oldPrev), selectedYear - 1),
+      split1Label: 'On-site', split1Val: `${fmt(oldOnsite)} <small>(${pct(oldOnsite, oldDonors)}%)</small>`,
+      split2Label: 'Mobile', split2Val: `${fmt(oldMobile)} <small>(${pct(oldMobile, oldDonors)}%)</small>`
+    },
+    {
+      icon: '⚠️', label: 'Donor Reaction (อาการข้างเคียง)', val: fmt(reaction), sub: `คิดเป็น ${donation ? (reaction / donation * 100).toFixed(2) : 0}% ของจำนวนบริจาค`, color: 'var(--red)', bg: 'var(--red-lt)',
+      badge: d2badge(delta(reaction, reactPrev), selectedYear - 1),
+      split1Label: 'On-site React', split1Val: `<span style="color:#dc2626;font-weight:700;">${fmt(rOnsite)}</span> <small>(${dOnsite ? (rOnsite / dOnsite * 100).toFixed(2) : 0}%)</small>`,
+      split2Label: 'Mobile React', split2Val: `<span style="color:#dc2626;font-weight:700;">${fmt(rMobile)}</span> <small>(${dMobile ? (rMobile / dMobile * 100).toFixed(2) : 0}%)</small>`,
+      valueStyle: 'color: #dc2626;'
+    },
+    {
+      icon: '📱', label: 'Online Registered (จองนัดหมายออนไลน์)', val: fmt(onlineAppts), sub: 'ลงทะเบียนนัดบริจาคล่วงหน้า', color: 'var(--blue)', bg: 'var(--blue-lt)',
+      badge: d2badge(delta(onlineAppts, onlinePrev), selectedYear - 1),
+      split1Label: 'สัดส่วนนัด', split1Val: `${dOnsite ? (onlineAppts / dOnsite * 100).toFixed(1) : 0}% <small>ของ On-site</small>`,
+      split2Label: 'ปีก่อนหน้า', split2Val: `${fmt(onlinePrev)} <small>ราย</small>`
+    },
+    {
+      icon: '🏫', label: 'Faculty Donors (บุคลากรศิริราช)', val: fmt(facultyStaff), sub: 'บุคลากรที่บริจาคโลหิตสะสม', color: 'var(--teal)', bg: 'var(--teal-lt)',
+      badge: d2badge(delta(facultyStaff, facultyPrev), selectedYear - 1),
+      split1Label: 'สัดส่วนคณะ', split1Val: `${donation ? (facultyStaff / donation * 100).toFixed(1) : 0}% <small>ของผู้บริจาครวม</small>`,
+      split2Label: 'ปีก่อนหน้า', split2Val: `${fmt(facultyPrev)} <small>ราย</small>`
+    }
+  ];
+
+  const grid = document.getElementById('kpiGrid');
+  grid.innerHTML = kpis.map(k => `
+    <div class="kpi-card fade-up" style="--kpi-color:${k.color}; --kpi-bg:${k.bg};">
+      <div class="kpi-card-top">
+        <div class="kpi-icon-wrap">${k.icon}</div>
+        ${k.badge||''}
+      </div>
+      <div class="kpi-label">${k.label}</div>
+      <div class="kpi-value" style="${k.valueStyle||''}">${k.val}</div>
+      <div class="kpi-sub">${k.sub}</div>
+      <div class="kpi-split-row">
+        <div class="kpi-split-col">
+          <span class="kpi-split-label">${k.split1Label}</span>
+          <span class="kpi-split-value">${k.split1Val}</span>
+        </div>
+        <div class="kpi-split-col">
+          <span class="kpi-split-label">${k.split2Label}</span>
+          <span class="kpi-split-value">${k.split2Val}</span>
+        </div>
+      </div>
+    </div>
+  `).join('');
+}
+
+// =====================================================
+//  DONOR CATEGORIES SECTION
+// =====================================================
+function renderDonorCategories() {
+  const idxs = getCurrentIdxs();
+  
+  const dOnsite = sumOf('donationOnsite', idxs);
+  const dMobile = sumOf('donationMobile', idxs);
+  
+  const repOnsite = sumOf('replaceOnsite', idxs);
+  const repMobile = sumOf('replaceMobile', idxs);
+  const replace = repOnsite + repMobile;
+
+  const autologous = sumOf('autologous', idxs);
+  const direct = sumOf('directOnsite', idxs);
+  const letting = sumOf('bloodLetting', idxs);
+
+  const volOnsite = Math.max(0, dOnsite - repOnsite - autologous - direct);
+  const volMobile = Math.max(0, dMobile - repMobile);
+  const voluntary = volOnsite + volMobile;
+
+  const categories = [
+    {
+      icon: '❤️', label: 'Voluntary (บริจาคสมัครใจ)', val: fmt(voluntary), sub: 'บริจาคโลหิตโดยสมัครใจ', color: 'var(--red)', bg: 'var(--red-lt)',
+      split1Label: 'On-site', split1Val: `${fmt(volOnsite)} <small>(${voluntary ? pct(volOnsite, voluntary) : 0}%)</small>`,
+      split2Label: 'Mobile', split2Val: `${fmt(volMobile)} <small>(${voluntary ? pct(volMobile, voluntary) : 0}%)</small>`
+    },
+    {
+      icon: '👤', label: 'Autologous (บริจาคเพื่อตนเอง)', val: fmt(autologous), sub: 'เจาะเก็บก่อนผ่าตัดของตนเอง', color: 'var(--purple)', bg: 'var(--purple-lt)',
+      split1Label: 'On-site', split1Val: `${fmt(autologous)} <small>(${autologous ? 100 : 0}%)</small>`,
+      split2Label: 'Mobile', split2Val: `0 <small>(0%)</small>`
+    },
+    {
+      icon: '🤝', label: 'Replacement (บริจาคทดแทน)', val: fmt(replace), sub: 'บริจาคเพื่อทดแทนให้ผู้ป่วย', color: 'var(--teal)', bg: 'var(--teal-lt)',
+      split1Label: 'On-site', split1Val: `${fmt(repOnsite)} <small>(${replace ? pct(repOnsite, replace) : 0}%)</small>`,
+      split2Label: 'Mobile', split2Val: `${fmt(repMobile)} <small>(${replace ? pct(repMobile, replace) : 0}%)</small>`
+    },
+    {
+      icon: '🏷️', label: 'Direct (บริจาคระบุผู้รับ)', val: fmt(direct), sub: 'ระบุชื่อผู้ป่วยรับโลหิตเฉพาะเจาะจง', color: 'var(--blue)', bg: 'var(--blue-lt)',
+      split1Label: 'On-site', split1Val: `${fmt(direct)} <small>(${direct ? 100 : 0}%)</small>`,
+      split2Label: 'Mobile', split2Val: `0 <small>(0%)</small>`
+    },
+    {
+      icon: '🏥', label: 'Blood Letting (เจาะระบายรักษา)', val: fmt(letting), sub: 'เจาะระบายเลือดเพื่อลดความเข้มข้น', color: 'var(--amber)', bg: 'var(--amber-lt)',
+      split1Label: 'On-site', split1Val: `${fmt(letting)} <small>(${letting ? 100 : 0}%)</small>`,
+      split2Label: 'Mobile', split2Val: `0 <small>(0%)</small>`
+    }
+  ];
+
+  const grid = document.getElementById('donorCatGrid');
+  grid.innerHTML = categories.map(c => `
+    <div class="kpi-card fade-up" style="--kpi-color:${c.color}; --kpi-bg:${c.bg};">
+      <div class="kpi-card-top">
+        <div class="kpi-icon-wrap">${c.icon}</div>
+      </div>
+      <div class="kpi-label">${c.label}</div>
+      <div class="kpi-value">${c.val}</div>
+      <div class="kpi-sub">${c.sub}</div>
+      <div class="kpi-split-row">
+        <div class="kpi-split-col">
+          <span class="kpi-split-label">${c.split1Label}</span>
+          <span class="kpi-split-value">${c.split1Val}</span>
+        </div>
+        <div class="kpi-split-col">
+          <span class="kpi-split-label">${c.split2Label}</span>
+          <span class="kpi-split-value">${c.split2Val}</span>
+        </div>
+      </div>
+    </div>
+  `).join('');
+}
+
+// =====================================================
+//  DATA TABLE RENDER
+// =====================================================
+function renderTable() {
+  const idxs = getCurrentIdxs();
+  const activeSet = new Set(selectedMonth !== null ? [selectedMonth] : []);
+  const tableIdxs = getAvailableIdxs();
+
+  const thead = `
+    <thead>
+      <tr>
+        <th class="text-left">ลำดับ</th>
+        <th class="text-left">รายการสถิติ</th>
+        ${tableIdxs.map(i => `<th class="${activeSet.has(i)?'active-month-col':''}"><span style="font-size:13px;font-weight:800;">${MONTHS_FY[i]}</span><br/><span style="font-size:9px;color:inherit;opacity:.7">${selectedYear}</span></th>`).join('')}
+        <th class="col-total">รวมปี ${selectedYear}</th>
+      </tr>
+    </thead>
+  `;
+
+  const totalCell = (key) => {
+    const t = sumOf(key, getAvailableIdxs());
+    return `<td class="col-total">${fmt(t)}</td>`;
+  };
+
+  const totalCellPercent = (numKey, denKey) => {
+    const n = sumOf(numKey, getAvailableIdxs());
+    const d = sumOf(denKey, getAvailableIdxs());
+    return `<td class="col-total">${d ? (n/d*100).toFixed(1)+'%' : '–'}</td>`;
+  };
+
+  const row = (num, name, key, isPercent = false, denKey = null) => {
+    let cells = '';
+    const arr = currentData()[key];
+    
+    tableIdxs.forEach(i => {
+      const activeClass = activeSet.has(i) ? 'active-month-col' : '';
+      let valText = '–';
+      if (arr && arr[i] !== null) {
+        if (isPercent && denKey) {
+          const denArr = currentData()[denKey];
+          valText = denArr && denArr[i] ? (arr[i]/denArr[i]*100).toFixed(1)+'%' : '–';
+        } else {
+          valText = fmt(arr[i]);
+        }
+      }
+      cells += `<td class="${activeClass}">${valText}</td>`;
+    });
+
+    let totalCellText = '';
+    if (isPercent && denKey) {
+      totalCellText = totalCellPercent(key, denKey);
+    } else {
+      totalCellText = totalCell(key);
+    }
+
+    const isTotal = (num === '');
+    const tdWeight = isTotal ? 'font-weight: 700; color: var(--text-1); background-color: var(--bg-alt);' : '';
+
+    return `
+      <tr class="${isTotal ? 'tr-total' : ''}">
+        <td class="text-left" style="${isTotal ? 'font-weight: 700; border-right: 1.5px solid var(--border); background-color: var(--bg-alt);' : ''}">${num}</td>
+        <td class="text-left" style="${isTotal ? 'font-weight: 700; background-color: var(--bg-alt);' : ''}">${name}</td>
+        ${isTotal ? cells.replace(/<td class="/g, `<td style="${tdWeight}" class="`) : cells}
+        ${isTotal ? totalCellText.replace(/<td class="/g, `<td style="${tdWeight}" class="`) : totalCellText}
+      </tr>
+    `;
+  };
+
+  const tbody = `
+    <tbody>
+      <tr class="section-header"><td colspan="${tableIdxs.length + 3}">1. ปริมาณการตรวจคัดกรอง (Screening & Deferrals)</td></tr>
+      ${row('1.1', 'ผู้ตรวจคัดกรอง ณ สถานที่ทำการ (On-site)', 'visitOnsite')}
+      ${row('1.2', 'ผู้ตรวจคัดกรอง ณ หน่วยรับบริจาคเคลื่อนที่ (Mobile)', 'visitMobile')}
+      ${row('', 'ผู้ตรวจคัดกรองรวมทั้งหมด (Total Screened)', 'visitTotal')}
+      ${row('1.3', 'จำนวนเลื่อน/ปฏิเสธ On-site Defer', 'deferOnsite')}
+      ${row('1.4', 'จำนวนเลื่อน/ปฏิเสธ Mobile Defer', 'deferMobile')}
+      ${row('', 'จำนวนเลื่อน/ปฏิเสธ รวม (Total Defer)', 'deferTotal')}
+      ${row('1.5', 'อัตราการ Defer ของผู้เข้าตรวจคัดกรอง (%)', 'deferTotal', true, 'visitTotal')}
+
+      <tr class="section-header"><td colspan="${tableIdxs.length + 3}">2. จำนวนโลหิตที่รับบริจาคได้จริง (Donations - Whole Blood)</td></tr>
+      ${row('2.1', 'จำนวนโลหิตบริจาค ณ สถานที่ทำการ (On-site)', 'donationOnsite')}
+      ${row('2.2', 'จำนวนโลหิตบริจาค ณ หน่วยเคลื่อนที่ (Mobile)', 'donationMobile')}
+      ${row('', 'จำนวนโลหิตบริจาครวมทั้งหมด (Total Donations)', 'donationTotal')}
+      ${row('2.3', 'ผู้บริจาครายใหม่ (New Donors)', 'newTotal')}
+      ${row('2.4', 'ผู้บริจาครายเก่า/ประจำ (Repeat Donors)', 'oldTotal')}
+      ${row('2.5', 'ผู้บริจาคเพื่อทดแทน (Replacement)', 'replaceTotal')}
+      ${row('2.6', 'Autologous Donations (เพื่อตนเอง)', 'autologous')}
+      ${row('2.7', 'ผู้บริจาคโดยสมัครใจ (Voluntary)', 'voluntary')}
+
+      <tr class="section-header"><td colspan="${tableIdxs.length + 3}">3. อาการข้างเคียงจากการบริจาคโลหิต (Adverse Reactions)</td></tr>
+      ${row('3.1', 'ปฏิกิริยาข้างเคียง ณ สถานที่ทำการ (On-site Reaction)', 'reactionOnsite')}
+      ${row('3.2', 'ปฏิกิริยาข้างเคียง ณ หน่วยเคลื่อนที่ (Mobile Reaction)', 'reactionMobile')}
+      ${row('', 'ปฏิกิริยาข้างเคียงสะสมรวมทั้งหมด (Total Reaction)', 'reactionTotal')}
+      ${row('3.3', 'อัตราการเกิดปฏิกิริยาข้างเคียงต่อจำนวนบริจาค (%)', 'reactionTotal', true, 'donationTotal')}
+
+      <tr class="section-header"><td colspan="${tableIdxs.length + 3}">4. สถิติจำแนกประเภทผู้บริจาครายบุคคล (Detailed Donor Profile)</td></tr>
+      ${row('4.1', 'ผู้บริจาคเก่า ชาย ในสถานที่', 'oldMaleOnsite')}
+      ${row('4.2', 'ผู้บริจาคเก่า หญิง ในสถานที่', 'oldFemaleOnsite')}
+      ${row('4.3', 'ผู้บริจาคเก่า ชาย หน่วยเคลื่อนที่', 'oldMaleMobile')}
+      ${row('4.4', 'ผู้บริจาคเก่า หญิง หน่วยเคลื่อนที่', 'oldFemaleMobile')}
+      ${row('4.5', 'ผู้บริจาคใหม่ ชาย ในสถานที่', 'newMaleOnsite')}
+      ${row('4.6', 'ผู้บริจาคใหม่ หญิง ในสถานที่', 'newFemaleOnsite')}
+      ${row('4.7', 'ผู้บริจาคใหม่ ชาย หน่วยเคลื่อนที่', 'newMaleMobile')}
+      ${row('4.8', 'ผู้บริจาคใหม่ หญิง หน่วยเคลื่อนที่', 'newFemaleMobile')}
+      
+      <tr class="section-header"><td colspan="${tableIdxs.length + 3}">5. กิจกรรมการเจาะระบายรักษา & การบริการเคลื่อนที่</td></tr>
+      ${row('5.1', 'เจาะระบายเพื่อรักษาโรค (Blood Letting)', 'bloodLetting')}
+      ${row('5.2', 'จำนวนออกหน่วยเคลื่อนที่สะสม (Drives Conducted)', 'drivesConducted')}
+      ${row('5.3', 'หน่วยเคลื่อนที่ที่บรรลุเป้าหมาย (Meeting Target)', 'drivesMeetingTarget')}
+      ${row('5.4', 'บริจาคโลหิตสะสมของบุคลากรคณะ (Faculty)', 'facultyDonors')}
+      ${row('5.5', 'บริจาคโลหิตสะสมหน่วยงานภายนอก (External)', 'externalDonors')}
+    </tbody>
+  `;
+
+  const table = document.getElementById('dataTable');
+  table.innerHTML = thead + tbody;
+}
+
+// =====================================================
+//  CHARTING LOGIC
+// =====================================================
+let chartDonation = null;
+let chartDeferTrends = null;
+let chartReactionTrends = null;
+let chartLocation = null;
+let chartDonorType = null;
+let chartGender = null;
+let chartOnlineSirirajCount = null;
+let chartOnlineSirirajPercent = null;
+
+function buildCharts() {
+  const idxs = getAvailableIdxs();
+  const monthsLabels = idxs.map(i => MONTHS_FY[i]);
+  const cData = currentData();
+  const pData = prevData();
+
+  // 1. Chart: Monthly Donation (Bar + Line)
+  const ctxDonation = document.getElementById('chartDonationMonthly').getContext('2d');
+  if (chartDonation) chartDonation.destroy();
+  
+  const donationOnsiteData = idxs.map(i => cData.donationOnsite[i]);
+  const donationMobileData = idxs.map(i => cData.donationMobile[i]);
+  const donationPrevTotalData = pData ? idxs.map(i => pData.donationTotal[i]) : [];
+
+  chartDonation = new Chart(ctxDonation, {
+    type: 'bar',
+    data: {
+      labels: monthsLabels,
+      datasets: [
+        {
+          label: 'บริจาคในสถานที่ (On-site)',
+          data: donationOnsiteData,
+          backgroundColor: '#dc2626', // Crimson Red
+          borderRadius: 4
+        },
+        {
+          label: 'หน่วยบริการเคลื่อนที่ (Mobile)',
+          data: donationMobileData,
+          backgroundColor: '#2563eb', // Blue
+          borderRadius: 4
+        },
+        ...(pData ? [{
+          label: `ยอดรวมปีก่อน (ปี ${selectedYear-1})`,
+          data: donationPrevTotalData,
+          type: 'line',
+          borderColor: '#94a3b8',
+          borderWidth: 2,
+          borderDash: [5, 5],
+          fill: false,
+          tension: 0.1,
+          pointStyle: 'circle',
+          pointRadius: 4
+        }] : [])
+      ]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        legend: {
+          position: 'top',
+          labels: { boxWidth: 12, font: { family: 'Sarabun' } }
+        },
+        tooltip: {
+          bodyFont: { family: 'Sarabun' },
+          titleFont: { family: 'Sarabun' }
+        }
+      },
+      scales: {
+        x: { grid: { display: false }, ticks: { font: { family: 'Sarabun' } } },
+        y: { grace: '12%', ticks: { font: { family: 'Sarabun' } } }
+      }
+    },
+    plugins: [{
+      id: 'unique_datalabels',
+      afterDatasetsDraw(chart) {
+        const { ctx, data } = chart;
+        ctx.save();
+        
+        // Draw total above the bar group
+        ctx.font = 'bold 10px Sarabun';
+        ctx.fillStyle = '#0f172a'; // slate-900
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'bottom';
+
+        const meta0 = chart.getDatasetMeta(0);
+        const meta1 = chart.getDatasetMeta(1);
+        
+        for (let i = 0; i < data.labels.length; i++) {
+          const val0 = data.datasets[0].data[i] || 0;
+          const val1 = data.datasets[1].data[i] || 0;
+          const total = val0 + val1;
+          if (total === 0) continue;
+
+          if (meta0.data[i] && meta1.data[i]) {
+            const xPos = (meta0.data[i].x + meta1.data[i].x) / 2;
+            const yPos = Math.min(meta0.data[i].y, meta1.data[i].y) - 14;
+            ctx.fillText(`รวม: ${total.toLocaleString()}`, xPos, yPos);
+          }
+        }
+        
+        // Draw individual bar values
+        chart.data.datasets.forEach((dataset, datasetIndex) => {
+          const isLine = dataset.type === 'line';
+          const meta = chart.getDatasetMeta(datasetIndex);
+          meta.data.forEach((element, index) => {
+            const val = dataset.data[index];
+            if (val === null || val === undefined || val === 0) return;
+            
+            ctx.font = isLine ? '8px Sarabun' : 'bold 9px Sarabun';
+            ctx.fillStyle = isLine ? '#475569' : (datasetIndex === 0 ? '#dc2626' : '#2563eb');
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'bottom';
+            ctx.fillText(val.toLocaleString(), element.x, element.y - 2);
+          });
+        });
+        ctx.restore();
+      }
+    }]
+  });
+
+  // 2. Chart: Defer Trends (Line Chart)
+  const ctxDef = document.getElementById('chartDeferTrends').getContext('2d');
+  if (chartDeferTrends) chartDeferTrends.destroy();
+
+  const deferOnsiteRates = idxs.map(i => cData.visitOnsite[i] ? (cData.deferOnsite[i] / cData.visitOnsite[i] * 100) : 0);
+  const deferMobileRates = idxs.map(i => cData.visitMobile[i] ? (cData.deferMobile[i] / cData.visitMobile[i] * 100) : 0);
+
+  const deferDatalabelsPlugin = {
+    id: 'deferDatalabels',
+    afterDatasetsDraw(chart) {
+      const { ctx } = chart;
+      ctx.save();
+      chart.data.datasets.forEach((dataset, datasetIndex) => {
+        const meta = chart.getDatasetMeta(datasetIndex);
+        meta.data.forEach((element, index) => {
+          const val = dataset.data[index];
+          if (val === null || val === undefined) return;
+          const text = val.toFixed(1) + '%';
+          ctx.font = 'bold 10px Sarabun, sans-serif';
+          ctx.fillStyle = datasetIndex === 0 ? '#d97706' : '#7c3aed';
+          ctx.textAlign = 'center';
+          ctx.textBaseline = 'bottom';
+          ctx.fillText(text, element.x, element.y - 6);
+        });
+      });
+      ctx.restore();
+    }
+  };
+
+  chartDeferTrends = new Chart(ctxDef, {
+    type: 'line',
+    plugins: [deferDatalabelsPlugin],
+    data: {
+      labels: monthsLabels,
+      datasets: [
+        {
+          label: 'อัตรา Defer ในสถานที่ (%)',
+          data: deferOnsiteRates,
+          borderColor: '#d97706', // Amber
+          backgroundColor: 'rgba(217,119,6,0.1)',
+          fill: true,
+          tension: 0.2
+        },
+        {
+          label: 'อัตรา Defer หน่วยเคลื่อนที่ (%)',
+          data: deferMobileRates,
+          borderColor: '#7c3aed', // Purple
+          backgroundColor: 'rgba(124,58,237,0.1)',
+          fill: true,
+          tension: 0.2
+        }
+      ]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        legend: { position: 'top', labels: { font: { family: 'Sarabun' } } },
+        tooltip: { bodyFont: { family: 'Sarabun' }, titleFont: { family: 'Sarabun' } }
+      },
+      scales: {
+        x: { ticks: { font: { family: 'Sarabun' } } },
+        y: {
+          title: { display: true, text: 'อัตรา Defer (%)', font: { family: 'Sarabun', weight: 'bold' } },
+          grace: '15%',
+          ticks: { font: { family: 'Sarabun' } }
+        }
+      }
+    }
+  });
+
+  // 3. Chart: Reaction Trends (Line Chart)
+  const ctxReact = document.getElementById('chartReactionTrends').getContext('2d');
+  if (chartReactionTrends) chartReactionTrends.destroy();
+
+  const reactOnsiteRates = idxs.map(i => cData.donationOnsite[i] ? (cData.reactionOnsite[i] / cData.donationOnsite[i] * 100) : 0);
+  const reactMobileRates = idxs.map(i => cData.donationMobile[i] ? (cData.reactionMobile[i] / cData.donationMobile[i] * 100) : 0);
+
+  const reactionDatalabelsPlugin = {
+    id: 'reactionDatalabels',
+    afterDatasetsDraw(chart) {
+      const { ctx } = chart;
+      ctx.save();
+      chart.data.datasets.forEach((dataset, datasetIndex) => {
+        const meta = chart.getDatasetMeta(datasetIndex);
+        meta.data.forEach((element, index) => {
+          const val = dataset.data[index];
+          if (val === null || val === undefined) return;
+          const text = val.toFixed(2) + '%';
+          ctx.font = 'bold 10px Sarabun, sans-serif';
+          ctx.fillStyle = datasetIndex === 0 ? '#db2777' : '#2563eb';
+          ctx.textAlign = 'center';
+          ctx.textBaseline = 'bottom';
+          ctx.fillText(text, element.x, element.y - 6);
+        });
+      });
+      ctx.restore();
+    }
+  };
+
+  chartReactionTrends = new Chart(ctxReact, {
+    type: 'line',
+    plugins: [reactionDatalabelsPlugin],
+    data: {
+      labels: monthsLabels,
+      datasets: [
+        {
+          label: 'อัตรา Reaction ในสถานที่ (%)',
+          data: reactOnsiteRates,
+          borderColor: '#db2777', // Pink
+          backgroundColor: 'rgba(219,39,119,0.1)',
+          fill: true,
+          tension: 0.2
+        },
+        {
+          label: 'อัตรา Reaction หน่วยเคลื่อนที่ (%)',
+          data: reactMobileRates,
+          borderColor: '#2563eb', // Blue
+          backgroundColor: 'rgba(37,99,235,0.1)',
+          fill: true,
+          tension: 0.2
+        }
+      ]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        legend: { position: 'top', labels: { font: { family: 'Sarabun' } } },
+        tooltip: { bodyFont: { family: 'Sarabun' }, titleFont: { family: 'Sarabun' } }
+      },
+      scales: {
+        x: { ticks: { font: { family: 'Sarabun' } } },
+        y: {
+          title: { display: true, text: 'อัตรา Reaction (%)', font: { family: 'Sarabun', weight: 'bold' } },
+          grace: '15%',
+          ticks: { font: { family: 'Sarabun' } }
+        }
+      }
+    }
+  });
+
+  // 4. Chart: Online Appointments vs Siriraj Staff (Count)
+  const ctxCount = document.getElementById('chartOnlineSirirajCount').getContext('2d');
+  if (chartOnlineSirirajCount) chartOnlineSirirajCount.destroy();
+
+  const onlineApptsData = idxs.map(i => cData.drivesMeetingTarget[i]);
+  const sirirajStaffData = idxs.map(i => cData.facultyDonors[i]);
+
+  const onlineRates = idxs.map(i => cData.donationOnsite[i] && cData.drivesMeetingTarget[i] !== null 
+    ? (cData.drivesMeetingTarget[i] / cData.donationOnsite[i] * 100) 
+    : null
+  );
+  const sirirajRates = idxs.map(i => cData.donationOnsite[i] && cData.facultyDonors[i] !== null 
+    ? (cData.facultyDonors[i] / cData.donationOnsite[i] * 100) 
+    : null
+  );
+
+  const countDatalabelsPlugin = {
+    id: 'countDatalabels',
+    afterDatasetsDraw(chart) {
+      const { ctx } = chart;
+      ctx.save();
+      chart.data.datasets.forEach((dataset, datasetIndex) => {
+        const meta = chart.getDatasetMeta(datasetIndex);
+        meta.data.forEach((element, index) => {
+          const val = dataset.data[index];
+          if (val === null || val === undefined || val === 0) return;
+          ctx.font = 'bold 10px Sarabun, sans-serif';
+          ctx.fillStyle = datasetIndex === 0 ? '#0284c7' : '#d97706';
+          ctx.textAlign = 'center';
+          ctx.textBaseline = 'bottom';
+          ctx.fillText(val.toLocaleString(), element.x, element.y - 4);
+        });
+      });
+      ctx.restore();
+    }
+  };
+
+  chartOnlineSirirajCount = new Chart(ctxCount, {
+    type: 'bar',
+    plugins: [countDatalabelsPlugin],
+    data: {
+      labels: monthsLabels,
+      datasets: [
+        {
+          label: 'จำนวนนัดออนไลน์ (ราย)',
+          data: onlineApptsData,
+          backgroundColor: '#0ea5e9', // Sky Blue
+          borderRadius: 4
+        },
+        {
+          label: 'จำนวนบุคลากรศิริราช (ราย)',
+          data: sirirajStaffData,
+          backgroundColor: '#f59e0b', // Amber/Yellow
+          borderRadius: 4
+        }
+      ]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        legend: { position: 'top', labels: { font: { family: 'Sarabun' } } },
+        tooltip: {
+          bodyFont: { family: 'Sarabun' },
+          titleFont: { family: 'Sarabun' },
+          callbacks: {
+            label: function(context) {
+              return (context.dataset.label || '') + ': ' + (context.parsed.y !== null ? context.parsed.y.toLocaleString() + ' ราย' : '–');
+            }
+          }
+        }
+      },
+      scales: {
+        x: { grid: { display: false }, ticks: { font: { family: 'Sarabun' } } },
+        y: {
+          title: { display: true, text: 'จำนวนราย (Persons)', font: { family: 'Sarabun', weight: 'bold' } },
+          grace: '15%',
+          ticks: { font: { family: 'Sarabun' } }
+        }
+      }
+    }
+  });
+
+  // 5. Chart: Online Appointments vs Siriraj Staff (Percent)
+  const ctxPercent = document.getElementById('chartOnlineSirirajPercent').getContext('2d');
+  if (chartOnlineSirirajPercent) chartOnlineSirirajPercent.destroy();
+
+  const percentDatalabelsPlugin = {
+    id: 'percentDatalabels',
+    afterDatasetsDraw(chart) {
+      const { ctx } = chart;
+      ctx.save();
+      chart.data.datasets.forEach((dataset, datasetIndex) => {
+        const meta = chart.getDatasetMeta(datasetIndex);
+        meta.data.forEach((element, index) => {
+          const val = dataset.data[index];
+          if (val === null || val === undefined) return;
+          const text = val.toFixed(1) + '%';
+          ctx.font = 'bold 10px Sarabun, sans-serif';
+          ctx.fillStyle = datasetIndex === 0 ? '#0284c7' : '#d97706';
+          ctx.textAlign = 'center';
+          ctx.textBaseline = 'bottom';
+          ctx.fillText(text, element.x, element.y - 6);
+        });
+      });
+      ctx.restore();
+    }
+  };
+
+  chartOnlineSirirajPercent = new Chart(ctxPercent, {
+    type: 'line',
+    plugins: [percentDatalabelsPlugin],
+    data: {
+      labels: monthsLabels,
+      datasets: [
+        {
+          label: 'สัดส่วนนัดออนไลน์ต่อผู้คัดกรองทั้งหมด (%)',
+          data: onlineRates,
+          borderColor: '#0284c7', // Darker Sky Blue
+          backgroundColor: 'rgba(2, 132, 199, 0.1)',
+          borderWidth: 3,
+          pointBackgroundColor: '#0284c7',
+          pointRadius: 4,
+          fill: true,
+          tension: 0.15
+        },
+        {
+          label: 'สัดส่วนบุคลากรศิริราชต่อผู้บริจาคทั้งหมด (%)',
+          data: sirirajRates,
+          borderColor: '#d97706', // Darker Amber
+          backgroundColor: 'rgba(217, 119, 6, 0.1)',
+          borderWidth: 3,
+          pointBackgroundColor: '#d97706',
+          pointRadius: 4,
+          fill: true,
+          tension: 0.15
+        }
+      ]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        legend: { position: 'top', labels: { font: { family: 'Sarabun' } } },
+        tooltip: {
+          bodyFont: { family: 'Sarabun' },
+          titleFont: { family: 'Sarabun' },
+          callbacks: {
+            label: function(context) {
+              return (context.dataset.label || '') + ': ' + (context.parsed.y !== null ? context.parsed.y.toFixed(1) + '%' : '–');
+            }
+          }
+        }
+      },
+      scales: {
+        x: { ticks: { font: { family: 'Sarabun' } } },
+        y: {
+          title: { display: true, text: 'สัดส่วน (%)', font: { family: 'Sarabun', weight: 'bold' } },
+          grace: '15%',
+          ticks: {
+            font: { family: 'Sarabun' },
+            callback: function(value) {
+              return value.toFixed(1) + '%';
+            }
+          }
+        }
+      }
+    }
+  });
+
+  // Share charts rely on selected period
+  updateShareCharts();
+}
+
+function updateShareCharts() {
+  const idxs = getCurrentIdxs();
+  const cData = currentData();
+
+  // Calculate totals for selected range
+  const donOnsite = sum(cData.donationOnsite, idxs);
+  const donMobile = sum(cData.donationMobile, idxs);
+
+  const newDonors = sum(cData.newTotal, idxs);
+  const oldDonors = sum(cData.oldTotal, idxs);
+  const replaceDonors = sum(cData.replaceTotal, idxs);
+
+  // Gender calculation
+  const mOnsiteOld = sum(cData.oldMaleOnsite, idxs);
+  const fOnsiteOld = sum(cData.oldFemaleOnsite, idxs);
+  const mMobileOld = sum(cData.oldMaleMobile, idxs);
+  const fMobileOld = sum(cData.oldFemaleMobile, idxs);
+
+  const mOnsiteNew = sum(cData.newMaleOnsite, idxs);
+  const fOnsiteNew = sum(cData.newFemaleOnsite, idxs);
+  const mMobileNew = sum(cData.newMaleMobile, idxs);
+  const fMobileNew = sum(cData.newFemaleMobile, idxs);
+
+  const totalMale = mOnsiteOld + mMobileOld + mOnsiteNew + mMobileNew;
+  const totalFemale = fOnsiteOld + fMobileOld + fOnsiteNew + fMobileNew;
+
+  // 3. Chart: Location Share (Pie)
+  const ctxLocation = document.getElementById('chartLocationShare').getContext('2d');
+  if (chartLocation) chartLocation.destroy();
+  const locationShareDatalabelsPlugin = {
+    id: 'locationShareDatalabels',
+    afterDatasetsDraw(chart) {
+      const { ctx } = chart;
+      ctx.save();
+      const meta = chart.getDatasetMeta(0);
+      const total = chart.data.datasets[0].data.reduce((a, b) => a + b, 0);
+      
+      meta.data.forEach((element, index) => {
+        const val = chart.data.datasets[0].data[index];
+        if (val === null || val === undefined || val === 0) return;
+        const pctVal = total > 0 ? ((val / total) * 100).toFixed(1) + '%' : '0%';
+        const emoji = index === 0 ? '🏥 ' : '🚌 ';
+        const text = `${emoji}${val.toLocaleString()} (${pctVal})`;
+        
+        const midAngle = (element.startAngle + element.endAngle) / 2;
+        const x1 = element.x + Math.cos(midAngle) * element.outerRadius;
+        const y1 = element.y + Math.sin(midAngle) * element.outerRadius;
+        const x2 = element.x + Math.cos(midAngle) * (element.outerRadius + 14);
+        const y2 = element.y + Math.sin(midAngle) * (element.outerRadius + 14);
+        const isRight = Math.cos(midAngle) >= 0;
+        const x3 = x2 + (isRight ? 15 : -15);
+        const y3 = y2;
+        
+        ctx.beginPath();
+        ctx.moveTo(x1, y1);
+        ctx.lineTo(x2, y2);
+        ctx.lineTo(x3, y3);
+        ctx.strokeStyle = '#64748b'; // slate-500
+        ctx.lineWidth = 1.5;
+        ctx.stroke();
+        
+        ctx.font = 'bold 12px Sarabun, sans-serif';
+        ctx.fillStyle = '#0f172a'; // slate-900
+        ctx.textAlign = 'right';
+        if (isRight) ctx.textAlign = 'left';
+        ctx.textBaseline = 'middle';
+        
+        const textX = x3 + (isRight ? 5 : -5);
+        ctx.fillText(text, textX, y3);
+      });
+      ctx.restore();
+    }
+  };
+
+  chartLocation = new Chart(ctxLocation, {
+    type: 'pie',
+    plugins: [locationShareDatalabelsPlugin],
+    data: {
+      labels: ['On-site 🏥 (ในสถานที่)', 'Mobile Unit 🚌 (หน่วยเคลื่อนที่)'],
+      datasets: [{
+        data: [donOnsite, donMobile],
+        backgroundColor: ['#dc2626', '#2563eb'],
+        borderWidth: 1
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      layout: {
+        padding: {
+          left: 45,
+          right: 45,
+          top: 10,
+          bottom: 10
+        }
+      },
+      plugins: {
+        legend: { position: 'bottom', labels: { font: { family: 'Sarabun' } } },
+        tooltip: { bodyFont: { family: 'Sarabun' } }
+      }
+    }
+  });
+
+  // 4. Chart: Donor Profile Breakdown (Donut) - Old vs New
+  const ctxDonor = document.getElementById('chartDonorShare').getContext('2d');
+  if (chartDonorType) chartDonorType.destroy();
+  
+  const repeatDonorsCombined = oldDonors + replaceDonors;
+  
+  const donorCenterPlugin = {
+    id: 'donorCenter',
+    beforeDraw(chart) {
+      const { ctx } = chart;
+      const meta = chart.getDatasetMeta(0);
+      if (!meta.data || meta.data.length === 0) return;
+      
+      const x = meta.data[0].x;
+      const y = meta.data[0].y;
+      
+      ctx.save();
+      ctx.font = '40px sans-serif';
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.fillText('👥', x, y);
+      ctx.restore();
+    }
+  };
+
+  const donorShareDatalabelsPlugin = {
+    id: 'donorShareDatalabels',
+    afterDatasetsDraw(chart) {
+      const { ctx } = chart;
+      ctx.save();
+      const meta = chart.getDatasetMeta(0);
+      const total = chart.data.datasets[0].data.reduce((a, b) => a + b, 0);
+      
+      meta.data.forEach((element, index) => {
+        const val = chart.data.datasets[0].data[index];
+        if (val === null || val === undefined || val === 0) return;
+        const pctVal = total > 0 ? ((val / total) * 100).toFixed(1) + '%' : '0%';
+        const emoji = index === 0 ? '🔁 ' : '🆕 ';
+        const text = `${emoji}${val.toLocaleString()} (${pctVal})`;
+        
+        const midAngle = (element.startAngle + element.endAngle) / 2;
+        const x1 = element.x + Math.cos(midAngle) * element.outerRadius;
+        const y1 = element.y + Math.sin(midAngle) * element.outerRadius;
+        const x2 = element.x + Math.cos(midAngle) * (element.outerRadius + 14);
+        const y2 = element.y + Math.sin(midAngle) * (element.outerRadius + 14);
+        const isRight = Math.cos(midAngle) >= 0;
+        const x3 = x2 + (isRight ? 15 : -15);
+        const y3 = y2;
+        
+        ctx.beginPath();
+        ctx.moveTo(x1, y1);
+        ctx.lineTo(x2, y2);
+        ctx.lineTo(x3, y3);
+        ctx.strokeStyle = '#64748b'; // slate-500
+        ctx.lineWidth = 1.5;
+        ctx.stroke();
+        
+        ctx.font = 'bold 12px Sarabun, sans-serif';
+        ctx.fillStyle = '#0f172a'; // slate-900
+        ctx.textAlign = isRight ? 'left' : 'right';
+        ctx.textBaseline = 'middle';
+        
+        const textX = x3 + (isRight ? 5 : -5);
+        ctx.fillText(text, textX, y3);
+      });
+      ctx.restore();
+    }
+  };
+
+  chartDonorType = new Chart(ctxDonor, {
+    type: 'doughnut',
+    plugins: [donorShareDatalabelsPlugin, donorCenterPlugin],
+    data: {
+      labels: ['ผู้บริจาคเก่า 🔁 (Repeat)', 'ผู้บริจาคใหม่ 🆕 (New)'],
+      datasets: [{
+        data: [repeatDonorsCombined, newDonors],
+        backgroundColor: ['#2563eb', '#0d9488'],
+        borderWidth: 1
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      layout: {
+        padding: {
+          left: 45,
+          right: 45,
+          top: 10,
+          bottom: 10
+        }
+      },
+      plugins: {
+        legend: { position: 'bottom', labels: { font: { family: 'Sarabun' } } },
+        tooltip: { bodyFont: { family: 'Sarabun' } }
+      }
+    }
+  });
+
+  // 5. Chart: Gender Share (Doughnut/Pie)
+  const ctxGender = document.getElementById('chartGenderShare').getContext('2d');
+  if (chartGender) chartGender.destroy();
+
+  const genderCenterPlugin = {
+    id: 'genderCenter',
+    beforeDraw(chart) {
+      const { ctx } = chart;
+      const meta = chart.getDatasetMeta(0);
+      if (!meta.data || meta.data.length === 0) return;
+      
+      const x = meta.data[0].x;
+      const y = meta.data[0].y;
+      
+      ctx.save();
+      ctx.font = '40px sans-serif';
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.fillText('👫', x, y);
+      ctx.restore();
+    }
+  };
+
+  const genderShareDatalabelsPlugin = {
+    id: 'genderShareDatalabels',
+    afterDatasetsDraw(chart) {
+      const { ctx } = chart;
+      ctx.save();
+      const meta = chart.getDatasetMeta(0);
+      const total = chart.data.datasets[0].data.reduce((a, b) => a + b, 0);
+      
+      meta.data.forEach((element, index) => {
+        const val = chart.data.datasets[0].data[index];
+        if (val === null || val === undefined || val === 0) return;
+        const pctVal = total > 0 ? ((val / total) * 100).toFixed(1) + '%' : '0%';
+        const emoji = index === 0 ? '🙋‍♂️ ' : '🙋‍♀️ ';
+        const text = `${emoji}${val.toLocaleString()} (${pctVal})`;
+        
+        const midAngle = (element.startAngle + element.endAngle) / 2;
+        const x1 = element.x + Math.cos(midAngle) * element.outerRadius;
+        const y1 = element.y + Math.sin(midAngle) * element.outerRadius;
+        const x2 = element.x + Math.cos(midAngle) * (element.outerRadius + 14);
+        const y2 = element.y + Math.sin(midAngle) * (element.outerRadius + 14);
+        const isRight = Math.cos(midAngle) >= 0;
+        const x3 = x2 + (isRight ? 15 : -15);
+        const y3 = y2;
+        
+        ctx.beginPath();
+        ctx.moveTo(x1, y1);
+        ctx.lineTo(x2, y2);
+        ctx.lineTo(x3, y3);
+        ctx.strokeStyle = '#64748b'; // slate-500
+        ctx.lineWidth = 1.5;
+        ctx.stroke();
+        
+        ctx.font = 'bold 12px Sarabun, sans-serif';
+        ctx.fillStyle = '#0f172a'; // slate-900
+        ctx.textAlign = isRight ? 'left' : 'right';
+        ctx.textBaseline = 'middle';
+        
+        const textX = x3 + (isRight ? 5 : -5);
+        ctx.fillText(text, textX, y3);
+      });
+      ctx.restore();
+    }
+  };
+
+  chartGender = new Chart(ctxGender, {
+    type: 'doughnut',
+    plugins: [genderShareDatalabelsPlugin, genderCenterPlugin],
+    data: {
+      labels: ['เพศชาย ♂️ (Male)', 'เพศหญิง ♀️ (Female)'],
+      datasets: [{
+        data: [totalMale, totalFemale],
+        backgroundColor: ['#3b82f6', '#ec4899'],
+        borderWidth: 1
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      layout: {
+        padding: {
+          left: 45,
+          right: 45,
+          top: 10,
+          bottom: 10
+        }
+      },
+      plugins: {
+        legend: { position: 'bottom', labels: { font: { family: 'Sarabun' } } },
+        tooltip: { bodyFont: { family: 'Sarabun' } }
+      }
+    }
+  });
+}
+
+// =====================================================
+//  YEAR COMPARISON MODE (multi-year overlay)
+// =====================================================
+let viewMode = 'monthly';        // 'monthly' | 'compare'
+let comparePeriod = 'ytd';       // 'ytd' (same months every year) | 'full'
+let compareMonth = null;         // null = all months ; 0-11 = one month compared across years
+let selectedYears = [2569, 2568, 2567];
+
+const YEAR_COLORS = {
+  2569: '#dc2626', // red
+  2568: '#2563eb', // blue
+  2567: '#0d9488', // teal
+  2566: '#d97706', // amber
+  2565: '#7c3aed', // purple
+  2564: '#db2777'  // pink
+};
+const COMPARE_YEARS = [2569, 2568, 2567, 2566, 2565, 2564].filter(y => getYearData(y));
+
+let cmpScreenTotalsChart = null, cmpDonTotalsChart = null,
+    cmpDonationChart = null, cmpVisitChart = null,
+    cmpDeferChart = null, cmpReactionChart = null,
+    cmpNewChart = null, cmpOldChart = null,
+    cmpOnsiteChart = null, cmpMobileChart = null;
+
+// Single-metric bar chart: one bar per year, coloured by year.
+// valueOf(y) -> number|null ; isPct controls formatting.
+function buildYearBar(canvasId, existing, years, valueOf, unit, isPct) {
+  if (existing) existing.destroy();
+  const fmtVal = (v) => isPct ? v.toFixed(1) + '%' : v.toLocaleString();
+  return new Chart(document.getElementById(canvasId).getContext('2d'), {
+    type: 'bar',
+    data: {
+      labels: years.map(y => `ปี ${y}`),
+      datasets: [{
+        label: unit,
+        data: years.map(y => valueOf(y)),
+        backgroundColor: years.map(y => YEAR_COLORS[y]),
+        borderRadius: 5,
+        maxBarThickness: 96
+      }]
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      plugins: {
+        legend: { display: false },
+        tooltip: {
+          bodyFont: { family: 'Sarabun' }, titleFont: { family: 'Sarabun' },
+          callbacks: { label: (ctx) => (ctx.parsed.y == null ? '–' : `${fmtVal(ctx.parsed.y)} ${isPct ? '' : unit}`) }
+        }
+      },
+      scales: {
+        x: { grid: { display: false }, ticks: { font: { family: 'Sarabun', weight: 'bold' } } },
+        y: { beginAtZero: true, grace: '15%', ticks: { font: { family: 'Sarabun' }, callback: (v) => isPct ? v.toFixed(1) + '%' : v.toLocaleString() } }
+      }
+    },
+    plugins: [{
+      id: canvasId + 'Labels',
+      afterDatasetsDraw(chart) {
+        const { ctx } = chart;
+        ctx.save();
+        chart.getDatasetMeta(0).data.forEach((el, i) => {
+          const val = chart.data.datasets[0].data[i];
+          if (val == null) return;
+          ctx.font = 'bold 11px Sarabun';
+          ctx.fillStyle = '#0f172a';
+          ctx.textAlign = 'center';
+          ctx.textBaseline = 'bottom';
+          ctx.fillText(fmtVal(val), el.x, el.y - 4);
+        });
+        ctx.restore();
+      }
+    }]
+  });
+}
+
+const availIdxOf = (y) => (typeof getAvailableIdx === 'function' ? getAvailableIdx(y) : getAvailableIdxs());
+const yearTotal = (y, key, idxs) => sum(getYearData(y)[key], idxs);
+
+function commonIdxs(years) {
+  if (!years.length) return [];
+  const minLen = Math.min(...years.map(y => availIdxOf(y).length));
+  return Array.from({ length: minLen }, (_, i) => i);
+}
+
+function flashHint(msg) {
+  const el = document.querySelector('#compareYearChips .compare-hint');
+  if (!el) return;
+  const original = '✔️ แตะเพื่อเลือก/ยกเลิกปี (เลือกได้ 2–6 ปี) เพื่อนำมาซ้อนเปรียบเทียบกัน';
+  el.textContent = '⚠️ ' + msg;
+  el.style.color = 'var(--red)';
+  clearTimeout(flashHint._t);
+  flashHint._t = setTimeout(() => { el.textContent = original; el.style.color = ''; }, 2200);
+}
+
+function buildYearMultiTabs() {
+  const c = document.getElementById('yearMultiTabs');
+  c.innerHTML = '';
+  COMPARE_YEARS.forEach(y => {
+    const sel = selectedYears.includes(y);
+    const avail = availIdxOf(y);
+    const monthsInfo = avail.length >= 12 ? 'ครบ 12 เดือน' : `${MONTHS_FY[0]}–${MONTHS_FY[avail.length - 1]} (${avail.length} ด.)`;
+    const tab = document.createElement('div');
+    tab.className = 'month-tab year-chip' + (sel ? ' selected' : '');
+    tab.style.setProperty('--chip-color', YEAR_COLORS[y]);
+    tab.innerHTML = `
+      <div class="month-tab-abbr"><span class="chip-swatch"></span>ปี ${y}<span class="chip-check">✔</span></div>
+      <div class="month-tab-num">${monthsInfo}</div>`;
+    tab.addEventListener('click', () => {
+      const i = selectedYears.indexOf(y);
+      if (i >= 0) {
+        if (selectedYears.length <= 2) { flashHint('ต้องเลือกอย่างน้อย 2 ปีเพื่อเปรียบเทียบ'); return; }
+        selectedYears.splice(i, 1);
+      } else {
+        if (selectedYears.length >= 6) { flashHint('เลือกเปรียบเทียบได้สูงสุด 6 ปี'); return; }
+        selectedYears.push(y);
+      }
+      buildYearMultiTabs();
+      renderCompare();
+    });
+    c.appendChild(tab);
+  });
+}
+
+function buildCompareMonthTabs() {
+  const c = document.getElementById('compareMonthTabs');
+  if (!c) return;
+  const sortedYears = [...selectedYears].sort((a, b) => a - b);
+  const maxLen = sortedYears.length ? Math.max(...sortedYears.map(y => availIdxOf(y).length)) : 0;
+  // reset month if no selected year has data for it
+  if (compareMonth !== null && compareMonth >= maxLen) compareMonth = null;
+  c.innerHTML = '';
+  MONTHS_FY.forEach((m, i) => {
+    const isAvail = i < maxLen;
+    const tab = document.createElement('div');
+    tab.className = 'month-tab' + (isAvail ? '' : ' disabled') + (compareMonth === i ? ' active' : '');
+    tab.innerHTML = `
+      <div class="month-tab-abbr">${m}</div>
+      <div class="month-tab-num">เทียบข้ามปี</div>
+      <div class="month-tab-dot"></div>`;
+    tab.addEventListener('click', () => {
+      if (!isAvail) return;
+      setCompareMonth(compareMonth === i ? null : i);
+    });
+    c.appendChild(tab);
+  });
+
+  const tag = document.getElementById('compareMonthTag');
+  tag.textContent = compareMonth === null
+    ? 'รวมทุกเดือน (ดูภาพรวมทั้งช่วง)'
+    : `เจาะจงเดือน ${MONTHS_FULL_FY[compareMonth]} · เทียบข้ามปี`;
+
+  // period toggle only matters in all-months mode
+  const pt = document.getElementById('periodToggle');
+  if (pt) {
+    pt.style.opacity = compareMonth === null ? '' : '0.4';
+    pt.style.pointerEvents = compareMonth === null ? '' : 'none';
+  }
+}
+
+function setCompareMonth(i) {
+  compareMonth = i;
+  renderCompare();
+}
+
+function renderCompare() {
+  if (viewMode !== 'compare') return;
+  buildCompareMonthTabs();   // reflect current year selection & availability (may reset month)
+  const sortedYears = [...selectedYears].sort((a, b) => a - b);
+  const cidx = commonIdxs(sortedYears);
+  const singleMonth = (compareMonth !== null);
+  const idxsFor = (y) => (singleMonth ? [compareMonth] : (comparePeriod === 'ytd' ? cidx : availIdxOf(y)));
+
+  // ----- period labels -----
+  const lastCommon = cidx.length ? MONTHS_FY[cidx.length - 1] : '–';
+  const periodLabel = singleMonth
+    ? `เฉพาะเดือน ${MONTHS_FULL_FY[compareMonth]} · เทียบข้ามปีที่เลือก`
+    : (comparePeriod === 'ytd'
+        ? `เทียบช่วง ${MONTHS_FY[0]}–${lastCommon} เท่ากันทุกปี (${cidx.length} เดือน)`
+        : 'ยอดรวมตามข้อมูลจริงของแต่ละปี (บางปีอาจยังไม่ครบ 12 เดือน)');
+  document.getElementById('comparePeriodTag').textContent = singleMonth
+    ? `โหมดเจาะจงเดือน (${MONTHS_FY[compareMonth]})`
+    : (comparePeriod === 'ytd' ? 'เทียบช่วงเดียวกันทุกปี (YTD)' : 'เต็มปีตามข้อมูลจริง');
+  document.getElementById('compareHeadlineNote').textContent = periodLabel;
+  document.getElementById('compareScreenSub').textContent = periodLabel;
+  document.getElementById('compareDonSub').textContent = periodLabel;
+  document.getElementById('compareTableSub').textContent = periodLabel;
+
+  // ----- trend section labels (switch between "รายเดือน" and "เดือน X ข้ามปี") -----
+  const setText = (id, t) => { const el = document.getElementById(id); if (el) el.textContent = t; };
+  if (singleMonth) {
+    const mn = MONTHS_FULL_FY[compareMonth];
+    setText('compareTrendTitle', `📊 เจาะจงเดือน ${mn} · เทียบข้ามปี`);
+    setText('compareTrendNote', 'แท่งแต่ละสี = แต่ละปี (แกน = ปี)');
+    setText('cmpDonationTitle', `ยอดบริจาคโลหิตรวม · ${mn}`);   setText('cmpDonationSub', `ยอดบริจาคเดือน ${mn} เทียบข้ามปี (ยูนิท)`);
+    setText('cmpVisitTitle', `ผู้เข้ารับการคัดกรองรวม · ${mn}`); setText('cmpVisitSub', `ผู้คัดกรองเดือน ${mn} เทียบข้ามปี (ราย)`);
+    setText('cmpDeferTitle', `อัตราการคัดกรองไม่ผ่าน · ${mn}`);  setText('cmpDeferSub', `Defer Rate เดือน ${mn} เทียบข้ามปี (%)`);
+    setText('cmpReactionTitle', `อัตราการเกิดอาการข้างเคียง · ${mn}`); setText('cmpReactionSub', `Reaction Rate เดือน ${mn} เทียบข้ามปี (%)`);
+    setText('cmpNewTitle', `ผู้บริจาครายใหม่ · ${mn}`);         setText('cmpNewSub', `New Donors เดือน ${mn} เทียบข้ามปี (ราย)`);
+    setText('cmpOldTitle', `ผู้บริจาครายเก่า/ประจำ · ${mn}`);   setText('cmpOldSub', `Repeat Donors เดือน ${mn} เทียบข้ามปี (ราย)`);
+    setText('cmpOnsiteTitle', `ยอดบริจาค ณ สถานที่ (On-site) · ${mn}`); setText('cmpOnsiteSub', `บริจาคในสถานที่เดือน ${mn} เทียบข้ามปี (ยูนิท)`);
+    setText('cmpMobileTitle', `ยอดบริจาคหน่วยเคลื่อนที่ (Mobile) · ${mn}`); setText('cmpMobileSub', `บริจาคหน่วยเคลื่อนที่เดือน ${mn} เทียบข้ามปี (ยูนิท)`);
+  } else {
+    setText('compareTrendTitle', '📊 สถิติรายเดือนเปรียบเทียบหลายปี');
+    setText('compareTrendNote', 'แท่งแต่ละสี = แต่ละปี (เดือน ม.ค. – ธ.ค.)');
+    setText('cmpDonationTitle', 'ยอดบริจาคโลหิตรวมรายเดือน');   setText('cmpDonationSub', 'Total Donations ต่อเดือน เปรียบเทียบระหว่างปี (ยูนิท)');
+    setText('cmpVisitTitle', 'ผู้เข้ารับการคัดกรองรวมรายเดือน'); setText('cmpVisitSub', 'Total Screened ต่อเดือน เปรียบเทียบระหว่างปี (ราย)');
+    setText('cmpDeferTitle', 'อัตราการคัดกรองไม่ผ่านรายเดือน (Defer Rate)'); setText('cmpDeferSub', 'Defer รวม ÷ ผู้คัดกรองรวม ในแต่ละเดือน (%)');
+    setText('cmpReactionTitle', 'อัตราการเกิดอาการข้างเคียงรายเดือน (Reaction Rate)'); setText('cmpReactionSub', 'Reaction รวม ÷ ยอดบริจาครวม ในแต่ละเดือน (%)');
+    setText('cmpNewTitle', 'ผู้บริจาครายใหม่รายเดือน (New Donors)'); setText('cmpNewSub', 'จำนวนผู้บริจาคหน้าใหม่ต่อเดือน เปรียบเทียบระหว่างปี (ราย)');
+    setText('cmpOldTitle', 'ผู้บริจาครายเก่า/ประจำรายเดือน (Repeat Donors)'); setText('cmpOldSub', 'จำนวนผู้บริจาคประจำต่อเดือน เปรียบเทียบระหว่างปี (ราย)');
+    setText('cmpOnsiteTitle', 'ยอดบริจาค ณ สถานที่รายเดือน (On-site)'); setText('cmpOnsiteSub', 'จำนวนบริจาคในสถานที่ต่อเดือน เปรียบเทียบระหว่างปี (ยูนิท)');
+    setText('cmpMobileTitle', 'ยอดบริจาคหน่วยเคลื่อนที่รายเดือน (Mobile)'); setText('cmpMobileSub', 'จำนวนบริจาคหน่วยเคลื่อนที่ต่อเดือน เปรียบเทียบระหว่างปี (ยูนิท)');
+  }
+
+  // ----- axis for monthly overlay -----
+  let axisIdx;
+  if (comparePeriod === 'ytd') {
+    axisIdx = cidx.slice();
+  } else {
+    const maxLen = Math.max(...sortedYears.map(y => availIdxOf(y).length));
+    axisIdx = Array.from({ length: maxLen }, (_, i) => i);
+  }
+  const monthLabels = axisIdx.map(i => MONTHS_FY[i]);
+
+  const lineDatasets = (valueAt) => sortedYears.map(y => {
+    const avail = availIdxOf(y);
+    const newest = y === Math.max(...sortedYears);
+    return {
+      label: `ปี ${y}`,
+      data: axisIdx.map(i => (avail.includes(i) ? valueAt(y, i) : null)),
+      borderColor: YEAR_COLORS[y],
+      backgroundColor: YEAR_COLORS[y],
+      borderWidth: newest ? 3.2 : 2,
+      pointRadius: 3,
+      pointHoverRadius: 5,
+      tension: 0.25,
+      spanGaps: false,
+      fill: false
+    };
+  });
+
+  const barDatasets = (valueAt) => sortedYears.map(y => {
+    const avail = availIdxOf(y);
+    return {
+      label: `ปี ${y}`,
+      data: axisIdx.map(i => (avail.includes(i) ? valueAt(y, i) : null)),
+      backgroundColor: YEAR_COLORS[y],
+      borderRadius: 3,
+      maxBarThickness: 26
+    };
+  });
+
+  const lineOpts = (unit, isPct) => ({
+    responsive: true,
+    maintainAspectRatio: false,
+    interaction: { mode: 'index', intersect: false },
+    plugins: {
+      legend: { position: 'top', labels: { boxWidth: 12, font: { family: 'Sarabun' } } },
+      tooltip: {
+        bodyFont: { family: 'Sarabun' }, titleFont: { family: 'Sarabun' },
+        callbacks: {
+          label: (ctx) => {
+            const v = ctx.parsed.y;
+            if (v === null || v === undefined) return `${ctx.dataset.label}: –`;
+            return `${ctx.dataset.label}: ` + (isPct ? v.toFixed(1) + '%' : v.toLocaleString() + ' ' + unit);
+          }
+        }
+      }
+    },
+    scales: {
+      x: { grid: { display: false }, ticks: { font: { family: 'Sarabun' } } },
+      y: {
+        beginAtZero: true,
+        grace: '12%',
+        ticks: { font: { family: 'Sarabun' }, callback: (v) => isPct ? v.toFixed(1) + '%' : v.toLocaleString() }
+      }
+    }
+  });
+
+  const deferRateAt = (y, i) => { const d = getYearData(y); return d.visitTotal[i] ? (d.deferTotal[i] / d.visitTotal[i] * 100) : null; };
+  const reactRateAt = (y, i) => { const d = getYearData(y); return d.donationTotal[i] ? (d.reactionTotal[i] / d.donationTotal[i] * 100) : null; };
+
+  if (singleMonth) {
+    // ===== Single-month mode: every chart compares that month ACROSS YEARS (x-axis = years) =====
+    const m = compareMonth;
+    const at = (key) => (y) => getYearData(y)[key][m];
+    cmpDonationChart = buildYearBar('chartCmpDonation', cmpDonationChart, sortedYears, at('donationTotal'), 'ยูนิท', false);
+    cmpVisitChart    = buildYearBar('chartCmpVisit', cmpVisitChart, sortedYears, at('visitTotal'), 'ราย', false);
+    cmpDeferChart    = buildYearBar('chartCmpDefer', cmpDeferChart, sortedYears, (y) => deferRateAt(y, m), '%', true);
+    cmpReactionChart = buildYearBar('chartCmpReaction', cmpReactionChart, sortedYears, (y) => reactRateAt(y, m), '%', true);
+    cmpNewChart      = buildYearBar('chartCmpNew', cmpNewChart, sortedYears, at('newTotal'), 'ราย', false);
+    cmpOldChart      = buildYearBar('chartCmpOld', cmpOldChart, sortedYears, at('oldTotal'), 'ราย', false);
+    cmpOnsiteChart   = buildYearBar('chartCmpOnsite', cmpOnsiteChart, sortedYears, at('donationOnsite'), 'ยูนิท', false);
+    cmpMobileChart   = buildYearBar('chartCmpMobile', cmpMobileChart, sortedYears, at('donationMobile'), 'ยูนิท', false);
+  } else {
+    // ===== All-months mode: grouped bar per month, one bar per year (x-axis = months) =====
+    const barChart = (canvasId, existing, valueAt, unit, isPct) => {
+      if (existing) existing.destroy();
+      return new Chart(document.getElementById(canvasId).getContext('2d'), {
+        type: 'bar',
+        data: { labels: monthLabels, datasets: barDatasets(valueAt) },
+        options: lineOpts(unit, isPct)
+      });
+    };
+    cmpDonationChart = barChart('chartCmpDonation', cmpDonationChart, (y, i) => getYearData(y).donationTotal[i], 'ยูนิท', false);
+    cmpVisitChart    = barChart('chartCmpVisit', cmpVisitChart, (y, i) => getYearData(y).visitTotal[i], 'ราย', false);
+    cmpDeferChart    = barChart('chartCmpDefer', cmpDeferChart, (y, i) => deferRateAt(y, i), '%', true);
+    cmpReactionChart = barChart('chartCmpReaction', cmpReactionChart, (y, i) => reactRateAt(y, i), '%', true);
+    cmpNewChart      = barChart('chartCmpNew', cmpNewChart, (y, i) => getYearData(y).newTotal[i], 'ราย', false);
+    cmpOldChart      = barChart('chartCmpOld', cmpOldChart, (y, i) => getYearData(y).oldTotal[i], 'ราย', false);
+    cmpOnsiteChart   = barChart('chartCmpOnsite', cmpOnsiteChart, (y, i) => getYearData(y).donationOnsite[i], 'ยูนิท', false);
+    cmpMobileChart   = barChart('chartCmpMobile', cmpMobileChart, (y, i) => getYearData(y).donationMobile[i], 'ยูนิท', false);
+  }
+
+  // ----- Headline bars: screening & donation per year (period sum, or single month) -----
+  cmpScreenTotalsChart = buildYearBar('chartCmpScreenTotals', cmpScreenTotalsChart, sortedYears, (y) => yearTotal(y, 'visitTotal', idxsFor(y)), 'ราย', false);
+  cmpDonTotalsChart = buildYearBar('chartCmpDonTotals', cmpDonTotalsChart, sortedYears, (y) => yearTotal(y, 'donationTotal', idxsFor(y)), 'ยูนิท', false);
+
+  renderCompareTable(sortedYears, idxsFor);
+}
+
+function renderCompareTable(sortedYears, idxsFor) {
+  const rows = [
+    { label: 'ผู้เข้ารับการคัดกรองรวม (Total Screened)', key: 'visitTotal', goodUp: true },
+    { label: 'ยอดบริจาคโลหิตรวม (Total Donation)', key: 'donationTotal', goodUp: true, strong: true },
+    { label: '— บริจาค ณ สถานที่ (On-site)', key: 'donationOnsite', goodUp: true },
+    { label: '— บริจาคหน่วยเคลื่อนที่ (Mobile)', key: 'donationMobile', goodUp: true },
+    { label: 'ผู้บริจาครายใหม่ (New Donors)', key: 'newTotal', goodUp: true },
+    { label: 'ผู้บริจาครายเก่า/ประจำ (Repeat Donors)', key: 'oldTotal', goodUp: true },
+    { label: 'จำนวน Defer รวม (Total Defer)', key: 'deferTotal', goodUp: null },
+    { label: 'อัตรา Defer (% ของผู้คัดกรอง)', rate: ['deferTotal', 'visitTotal'], goodUp: null },
+    { label: 'อาการข้างเคียงรวม (Total Reaction)', key: 'reactionTotal', goodUp: null },
+    { label: 'อัตรา Reaction (% ของผู้บริจาค)', rate: ['reactionTotal', 'donationTotal'], goodUp: null }
+  ];
+
+  const valFor = (row, y) => {
+    if (row.rate) {
+      const n = yearTotal(y, row.rate[0], idxsFor(y));
+      const d = yearTotal(y, row.rate[1], idxsFor(y));
+      return d ? (n / d * 100) : null;
+    }
+    return yearTotal(y, row.key, idxsFor(y));
+  };
+  const cellText = (row, v) => v == null ? '–' : (row.rate ? v.toFixed(1) + '%' : fmt(v));
+
+  const oldest = sortedYears[0], newest = sortedYears[sortedYears.length - 1];
+  const multi = sortedYears.length >= 2;
+
+  const changeCell = (row) => {
+    if (!multi) return '';
+    const ov = valFor(row, oldest), nv = valFor(row, newest);
+    if (ov == null || nv == null || (!row.rate && ov === 0)) return `<td class="cmp-change same">–</td>`;
+    let arrow, cls, txt;
+    if (row.rate) {
+      const diff = nv - ov;
+      arrow = diff > 0 ? '▲' : (diff < 0 ? '▼' : '→');
+      txt = `${arrow} ${Math.abs(diff).toFixed(1)} pp`;
+      cls = 'same';                       // neutral for rates (no good/bad judgement)
+    } else {
+      const diff = (nv - ov) / ov * 100;
+      arrow = diff > 0 ? '▲' : (diff < 0 ? '▼' : '→');
+      txt = `${arrow} ${Math.abs(diff).toFixed(1)}%`;
+      cls = (row.goodUp === null) ? 'same' : (((diff > 0) === row.goodUp) ? 'up' : (diff === 0 ? 'same' : 'down'));
+    }
+    return `<td class="cmp-change ${cls}">${txt}</td>`;
+  };
+
+  const thead = `
+    <thead>
+      <tr>
+        <th class="text-left">รายการสถิติ</th>
+        ${sortedYears.map(y => `<th class="cmp-year" style="background:${YEAR_COLORS[y]};">ปี ${y}</th>`).join('')}
+        ${multi ? `<th class="col-total">เปลี่ยนแปลง<br/><span style="font-size:9px;font-weight:500;opacity:.8;">${oldest} → ${newest}</span></th>` : ''}
+      </tr>
+    </thead>`;
+
+  const tbody = `<tbody>${rows.map(row => `
+      <tr class="${row.rate ? 'cmp-rate' : ''}">
+        <td class="cmp-metric" style="${row.strong ? 'font-weight:800;color:var(--text-1);' : ''}">${row.label}</td>
+        ${sortedYears.map(y => {
+          const v = valFor(row, y);
+          return `<td style="${row.strong ? 'font-weight:800;' : ''}">${cellText(row, v)}</td>`;
+        }).join('')}
+        ${changeCell(row)}
+      </tr>`).join('')}</tbody>`;
+
+  document.getElementById('compareTable').innerHTML = thead + tbody;
+}
+
+function setViewMode(mode) {
+  viewMode = mode;
+  const monthly = (mode === 'monthly');
+  document.getElementById('monthlyView').style.display = monthly ? '' : 'none';
+  document.getElementById('compareView').style.display = monthly ? 'none' : '';
+  document.getElementById('yearTabs').style.display = monthly ? '' : 'none';
+  document.getElementById('compareYearChips').style.display = monthly ? 'none' : '';
+  document.getElementById('modeMonthlyBtn').classList.toggle('active', monthly);
+  document.getElementById('modeCompareBtn').classList.toggle('active', !monthly);
+  document.getElementById('yearCardTitle').textContent = monthly
+    ? 'เลือกปีปฏิทินย้อนหลัง 4 ปี' : 'เลือกปีที่ต้องการเปรียบเทียบ';
+  document.getElementById('selectedYearTag').style.display = monthly ? '' : 'none';
+
+  if (monthly) {
+    refresh();
+    buildCharts();
+  } else {
+    buildYearMultiTabs();
+    renderCompare();
+  }
+}
+
+function setComparePeriod(p) {
+  comparePeriod = p;
+  document.getElementById('periodYtdBtn').classList.toggle('active', p === 'ytd');
+  document.getElementById('periodFullBtn').classList.toggle('active', p === 'full');
+  renderCompare();
+}
+
+// =====================================================
+//  REFRESH TRIGGER
+// =====================================================
+function refresh() {
+  buildYearTabs();
+  buildMonthTabs();
+  renderMonthPanel();
+  renderKPI();
+  renderDonorCategories();
+  renderTable();
+  if (chartDonation) {
+    updateShareCharts();
+  }
+  // keep comparison view in sync when live data updates arrive
+  if (viewMode === 'compare') {
+    buildYearMultiTabs();
+    renderCompare();
+  }
+}
+
+// =====================================================
+//  INITIALIZATION
+// =====================================================
+window.addEventListener('DOMContentLoaded', () => {
+  refresh();
+  buildCharts();
+});
+
+// Pie / doughnut charts must stay circular. When printing, lock them to a fixed
+// square aspect ratio so they don't stretch into ovals; restore on screen.
+const ROUND_CHARTS = ['chartLocation', 'chartDonorType', 'chartGender'];
+
+function setChartsForPrint(isPrint) {
+  document.querySelectorAll('canvas').forEach(cv => {
+    const ch = (window.Chart && Chart.getChart) ? Chart.getChart(cv) : null;
+    if (!ch) return;
+    const isRound = ROUND_CHARTS.some(name => window[name] === ch);
+    if (isRound) {
+      ch.options.maintainAspectRatio = isPrint ? true : false;
+      if (isPrint) ch.options.aspectRatio = 1;        // perfect circle
+    }
+    ch.resize();
+    ch.update('none');
+  });
+}
+
+// Ensure Chart.js canvases redraw at the print layout size (not the on-screen size),
+// otherwise charts get cropped or distorted in the exported PDF.
+window.addEventListener('beforeprint', () => setChartsForPrint(true));
+window.addEventListener('afterprint',  () => setChartsForPrint(false));
+
+function exportToPDF() {
+  setChartsForPrint(true);
+  // Give the print CSS + resize a moment to apply before opening the print dialog.
+  setTimeout(() => { setChartsForPrint(true); window.print(); }, 300);
+}
+
+function triggerSoftRefresh() {
+  const btn = document.getElementById('btnRefresh');
+  if (btn) {
+    btn.classList.add('spinning');
+  }
+  
+  // Re-run standard refresh and chart building
+  refresh();
+  buildCharts();
+  
+  // Reset the rotation animation class after 400ms
+  setTimeout(() => {
+    if (btn) {
+      btn.classList.remove('spinning');
+    }
+  }, 400);
+}
+
+// Toggle laboratory navigation dropdown
+function toggleNavDropdown(event) {
+  event.preventDefault();
+  event.stopPropagation();
+  const dropdown = event.currentTarget.nextElementSibling;
+  if (dropdown) {
+    dropdown.classList.toggle('show');
+  }
+}
+
+// Close dropdown when clicking outside
+document.addEventListener('click', function(event) {
+  const dropdowns = document.querySelectorAll('.nav-dropdown-content');
+  dropdowns.forEach(d => {
+    if (!event.target.closest('.nav-item-dropdown')) {
+      d.classList.remove('show');
+    }
+  });
+});
+
+// Premium Web Audio API synthesized click-click sound effect
+function playClickSound() {
+  try {
+    const AudioContext = window.AudioContext || window.webkitAudioContext;
+    if (!AudioContext) return;
+    const ctx = new AudioContext();
+    
+    // Primary contact press click ("cl")
+    const osc1 = ctx.createOscillator();
+    const gain1 = ctx.createGain();
+    osc1.connect(gain1);
+    gain1.connect(ctx.destination);
+    
+    osc1.type = 'triangle';
+    osc1.frequency.setValueAtTime(2500, ctx.currentTime);
+    osc1.frequency.exponentialRampToValueAtTime(800, ctx.currentTime + 0.012);
+    
+    gain1.gain.setValueAtTime(0.04, ctx.currentTime);
+    gain1.gain.exponentialRampToValueAtTime(0.0001, ctx.currentTime + 0.012);
+    
+    osc1.start();
+    osc1.stop(ctx.currentTime + 0.012);
+    
+    // Secondary contact release click ("ick")
+    const osc2 = ctx.createOscillator();
+    const gain2 = ctx.createGain();
+    osc2.connect(gain2);
+    gain2.connect(ctx.destination);
+    
+    osc2.type = 'triangle';
+    osc2.frequency.setValueAtTime(2000, ctx.currentTime + 0.03);
+    osc2.frequency.exponentialRampToValueAtTime(600, ctx.currentTime + 0.042);
+    
+    gain2.gain.setValueAtTime(0.02, ctx.currentTime + 0.03);
+    gain2.gain.exponentialRampToValueAtTime(0.0001, ctx.currentTime + 0.042);
+    
+    osc2.start(ctx.currentTime + 0.03);
+    osc2.stop(ctx.currentTime + 0.042);
+  } catch (e) {
+    console.warn("Click sound failed:", e);
+  }
+}
+
+// Attach click sound listener to all interactive elements
+document.addEventListener('click', function(event) {
+  const target = event.target.closest('button, a, .month-tab, .nav-dropdown, [role="button"], .month-tab-abbr');
+  if (target) {
+    playClickSound();
+  }
+});</script>
+<audio id="bgMusic" loop preload="none">
+    <source src="bgm.mp3" type="audio/mpeg">
+    <source src="https://upload.wikimedia.org/wikipedia/commons/d/d3/Gymnop%C3%A9die_No._1.ogg" type="audio/ogg">
+  </audio>
+<script>
+function toggleMusic() {
+  const audio = document.getElementById('bgMusic');
+  const btnText = document.getElementById('musicText');
+  const icon = document.querySelector('#btnMusic .music-icon');
+  if (audio.paused) {
+    audio.volume = 0.2;
+    audio.play();
+    icon.textContent = '⏸️';
+  } else {
+    audio.pause();
+    icon.textContent = '🎵';
+  }
+}
+</script>
+
+<!-- ===== ระบบอัพเดทอัตโนมัติจากไฟล์ Excel ===== -->
+<script src="xlsx.full.min.js"></script>
+<script src="dashboard_autoload.js"></script>
+<script src="live_bloodcollection.js"></script>
+<script src="autoload_bloodcollection.js"></script>
+
+</body>
+</html>
+

@@ -1,0 +1,951 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
+  <meta http-equiv="Pragma" content="no-cache" />
+  <meta http-equiv="Expires" content="0" />
+  <title>DNA Laboratory Dashboard | ปีปฏิทิน 2569</title>
+  <meta name="description" content="Dashboard สถิติห้องปฏิบัติการสาขา DNA Laboratory ปีปฏิทิน 2569 (HLA-DNA Typing & HLA Antibody Luminex)" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.2.0/dist/chartjs-plugin-datalabels.min.js"></script>
+
+  <style>
+    :root {
+      --bg: #f8fafc; --bg-alt: #f1f5f9; --surface: #ffffff; --surface-hover: #f8fafc;
+      --surface-2: #f1f5f9; --border: #e2e8f0; --border-strong: #cbd5e1;
+      --red: #dc2626; --red-lt: #fee2e2; --red-md: #fca5a5;
+      --blue: #2563eb; --blue-lt: #dbeafe; --blue-md: #bfdbfe;
+      --teal: #0d9488; --teal-lt: #ccfbf1; --teal-md: #99f6e4;
+      --purple: #7c3aed; --purple-lt: #f3e8ff; --purple-md: #e9d5ff;
+      --amber: #d97706; --amber-lt: #fef3c7; --amber-md: #fde68a;
+      --pink: #db2777; --pink-lt: #fce7f3;
+      --rose: #db2777; --rose-lt: #fce7f3; --rose-md: #fbcfe8;
+      --orange: #f97316; --orange-lt: #ffedd5; --orange-md: #fed7aa;
+      --green: #16a34a; --green-lt: #dcfce7;
+      /* DNA Theme: Violet/Purple (sibling of HLA indigo) */
+      --indigo: #7c3aed; --indigo-lt: #f3e8ff; --indigo-md: #d8b4fe;
+      --violet: #6d28d9; --violet-lt: #ede9fe; --violet-md: #c4b5fd;
+      --text-1: #0f172a; --text-2: #334155; --text-3: #64748b; --text-4: #cbd5e1;
+      --shadow-sm: 0 1px 3px rgba(15,23,42,0.06), 0 1px 2px rgba(15,23,42,0.04);
+      --shadow-md: 0 4px 12px rgba(15,23,42,0.08), 0 2px 4px rgba(15,23,42,0.04);
+      --shadow-lg: 0 10px 25px -5px rgba(15,23,42,0.1), 0 8px 10px -6px rgba(15,23,42,0.1);
+      --radius: 16px; --radius-sm: 10px; --radius-xs: 6px;
+    }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body { font-family: 'Sarabun','Inter',sans-serif; background: var(--bg); color: var(--text-1); min-height: 100vh; font-size: 14px; line-height: 1.5; }
+
+    .header { background: var(--surface); border-bottom: 1px solid var(--border); box-shadow: var(--shadow-sm); position: sticky; top: 0; z-index: 100; }
+    .header-inner { max-width: 1440px; margin: 0 auto; padding: 0 28px; display: flex; align-items: center; gap: 20px; height: 68px; }
+    .logo-wrap { display: flex; align-items: center; gap: 14px; flex-shrink: 0; }
+    .logo-info h1 { font-size: 16px; font-weight: 700; color: var(--text-1); line-height: 1.2; }
+    .logo-info p { font-size: 12px; color: var(--text-3); margin-top: 1px; }
+    .header-divider { width: 1px; height: 32px; background: var(--border); }
+    .nav-menu { display: flex; align-items: center; gap: 8px; margin: 0 4px; overflow: visible; }
+    .nav-link { display: inline-flex; align-items: center; gap: 6px; padding: 6px 14px; border-radius: 20px; color: var(--text-2); font-weight: 500; font-size: 12.5px; text-decoration: none; transition: all 0.2s cubic-bezier(0.16,1,0.3,1); }
+    .nav-link:hover { background: var(--bg-alt); color: var(--text-1); }
+    .nav-link.active { font-weight: 700; background: var(--indigo-lt); color: var(--indigo); }
+    .header-meta { display: flex; align-items: center; gap: 10px; flex: 1; }
+    .pill { display: inline-flex; align-items: center; gap: 5px; padding: 5px 12px; border-radius: 20px; font-size: 12px; font-weight: 600; border: 1.5px solid; white-space: nowrap; }
+    .pill-indigo { background: var(--indigo-lt); color: var(--indigo); border-color: var(--indigo-md); }
+    .pill-teal { background: var(--teal-lt); color: var(--teal); border-color: var(--teal-md); }
+    .pill-blue { background: var(--blue-lt); color: var(--blue); border-color: var(--blue-md); }
+    .live-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--teal); animation: blink 1.8s ease-in-out infinite; }
+    @keyframes blink { 0%,100% { opacity: 1; transform: scale(1); } 50% { opacity: 0.4; transform: scale(0.7); } }
+
+    .btn-refresh { display: inline-flex; align-items: center; gap: 5px; padding: 7px 14px; background: var(--indigo-lt); color: var(--indigo); border: 1.5px solid var(--indigo-md); border-radius: 20px; font-size: 12px; font-weight: 600; cursor: pointer; transition: all 0.2s; }
+    .btn-refresh:hover { background: var(--indigo-md); }
+    .btn-refresh.spinning svg { animation: spin 0.4s linear; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .btn-export { display: inline-flex; align-items: center; gap: 5px; padding: 7px 14px; background: var(--indigo); color: #fff; border: none; border-radius: 20px; font-size: 12px; font-weight: 600; cursor: pointer; transition: all 0.2s; }
+    .btn-export:hover { background: var(--violet); }
+    .btn-action { background: var(--surface-2); border: 1px solid var(--border); color: var(--text-2); padding: 6px 14px; border-radius: 20px; font-size: 12px; font-weight: 600; cursor: pointer; transition: all 0.2s; }
+    .btn-action:hover { background: var(--border); color: var(--text-1); }
+    .btn-action-secondary { background: var(--surface-2); border: 1px solid var(--border); color: var(--text-2); }
+
+    .main { max-width: 1440px; margin: 0 auto; padding: 28px 28px 48px; }
+    .month-bar { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); box-shadow: var(--shadow-sm); padding: 16px 20px; margin-bottom: 24px; }
+    .month-bar-top { display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px; gap: 12px; flex-wrap: wrap; }
+    .month-bar-label { display: flex; align-items: center; gap: 10px; }
+    .month-bar-title { font-size: 15px; font-weight: 700; color: var(--text-1); }
+    .month-bar-subtitle { font-size: 12px; color: var(--text-3); }
+    .month-tabs { display: grid; grid-template-columns: repeat(12, 1fr); gap: 8px; }
+    @media (max-width: 1024px) { .month-tabs { grid-template-columns: repeat(6, 1fr); } }
+    @media (max-width: 640px) { .month-tabs { grid-template-columns: repeat(4, 1fr); } }
+    .month-tab { background: var(--surface); border: 1.5px solid var(--border); border-radius: var(--radius-sm); padding: 10px 6px; text-align: center; cursor: pointer; transition: all 0.2s cubic-bezier(0.4,0,0.2,1); position: relative; user-select: none; }
+    .month-tab:hover:not(.disabled) { border-color: var(--indigo-md); background: var(--surface-hover); transform: translateY(-2px); }
+    .month-tab.active { background: var(--indigo-lt); border-color: var(--indigo); color: var(--indigo); }
+    .month-tab.disabled { opacity: 0.35; cursor: not-allowed; background: var(--bg-alt); }
+    .month-tab-abbr { font-size: 13px; font-weight: 700; line-height: 1.2; }
+    .month-tab-num { font-size: 10px; font-weight: 500; opacity: 0.7; margin-top: 1px; }
+    .month-tab-dot { width: 5px; height: 5px; border-radius: 50%; background: var(--indigo); position: absolute; bottom: 6px; left: 50%; transform: translateX(-50%); display: none; }
+    .month-tab.active .month-tab-dot { display: block; }
+
+    .mdp { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); box-shadow: var(--shadow-sm); padding: 20px; margin-bottom: 24px; display: flex; align-items: center; gap: 24px; flex-wrap: wrap; }
+    .mdp-month-badge { padding: 12px 18px; border-radius: var(--radius-sm); background: var(--indigo-lt); color: var(--indigo); text-align: center; flex-shrink: 0; }
+    .mdp-month-name { font-size: 18px; font-weight: 800; line-height: 1.1; }
+    .mdp-month-year { font-size: 12px; font-weight: 600; opacity: 0.7; margin-top: 2px; }
+    .mdp-divider { width: 1px; height: 48px; background: var(--border); flex-shrink: 0; }
+    .mdp-stats { display: flex; gap: 28px; flex-wrap: wrap; flex: 1; }
+    .mdp-stat { display: flex; flex-direction: column; gap: 2px; }
+    .mdp-stat-val { font-size: 22px; font-weight: 800; color: var(--indigo); }
+    .mdp-stat-lbl { font-size: 11px; color: var(--text-3); font-weight: 500; }
+
+    .kpi-section-title { display: flex; align-items: center; gap: 10px; font-size: 14px; font-weight: 700; color: var(--text-1); margin-bottom: 16px; padding: 0 4px; }
+    .kpi-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-bottom: 24px; }
+    @media (max-width: 1200px) { .kpi-grid { grid-template-columns: repeat(2, 1fr); } }
+    @media (max-width: 640px) { .kpi-grid { grid-template-columns: 1fr; } }
+    .kpi-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 20px; box-shadow: var(--shadow-sm); transition: all 0.2s; border-left: 3px solid var(--kpi-color, var(--indigo)); }
+    .kpi-card:hover { box-shadow: var(--shadow-md); transform: translateY(-2px); }
+    .kpi-icon-wrap { width: 36px; height: 36px; border-radius: 10px; background: var(--kpi-bg, var(--indigo-lt)); display: flex; align-items: center; justify-content: center; font-size: 18px; margin-bottom: 12px; }
+    .kpi-label { font-size: 12px; font-weight: 600; color: var(--text-3); text-transform: uppercase; letter-spacing: 0.03em; margin-bottom: 4px; }
+    .kpi-value { font-size: 28px; font-weight: 800; color: var(--kpi-color, var(--indigo)); line-height: 1.1; margin-bottom: 4px; }
+    .kpi-sub { font-size: 11px; color: var(--text-3); margin-bottom: 12px; }
+    .kpi-badge { display: inline-flex; align-items: center; gap: 3px; padding: 3px 8px; border-radius: 20px; font-size: 11px; font-weight: 700; }
+    .kpi-badge.up { background: #dcfce7; color: #15803d; }
+    .kpi-badge.down { background: #fee2e2; color: #dc2626; }
+    .kpi-badge.same { background: var(--bg-alt); color: var(--text-3); }
+    .kpi-badge.target { background: var(--indigo-lt); color: var(--indigo); }
+    .kpi-split-row { display: flex; flex-wrap: wrap; gap: 8px 12px; border-top: 1px solid var(--border); padding-top: 10px; }
+    .kpi-split-col { flex: 1 1 40%; min-width: 0; display: flex; flex-direction: column; gap: 2px; }
+    .kpi-split-label { font-size: 10px; color: var(--text-3); font-weight: 500; }
+    .kpi-split-value { font-size: 13px; font-weight: 700; color: var(--text-1); }
+
+    /* ===== HERO KPI CARDS (main 3) ===== */
+    .hero-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 18px; margin-bottom: 24px; }
+    @media (max-width: 1100px) { .hero-grid { grid-template-columns: 1fr; } }
+    .hero-card {
+      position: relative; background: var(--surface); border: 1px solid var(--border);
+      border-radius: var(--radius); box-shadow: var(--shadow-sm); padding: 0; overflow: hidden;
+      transition: all 0.25s cubic-bezier(0.16,1,0.3,1);
+    }
+    .hero-card:hover { box-shadow: var(--shadow-lg); transform: translateY(-3px); }
+    .hero-top {
+      padding: 18px 20px 16px; position: relative;
+      background: linear-gradient(135deg, var(--hc-bg) 0%, rgba(255,255,255,0) 130%);
+      border-bottom: 1px solid var(--border);
+    }
+    .hero-top::before { content:''; position:absolute; left:0; top:0; bottom:0; width:4px; background: var(--hc); }
+    .hero-head { display: flex; align-items: center; gap: 12px; margin-bottom: 14px; }
+    .hero-icon {
+      width: 44px; height: 44px; border-radius: 13px; background: var(--surface);
+      box-shadow: var(--shadow-sm); display: flex; align-items: center; justify-content: center;
+      font-size: 22px; flex-shrink: 0; border: 1px solid var(--border);
+    }
+    .hero-titles { min-width: 0; }
+    .hero-label { font-size: 13px; font-weight: 700; color: var(--text-1); line-height: 1.25; }
+    .hero-sub { font-size: 11px; color: var(--text-3); margin-top: 2px; }
+    .hero-value-row { display: flex; align-items: baseline; gap: 8px; }
+    .hero-value { font-size: 38px; font-weight: 800; color: var(--hc); line-height: 1; letter-spacing: -0.02em; }
+    .hero-unit { font-size: 13px; font-weight: 600; color: var(--text-3); }
+    /* segmented method bar */
+    .hero-bar { display: flex; height: 8px; border-radius: 6px; overflow: hidden; margin-top: 14px; background: var(--bg-alt); }
+    .hero-bar span { height: 100%; transition: width 0.4s ease; }
+    .hero-legend { display: flex; flex-wrap: wrap; gap: 4px 12px; margin-top: 9px; }
+    .hero-legend .lg { display: inline-flex; align-items: center; gap: 5px; font-size: 10.5px; color: var(--text-2); font-weight: 500; }
+    .hero-legend .dot { width: 8px; height: 8px; border-radius: 3px; flex-shrink: 0; }
+    .hero-legend .lg b { color: var(--text-1); font-weight: 700; }
+    /* sub-group rows */
+    .hero-body { padding: 14px 20px 18px; display: flex; flex-direction: column; gap: 12px; }
+    .hero-sub-row { }
+    .hero-sub-head { display: flex; align-items: baseline; justify-content: space-between; margin-bottom: 7px; }
+    .hero-sub-name { font-size: 12px; font-weight: 700; color: var(--text-2); display: inline-flex; align-items: center; gap: 6px; }
+    .hero-sub-name .pin { width: 7px; height: 7px; border-radius: 2px; background: var(--hc); }
+    .hero-sub-total { font-size: 13px; font-weight: 800; color: var(--hc); }
+    .hero-sub-total small { font-size: 10px; font-weight: 600; color: var(--text-3); }
+    .hero-chips { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; }
+    .hero-chip {
+      background: var(--bg-alt); border: 1px solid var(--border); border-radius: 8px;
+      padding: 6px 4px 5px; text-align: center;
+    }
+    .hero-chip .m { font-size: 9px; font-weight: 700; color: var(--text-3); text-transform: uppercase; letter-spacing: 0.02em; }
+    .hero-chip .n { font-size: 15px; font-weight: 800; color: var(--text-1); line-height: 1.1; margin-top: 1px; }
+    .hero-chip.zero .n { color: var(--text-4); }
+    .hero-chip.lead { background: var(--hc-bg); border-color: var(--hc); }
+    .hero-chip.lead .n, .hero-chip.lead .m { color: var(--hc); }
+    @media print {
+      .hero-grid { grid-template-columns: repeat(3,1fr) !important; gap: 8px !important; }
+      .hero-card { break-inside: avoid !important; box-shadow: none !important; }
+      .hero-value { font-size: 24px !important; } .hero-icon { width: 30px !important; height: 30px !important; font-size: 15px !important; }
+      .hero-chip .n { font-size: 11px !important; } .hero-sub-name, .hero-label { font-size: 9px !important; }
+    }
+
+    .charts-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 32px; }
+    @media (max-width: 900px) { .charts-grid { grid-template-columns: 1fr; } }
+    .chart-card {
+      background: linear-gradient(150deg, rgba(255,255,255,1) 0%, rgba(248,250,252,0.6) 100%);
+      border: 1px solid rgba(0,0,0,0.06);
+      border-top: 4px solid var(--indigo);
+      border-radius: var(--radius);
+      box-shadow: 0 4px 16px rgba(0,0,0,0.04), 0 2px 4px rgba(0,0,0,0.02);
+      padding: 24px;
+      transition: all 0.3s cubic-bezier(0.25,0.8,0.25,1);
+      position: relative;
+    }
+    .chart-card:hover {
+      box-shadow: 0 16px 32px rgba(0,0,0,0.08), 0 6px 12px rgba(0,0,0,0.04);
+      transform: translateY(-4px);
+    }
+    .chart-header { margin-bottom: 20px; }
+    .chart-title h3 { font-size: 15px; font-weight: 700; color: var(--text-1); }
+    .chart-title p { font-size: 12.5px; color: var(--text-3); margin-top: 4px; }
+    .chart-wrap { position: relative; height: 320px; }
+
+    .table-section { background: #ffffff; border: 1px solid rgba(0,0,0,0.06); border-radius: var(--radius); box-shadow: 0 6px 24px rgba(0,0,0,0.03); margin-bottom: 32px; overflow: hidden; transition: all 0.3s; }
+    .table-section:hover { box-shadow: 0 10px 32px rgba(0,0,0,0.06); }
+    .table-header { padding: 20px 24px; border-bottom: none; background: linear-gradient(135deg, var(--indigo) 0%, var(--violet) 100%); display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px; color: #ffffff; }
+    .table-title { display: flex; align-items: center; gap: 14px; }
+    .table-title-icon { background: rgba(255,255,255,0.2); padding: 8px; border-radius: 12px; font-size: 22px; width: 44px; height: 44px; display: flex; align-items: center; justify-content: center; backdrop-filter: blur(4px); box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
+    .table-title h3 { font-size: 16px; font-weight: 700; color: #ffffff; letter-spacing: 0.2px; }
+    .table-title p { font-size: 12.5px; color: rgba(255,255,255,0.8); margin-top: 4px; }
+    .table-wrap { overflow-x: auto; background: var(--surface); }
+    table { width: 100%; border-collapse: separate; border-spacing: 0; font-size: 13px; }
+    thead th { background: rgba(248,250,252,0.8); color: var(--text-2); font-weight: 700; padding: 12px 14px; text-align: center; border-bottom: 2px solid var(--border-strong); white-space: nowrap; backdrop-filter: blur(8px); }
+    .text-left { text-align: left !important; }
+    .sticky-col-1 { position: sticky; left: 0; background: rgba(248,250,252,0.95); z-index: 1; min-width: 44px; max-width: 50px; font-weight: 600; }
+    .sticky-col-2 { position: sticky; left: 44px; background: rgba(248,250,252,0.95); z-index: 1; min-width: 240px; border-right: 2px solid var(--border); font-weight: 600; color: var(--text-1); }
+    tbody td { padding: 10px 14px; text-align: center; border-bottom: 1px solid var(--border); color: var(--text-2); transition: background 0.2s; }
+    tbody td.text-left { text-align: left; }
+    tbody tr:hover td { background: var(--indigo-lt); }
+    .sticky-col-1, .sticky-col-2 { background: var(--surface); }
+    tbody tr:hover .sticky-col-1, tbody tr:hover .sticky-col-2 { background: var(--indigo-lt); }
+    .col-total { background: rgba(124,58,237,0.04) !important; color: var(--indigo) !important; font-weight: 800; border-left: 2px solid var(--border); }
+    .active-month-col { background: rgba(124,58,237,0.06); font-weight: 700; color: var(--indigo); }
+    tr.section-header td { background: var(--bg-alt); color: var(--text-2); font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.03em; padding: 10px 14px; border-bottom: 1px solid var(--border); text-align: left; border-top: 1px solid var(--border); }
+    tr.tr-total td { background: var(--indigo-lt); color: var(--indigo); font-weight: 800; border-top: 2px solid var(--indigo-md); }
+
+    .analysis-section { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); box-shadow: var(--shadow-sm); overflow: hidden; }
+    .analysis-header { padding: 20px; border-bottom: 1px solid var(--border); background: linear-gradient(135deg, var(--indigo-lt) 0%, var(--violet-lt) 100%); }
+    .analysis-title h3 { font-size: 15px; font-weight: 700; color: var(--indigo); }
+    .analysis-title p { font-size: 12px; color: var(--text-3); margin-top: 4px; }
+    .analysis-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0; }
+    @media (max-width: 900px) { .analysis-grid { grid-template-columns: 1fr; } }
+    .analysis-card { padding: 20px; border-right: 1px solid var(--border); border-bottom: 1px solid var(--border); }
+    .analysis-card:last-child { border-right: none; }
+    .analysis-card h4 { font-size: 13px; font-weight: 700; color: var(--text-1); margin-bottom: 12px; }
+    .analysis-card ul { list-style: none; display: flex; flex-direction: column; gap: 10px; }
+    .analysis-card li { font-size: 13px; color: var(--text-2); line-height: 1.6; padding-left: 16px; position: relative; }
+    .analysis-card li::before { content: '•'; position: absolute; left: 0; color: var(--indigo); font-weight: 700; }
+    .recommendations-box { padding: 20px; background: var(--indigo-lt); border-top: 1px solid var(--indigo-md); }
+    .recommendations-box h5 { font-size: 13px; font-weight: 700; color: var(--indigo); margin-bottom: 12px; }
+    .recommendations-box ol { padding-left: 20px; display: flex; flex-direction: column; gap: 8px; }
+    .recommendations-box li { font-size: 13px; color: var(--text-2); line-height: 1.6; }
+
+    .footer { background: var(--surface); border-top: 1px solid var(--border); padding: 16px 28px; max-width: 1440px; margin: 0 auto; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 8px; font-size: 12px; color: var(--text-3); }
+    @keyframes fadeUp { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: translateY(0); } }
+    .fade-up { animation: fadeUp 0.45s ease both; }
+    .nav-item-dropdown { position: relative; }
+    .nav-dropdown-content { display: none; position: absolute; top: 100%; left: 0; background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-sm); box-shadow: var(--shadow-md); z-index: 200; min-width: 285px; margin-top: 4px; overflow: hidden; }
+    .nav-dropdown-content a { display: block; padding: 10px 16px; color: var(--text-2); text-decoration: none; font-size: 12px; font-weight: 500; transition: all 0.2s; text-align: left; }
+    .nav-dropdown-content a:hover { background: var(--bg-alt); color: var(--text-1); }
+    .nav-dropdown-content a.sub { padding-left: 30px; font-size: 11.5px; color: var(--text-3); border-top: 1px solid var(--border); }
+    .nav-dropdown-content a.sub::before { content: '↳ '; color: var(--indigo); }
+
+    /* ===== SUB-MENU TAB BAR ===== */
+    .tab-nav-bar { background: var(--surface); border-bottom: 2px solid var(--border); position: sticky; top: 68px; z-index: 99; box-shadow: 0 2px 8px rgba(15,23,42,0.05); }
+    .tab-nav-inner { max-width: 1440px; margin: 0 auto; padding: 0 24px; display: flex; align-items: center; gap: 2px; overflow-x: auto; scrollbar-width: none; }
+    .tab-nav-inner::-webkit-scrollbar { display: none; }
+    .tab-btn { display: inline-flex; align-items: center; gap: 7px; padding: 13px 20px; background: transparent; border: none; border-bottom: 3px solid transparent; color: var(--text-3); font-family: 'Sarabun','Inter',sans-serif; font-size: 13.5px; font-weight: 600; cursor: pointer; transition: all 0.18s ease; white-space: nowrap; margin-bottom: -2px; text-decoration: none; }
+    .tab-btn:hover { color: var(--text-1); background: var(--bg-alt); }
+    .tab-btn.active { color: var(--indigo); border-bottom-color: var(--indigo); font-weight: 800; background: transparent; }
+    @media print { .tab-nav-bar { display: none !important; } }
+    .nav-dropdown-content.show { display: block !important; }
+
+    @page { size: A4 landscape; margin: 8mm 10mm 10mm 10mm; }
+    @media print {
+      *, *::before, *::after { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; color-adjust: exact !important; }
+      html, body { background: #ffffff !important; color: #000 !important; font-size: 10px !important; }
+      .btn-export, .btn-refresh, .btn-action, .btn-action-secondary, #btnMusic, #btnRefresh,
+      .nav-menu, .nav-item-dropdown, .header-meta, .header-divider, .month-bar, #monthDetailPanel, .mdp, .footer, .live-dot { display: none !important; }
+      .header { position: relative !important; box-shadow: none !important; border-bottom: 2px solid #333 !important; height: auto !important; padding: 6px 0 8px !important; }
+      .header-inner { max-width: 100% !important; height: auto !important; padding: 0 10mm !important; }
+      .logo-info h1 { font-size: 13px !important; } .logo-info p { font-size: 9px !important; }
+      .main { max-width: 100% !important; width: 100% !important; padding: 0 !important; }
+      .kpi-section-title { font-size: 10px !important; margin-bottom: 6px !important; break-after: avoid !important; }
+      .kpi-grid { display: grid !important; grid-template-columns: repeat(4, 1fr) !important; gap: 6px !important; margin-bottom: 8px !important; break-inside: avoid !important; }
+      .kpi-card { break-inside: avoid !important; box-shadow: none !important; border: 1px solid #d1d5db !important; padding: 7px 9px !important; }
+      .kpi-value { font-size: 18px !important; }
+      .kpi-label, .kpi-sub, .kpi-split-label { font-size: 8px !important; }
+      .kpi-split-value { font-size: 10px !important; } .kpi-badge { font-size: 8px !important; }
+      .kpi-icon-wrap { width: 26px !important; height: 26px !important; font-size: 14px !important; margin-bottom: 6px !important; }
+      .charts-grid { display: grid !important; grid-template-columns: 1fr 1fr !important; gap: 8px !important; margin-bottom: 8px !important; break-inside: avoid !important; }
+      .chart-card { box-shadow: none !important; border: 1px solid #d1d5db !important; padding: 10px !important; break-inside: avoid !important; }
+      .chart-title h3 { font-size: 10px !important; } .chart-title p { font-size: 8.5px !important; }
+      .chart-wrap { height: 160px !important; max-height: 160px !important; overflow: hidden !important; }
+      .table-section { break-before: page !important; box-shadow: none !important; border: 1px solid #d1d5db !important; }
+      .table-header { padding: 10px 14px !important; } .table-title h3 { font-size: 11px !important; }
+      table { font-size: 8px !important; } thead th { padding: 5px 7px !important; font-size: 8px !important; } tbody td { padding: 3px 7px !important; }
+      .sticky-col-1, .sticky-col-2 { position: relative !important; left: auto !important; }
+      .analysis-section { break-before: page !important; box-shadow: none !important; border: 1px solid #d1d5db !important; }
+      .analysis-grid { display: grid !important; grid-template-columns: 1fr 1fr !important; }
+      .analysis-card { padding: 12px !important; } .analysis-card h4 { font-size: 10px !important; } .analysis-card li { font-size: 8.5px !important; }
+      .recommendations-box { padding: 12px !important; } .recommendations-box h5 { font-size: 10px !important; } .recommendations-box li { font-size: 8.5px !important; }
+    }
+  </style>
+</head>
+<body>
+<script>
+if (sessionStorage.getItem('auth') !== 'ok') { /* location.replace('login.html'); */ }
+</script>
+
+<!-- ===== HEADER ===== -->
+<header class="header dna-theme">
+  <div class="header-inner">
+    <div class="logo-wrap">
+      <img src="F_01_png_v-logo_si_th.png" alt="Siriraj Logo" style="height: 54px; width: auto; object-fit: contain; margin-right: 2px;">
+      <div class="header-divider" style="height: 32px; margin: 0 10px;"></div>
+      <div class="logo-info">
+        <h1>DNA Laboratory</h1>
+        <p>ห้องปฏิบัติการสาขา DNA · ภาควิชาเวชศาสตร์การธนาคารเลือด</p>
+      </div>
+    </div>
+    <div class="header-divider"></div>
+    <nav class="nav-menu">
+      <div class="nav-item-dropdown">
+        <a href="#" class="nav-link active" onclick="toggleNavDropdown(event)">🧬 Lab: DNA Laboratory ▾</a>
+        <div class="nav-dropdown-content">
+          <a href="Dashboard Blood Collection.html">Blood Collection</a>
+          <a href="Dashboard Hemapheresis.html">Hemapheresis</a>
+          <a href="Dashboard Blood Processing.html">Blood Processing</a>
+          <a href="Dashboard Infection.html">Infectious Serology</a>
+          <a href="Dashboard Blood Component.html">Blood Component Preparation</a>
+          <a href="Dashboard QC Blood Components.html">QC Blood Components</a>
+          <a href="Dashboard Immunohematology.html">Immunohematology</a>
+          <a href="Dashboard Blood Prep Disp.html">ผลิต &amp; จ่ายเลือด</a>
+          <a href="Dashboard Standard Laboratory.html">Standard Laboratory</a>
+          <a href="Dashboard Reference Laboratory.html">Reference Laboratory</a>
+          <a href="Dashboard HLA Laboratory.html">HLA Laboratory</a>
+          <a href="Dashboard DNA Laboratory.html" style="font-weight:700; background:var(--bg-alt); color:var(--text-1);">DNA Laboratory</a>
+        </div>
+      </div>
+    </nav>
+    <div class="header-divider"></div>
+    <div class="header-meta">
+      <div class="pill pill-indigo" id="headerYearPill">📅 ปี 2569</div>
+      <div class="pill pill-teal" id="headerMonthsPill"><span class="live-dot"></span> ข้อมูล ม.ค.–พ.ค. 2569</div>
+      <div class="pill pill-blue" id="headerFilePill">📄 สถิติ 69.xlsx</div>
+    </div>
+    <div style="display: inline-flex; gap: 8px;">
+      <a href="index.html" class="btn-refresh" style="text-decoration:none;">🏠 หน้าแรก</a>
+      <button class="btn-refresh" id="btnRefresh" onclick="triggerSoftRefresh()">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"/></svg>
+        รีเฟรชข้อมูล
+      </button>
+      <button class="btn-action btn-action-secondary" id="btnMusic" onclick="toggleMusic()">
+        <span class="music-icon" style="font-size:14px; line-height:1;">🎵</span> <span id="musicText">BGM</span>
+      </button>
+      <button class="btn-export" onclick="exportToPDF()">📥 Export PDF</button>
+    </div>
+  </div>
+</header>
+
+<!-- ===== SUB-MENU TAB BAR ===== -->
+<div class="tab-nav-bar">
+  <div class="tab-nav-inner">
+    <a href="Dashboard DNA Laboratory.html" class="tab-btn active">🧬 HLA-DNA Typing</a>
+    <a href="Dashboard DNA Luminex.html" class="tab-btn">🩸 HLA Antibody (Luminex)</a>
+  </div>
+</div>
+
+<!-- ===== MAIN ===== -->
+<main class="main">
+  <div class="month-bar fade-up" style="animation-delay:0.05s;">
+    <div class="month-bar-top">
+      <div class="month-bar-label">
+        <span class="month-bar-title">เลือกปีปฏิทิน</span>
+        <span class="month-bar-subtitle" id="selectedYearTag">ปี 2569</span>
+      </div>
+    </div>
+    <div class="month-tabs" id="yearTabs" style="grid-template-columns: repeat(6, 1fr);"></div>
+  </div>
+
+  <div class="month-bar fade-up" style="animation-delay:0.1s;">
+    <div class="month-bar-top">
+      <div class="month-bar-label">
+        <span class="month-bar-title">เลือกเดือนเปรียบเทียบสถิติ</span>
+        <span class="month-bar-subtitle" id="selectedMonthTag">รวมทุกเดือน</span>
+      </div>
+      <div style="display:flex; gap:8px;">
+        <button class="btn-action" onclick="selectAll()">รวมทุกเดือน</button>
+      </div>
+    </div>
+    <div class="month-tabs" id="monthTabs"></div>
+  </div>
+
+  <div class="mdp fade-up" id="monthDetailPanel" style="animation-delay:0.15s; display:none;"></div>
+
+  <div class="kpi-section-title fade-up" style="animation-delay:0.2s;">
+    <span>🧬 ดัชนีชี้วัดหลัก — งาน HLA-DNA Typing ห้อง DNA Laboratory</span>
+    <span style="font-size:12px; font-weight:normal; color:var(--text-3); margin-left:auto;" id="kpiPeriodNote"></span>
+  </div>
+  <div class="hero-grid" id="kpiGrid"></div>
+
+  <div class="kpi-section-title fade-up" style="animation-delay:0.22s;">
+    <span>🔬 สถิติ Method, HLA Antibody</span>
+  </div>
+  <div class="kpi-grid" id="kpiGrid2" style="margin-bottom:32px;"></div>
+
+  <div class="kpi-section-title fade-up" style="animation-delay:0.23s;">
+    <span>💊 HLA for Adverse drug reaction / disease association</span>
+  </div>
+  <div class="kpi-grid" id="kpiGridADR" style="margin-bottom:32px;"></div>
+
+  <div class="charts-grid">
+    <div class="chart-card fade-up" style="animation-delay:0.25s;">
+      <div class="chart-header"><div class="chart-title"><h3>HLA-DNA Typing รายเดือน — แยกตามกลุ่มงาน</h3><p>BMT / Solid Organ / Post-KT (ราย)</p></div></div>
+      <div class="chart-wrap"><canvas id="chartGroup"></canvas></div>
+    </div>
+    <div class="chart-card fade-up" style="animation-delay:0.28s;">
+      <div class="chart-header"><div class="chart-title"><h3>สัดส่วนวิธีตรวจ (Method)</h3><p>NGS / SSO / SSP / RT-PCR ของช่วงที่เลือก</p></div></div>
+      <div class="chart-wrap">
+        <canvas id="chartMethod"></canvas>
+        <img src="file:///C:/Users/Tam/.gemini/antigravity/brain/4151c06c-b2c9-46a1-aa3a-dc1190c0c833/dna_method_icon_1782667388616.png" 
+             style="position: absolute; top: 42%; left: 50%; transform: translate(-50%, -50%); width: 140px; height: 140px; pointer-events: none; mix-blend-mode: multiply; opacity: 0.9;" alt="DNA Method Icon" />
+      </div>
+    </div>
+  </div>
+
+  <div class="charts-grid">
+    <div class="chart-card fade-up" style="animation-delay:0.3s;">
+      <div class="chart-header"><div class="chart-title"><h3>แนวโน้มวิธีตรวจรายเดือน</h3><p id="methodTrendSubtitle">NGS / SSO / SSP / RT-PCR (ราย)</p></div></div>
+      <div class="chart-wrap"><canvas id="chartMethodTrend"></canvas></div>
+    </div>
+    <div class="chart-card fade-up" style="animation-delay:0.33s;">
+      <div class="chart-header"><div class="chart-title"><h3>HLA for ADR / Disease Association รายเดือน</h3><p>B*15:02 / B*58:01 / B*57:01 / B*51 (ราย)</p></div></div>
+      <div class="chart-wrap"><canvas id="chartADR"></canvas></div>
+    </div>
+  </div>
+
+  <div class="table-section fade-up" style="animation-delay:0.45s;">
+    <div class="table-header">
+      <div class="table-title">
+        <div class="table-title-icon">📑</div>
+        <div>
+          <h3>รายงานตารางสถิติ DNA Laboratory รายเดือนอย่างละเอียด</h3>
+          <p>HLA-DNA Typing จำแนกตามกลุ่มงาน × วิธี · ปีที่เลือก</p>
+        </div>
+      </div>
+    </div>
+    <div class="table-wrap"><table id="dataTable"></table></div>
+  </div>
+
+  <div class="analysis-section fade-up" style="animation-delay:0.5s; margin-bottom:32px;">
+    <div class="analysis-header"><div class="analysis-title">
+      <h3>🧠 บทวิเคราะห์แนวโน้มสถิติ DNA Laboratory และการบริหารคุณภาพเชิงยุทธศาสตร์ (ปี 2569)</h3>
+      <p>วิเคราะห์ปริมาณงาน HLA-DNA Typing, การเปลี่ยนผ่านสู่ NGS และงาน HLA-ADR</p>
+    </div></div>
+    <div class="analysis-grid">
+      <div class="analysis-card">
+        <h4>📊 บทวิเคราะห์จากฐานข้อมูลสถิติห้อง DNA Laboratory (ปี 2569)</h4>
+        <ul>
+          <li><strong>การเปลี่ยนผ่านสู่ NGS เด่นชัด:</strong> ตั้งแต่ มี.ค. 2569 เป็นต้นมา สัดส่วนการตรวจด้วย NGS เพิ่มขึ้นอย่างรวดเร็ว (จาก 0 รายในช่วง ม.ค.–ก.พ. เป็น 22–47 รายต่อเดือน) สวนทางกับ RT-PCR ที่ลดลงเหลือเกือบ 0 สะท้อนการยกระดับเทคโนโลยี High-resolution HLA Typing</li>
+          <li><strong>งาน Solid Organ (KT/HT) เป็นกลุ่มปริมาณสูงสุด:</strong> งาน HLA Typing สำหรับผู้ป่วยปลูกถ่ายไต/หัวใจ (PT.KT,HT) มีปริมาณนำกลุ่มอื่น โดยเฉพาะ NGS ที่เพิ่มต่อเนื่อง</li>
+          <li><strong>Post-KT Monitoring สม่ำเสมอ:</strong> งาน DQA (SSP) และ DPA,DPB (SSO) สำหรับ Post-KT typing คงปริมาณคงที่ ~18–23 รายต่อเดือน เป็นงาน routine ที่เป็นฐานปริมาณงานหลัก</li>
+        </ul>
+      </div>
+      <div class="analysis-card">
+        <h4>🌐 แนวทางการบริหารจัดการและพัฒนาคุณภาพห้อง DNA Laboratory</h4>
+        <ul>
+          <li><strong>HLA Antibody (Luminex):</strong> ดูรายละเอียดงานตรวจแอนติบอดี HLA แยกเป็นหน้าเฉพาะที่เมนู DNA Laboratory → HLA Antibody (Luminex)</li>
+          <li><strong>HLA for ADR / Disease association:</strong> การตรวจ B*15:02 และ B*58:01 ก่อนเริ่มยา (Carbamazepine / Allopurinol) เป็นบริการเชิงป้องกัน ADR ที่มีคุณค่าทางคลินิกสูง ควรประชาสัมพันธ์ให้แพทย์ส่งตรวจเพิ่ม</li>
+          <li><strong>First Pass Success Rate (NGS):</strong> ควรติดตาม KPI อัตราตรวจผ่านครั้งแรก ≥95% และ Repeat Rate ≤2% อย่างต่อเนื่องเพื่อยืนยันคุณภาพ workflow NGS ที่เพิ่งขยายตัว</li>
+        </ul>
+      </div>
+    </div>
+    <div class="recommendations-box">
+      <h5>💡 ข้อเสนอแนะเชิงยุทธศาสตร์เพื่อการพัฒนาประสิทธิภาพห้อง DNA Laboratory</h5>
+      <ol>
+        <li><strong>เร่งการเปลี่ยนผ่านสู่ NGS เต็มรูปแบบ:</strong> วางแผน batch run NGS ให้คุ้มทุน (จำนวน sample/run เหมาะสม) เพื่อลดต้นทุนและเวลารอผล พร้อมลดงาน RT-PCR/SSP ที่ความละเอียดต่ำกว่า</li>
+        <li><strong>พัฒนาฐานข้อมูล HLA Antibody ร่วมกับงานปลูกถ่าย:</strong> เชื่อมผล Luminex Single Antigen เข้ากับ Virtual Crossmatch ของทีม transplant เพื่อสนับสนุนการจับคู่ผู้บริจาค–ผู้รับ</li>
+        <li><strong>ขยายบริการ HLA-ADR เชิงป้องกัน:</strong> ส่งเสริมการตรวจ B*15:02/B*58:01/B*57:01 ก่อนเริ่มยา ผ่านการสื่อสารกับหน่วยอายุรกรรม/ผิวหนัง/ติดเชื้อ เพื่อลดอุบัติการณ์ SJS/TEN และ DRESS</li>
+      </ol>
+    </div>
+  </div>
+</main>
+
+<footer class="footer">
+  <div>ห้องปฏิบัติการสาขา DNA Laboratory · สถิติปีปฏิทิน 2569 · ภาควิชาเวชศาสตร์การธนาคารเลือด</div>
+  <div id="monthSelectorFootnote">Dashboard สร้างจาก: สถิติ 69.xlsx (Tab: DNA) · อัปเดตล่าสุด: มิถุนายน 2569</div>
+</footer>
+
+<audio id="bgMusic" loop preload="none">
+  <source src="bgm.mp3" type="audio/mpeg">
+</audio>
+
+<script>
+// =====================================================
+//  DATA — DNA Laboratory (CY 2569)
+//  Source: สถิติ 69.xlsx  Tab "DNA" + "Luminex"
+//  Months index 0..11 = ม.ค...ธ.ค.  | DNA: 5 mo (ม.ค.-พ.ค.) | Luminex: 3 mo (ม.ค.-มี.ค.)
+// =====================================================
+const N5 = [null,null,null,null,null,null,null]; // 7 trailing nulls helper
+const DNA2569 = {
+  // --- BMT ---  (PT.BMT)
+  dna_bmt_pt_ngs:  [0,0,3,19,12, null,null,null,null,null,null,null],
+  dna_bmt_pt_sso:  [14,11,1,0,0, null,null,null,null,null,null,null],
+  dna_bmt_pt_ssp:  [0,0,1,1,0, null,null,null,null,null,null,null],
+  dna_bmt_pt_pcr:  [2,2,0,0,0, null,null,null,null,null,null,null],
+  // --- BMT --- (Donor BMT)
+  dna_bmt_d_ngs:   [0,0,1,2,2, null,null,null,null,null,null,null],
+  dna_bmt_d_sso:   [0,5,0,0,0, null,null,null,null,null,null,null],
+  dna_bmt_d_ssp:   [0,1,1,2,2, null,null,null,null,null,null,null],
+  dna_bmt_d_pcr:   [0,0,2,3,0, null,null,null,null,null,null,null],
+  // --- Solid Organ --- (PT.KT,HT)
+  dna_kt_pt_ngs:   [0,0,18,23,24, null,null,null,null,null,null,null],
+  dna_kt_pt_sso:   [0,1,0,0,0, null,null,null,null,null,null,null],
+  dna_kt_pt_ssp:   [0,0,0,0,0, null,null,null,null,null,null,null],
+  dna_kt_pt_pcr:   [9,10,0,0,0, null,null,null,null,null,null,null],
+  // --- Solid Organ --- (LRD)
+  dna_lrd_ngs:     [0,0,0,3,6, null,null,null,null,null,null,null],
+  dna_lrd_sso:     [0,0,0,0,0, null,null,null,null,null,null,null],
+  dna_lrd_ssp:     [0,1,0,0,0, null,null,null,null,null,null,null],
+  dna_lrd_pcr:     [0,1,0,0,0, null,null,null,null,null,null,null],
+  // --- Post KT (PT, LRD) ---
+  dna_post_dqa:    [23,15,23,18,20, null,null,null,null,null,null,null], // DQA SSP
+  dna_post_dpadpb: [23,15,23,18,20, null,null,null,null,null,null,null], // DPA,DPB SSO
+  // --- Method summary ---
+  dna_m_ngs:       [0,0,22,47,44, null,null,null,null,null,null,null],
+  dna_m_sso:       [37,32,24,18,20, null,null,null,null,null,null,null],
+  dna_m_ssp:       [23,17,25,21,22, null,null,null,null,null,null,null],
+  dna_m_pcr:       [11,13,2,3,0, null,null,null,null,null,null,null],
+  dna_total:       [71,62,73,89,86, null,null,null,null,null,null,null],
+  // --- HLA for ADR / disease association ---
+  dna_adr_b1502:   [6,0,2,6,4, null,null,null,null,null,null,null],
+  dna_adr_b5801:   [10,2,7,5,3, null,null,null,null,null,null,null],
+  dna_adr_b5701:   [1,0,1,2,1, null,null,null,null,null,null,null],
+  dna_adr_b51:     [0,0,0,2,1, null,null,null,null,null,null,null],
+  // --- KPI (NGS) ---
+  dna_kpi_firstpass: [0,0,22,47,44, null,null,null,null,null,null,null],
+  dna_kpi_repeat:    [0,0,0,0,0, null,null,null,null,null,null,null],
+
+  // ===== Luminex (Service = ศิริราช + ร.พ.อื่น ๆ) — 3 months =====
+  lum_screening:   [47,71,47, null,null,null,null,null,null,null,null,null],
+  lum_pra1:        [3,3,0, null,null,null,null,null,null,null,null,null],
+  lum_pra2:        [3,3,0, null,null,null,null,null,null,null,null,null],
+  lum_sa1:         [38,18,36, null,null,null,null,null,null,null,null,null],
+  lum_sa2:         [36,16,36, null,null,null,null,null,null,null,null,null],
+  lum_sa1_c1q:     [0,0,0, null,null,null,null,null,null,null,null,null],
+  lum_sa2_c1q:     [0,0,0, null,null,null,null,null,null,null,null,null],
+  lum_mica_geno:   [8,6,8, null,null,null,null,null,null,null,null,null],
+  lum_mica_ab:     [0,0,2, null,null,null,null,null,null,null,null,null],
+  lum_trali:       [0,0,0, null,null,null,null,null,null,null,null,null],
+  lum_total:       [135,117,129, null,null,null,null,null,null,null,null,null],
+  // Luminex EQAS (3rd col per month)
+  lum_eqas:        [0,0,22, null,null,null,null,null,null,null,null,null],
+};
+
+// =====================================================
+//  STATE & HELPERS
+// =====================================================
+let selectedYear  = 2569;
+let selectedMonth = null;
+const MONTHS_FY = ['ม.ค.','ก.พ.','มี.ค.','เม.ย.','พ.ค.','มิ.ย.','ก.ค.','ส.ค.','ก.ย.','ต.ค.','พ.ย.','ธ.ค.'];
+const MONTHS_FULL = ['มกราคม','กุมภาพันธ์','มีนาคม','เมษายน','พฤษภาคม','มิถุนายน','กรกฎาคม','สิงหาคม','กันยายน','ตุลาคม','พฤศจิกายน','ธันวาคม'];
+const YEARS = [2569];
+
+const getYearData = (y) => (y === 2569 ? DNA2569 : null);
+const currentData = () => getYearData(selectedYear);
+
+// DNA tab has 5 months of data
+function getAvailableIdx(year) { return [0,1,2,3,4]; }
+const getAvailableIdxs = () => getAvailableIdx(selectedYear);
+const hasData = i => getAvailableIdxs().includes(i);
+
+const sum = (arr, idxs) => { if (!arr) return 0; if (!idxs) idxs = getAvailableIdxs(); return idxs.reduce((a,i)=>a+(arr[i]||0),0); };
+const sumOf = (key, idxs, cd) => sum((cd||currentData())[key], idxs);
+const fmt = (v, dec=0) => (v==null||isNaN(v)) ? '–' : Number(v).toLocaleString('th-TH',{minimumFractionDigits:dec,maximumFractionDigits:dec});
+const pct = (a,b) => b ? Math.round((a/b)*100) : 0;
+function getCurrentIdxs(){ return selectedMonth!==null ? [selectedMonth] : getAvailableIdxs(); }
+
+// =====================================================
+//  YEAR & MONTH TABS
+// =====================================================
+function buildYearTabs(){
+  const c = document.getElementById('yearTabs'); c.innerHTML='';
+  YEARS.forEach(y=>{
+    const t=document.createElement('div');
+    t.className='month-tab'+(selectedYear===y?' active':'');
+    t.innerHTML=`<div class="month-tab-abbr">ปี ${y}</div><div class="month-tab-num">ม.ค. - พ.ค. (5 เดือน)</div><div class="month-tab-dot"></div>`;
+    t.addEventListener('click',()=>{ if(selectedYear===y)return; selectedYear=y; refresh(); buildCharts(); });
+    c.appendChild(t);
+  });
+  document.getElementById('selectedYearTag').textContent=`ปีปฏิทิน ${selectedYear}`;
+  document.getElementById('headerYearPill').innerHTML=`📅 ปี ${selectedYear}`;
+  document.getElementById('headerMonthsPill').innerHTML=`<span class="live-dot"></span> ข้อมูล ม.ค.–พ.ค. ${selectedYear}`;
+  document.getElementById('headerFilePill').textContent=`📄 สถิติ ${selectedYear-2500}.xlsx`;
+}
+
+function buildMonthTabs(){
+  const c=document.getElementById('monthTabs'); c.innerHTML='';
+  MONTHS_FY.forEach((m,i)=>{
+    const av=hasData(i);
+    const t=document.createElement('div');
+    t.className='month-tab'+(!av?' disabled':'')+(selectedMonth===i?' active':'');
+    t.innerHTML=`<div class="month-tab-abbr">${m}</div><div class="month-tab-num">${selectedYear}</div><div class="month-tab-dot"></div>`;
+    t.addEventListener('click',()=>{ if(!av)return; selectedMonth=selectedMonth===i?null:i; refresh(); });
+    c.appendChild(t);
+  });
+  const tag=document.getElementById('selectedMonthTag');
+  tag.textContent = selectedMonth===null ? `รวมทุกเดือน (ม.ค.–พ.ค. ${selectedYear})` : `${MONTHS_FULL[selectedMonth]} ${selectedYear}`;
+}
+function selectAll(){ selectedMonth=null; refresh(); }
+
+// =====================================================
+//  MONTH DETAIL PANEL
+// =====================================================
+function renderMonthPanel(){
+  const p=document.getElementById('monthDetailPanel');
+  if(selectedMonth===null){ p.style.display='none'; return; }
+  p.style.display='flex';
+  const d=currentData(), i=selectedMonth;
+  const gv=k=>(d[k]&&d[k][i]!=null)?d[k][i]:0;
+  const dnaTotal=gv('dna_total');
+  const ngs=gv('dna_m_ngs');
+  const sso=gv('dna_m_sso');
+  const adr=gv('dna_adr_b1502')+gv('dna_adr_b5801')+gv('dna_adr_b5701')+gv('dna_adr_b51');
+  p.innerHTML=`
+    <div class="mdp-month-badge"><div class="mdp-month-name">${MONTHS_FULL[i]}</div><div class="mdp-month-year">${selectedYear}</div></div>
+    <div class="mdp-divider"></div>
+    <div class="mdp-stats">
+      <div class="mdp-stat"><span class="mdp-stat-val">${fmt(dnaTotal)}</span><span class="mdp-stat-lbl">HLA-DNA Typing (ราย)</span></div>
+      <div class="mdp-stat"><span class="mdp-stat-val">${fmt(ngs)}</span><span class="mdp-stat-lbl">NGS (ราย)</span></div>
+      <div class="mdp-stat"><span class="mdp-stat-val">${fmt(sso)}</span><span class="mdp-stat-lbl">SSO (ราย)</span></div>
+      <div class="mdp-stat"><span class="mdp-stat-val">${fmt(adr)}</span><span class="mdp-stat-lbl">HLA-ADR (ราย)</span></div>
+    </div>
+    <button class="btn-action" onclick="selectAll()" style="margin-left:auto;">ดูทั้งปี</button>`;
+}
+
+// helper sums of groups
+function gSum(keys, pi, cd){ return keys.reduce((a,k)=>a+sumOf(k,pi,cd),0); }
+
+// =====================================================
+//  KPI GRID 1 — Main (HLA-DNA Typing groups)
+// =====================================================
+function renderKPI(){
+  const idxs=getCurrentIdxs(), pi=idxs;
+  document.getElementById('kpiPeriodNote').textContent = selectedMonth!==null
+    ? `เดือน ${MONTHS_FULL[selectedMonth]} ${selectedYear}`
+    : `รวม ${idxs.length} เดือน (${idxs.map(i=>MONTHS_FY[i]).join(', ')})`;
+
+  // helper: per-method values for a sub-group (NGS/SSO/SSP/RT-PCR keys)
+  const mv = (ngsK,ssoK,sspK,pcrK)=>({ NGS:sumOf(ngsK,pi), SSO:sumOf(ssoK,pi), SSP:sumOf(sspK,pi), 'RT-PCR':sumOf(pcrK,pi) });
+
+  const cards=[
+    { icon:'🧫', label:'BMT HLA Typing', sub:'ปลูกถ่ายไขกระดูก (Bone Marrow Transplant)', hc:'var(--indigo)', hcBg:'var(--indigo-lt)',
+      subs:[
+        { name:'PT.BMT — ผู้ป่วย', methods: mv('dna_bmt_pt_ngs','dna_bmt_pt_sso','dna_bmt_pt_ssp','dna_bmt_pt_pcr') },
+        { name:'Donor BMT — ผู้บริจาค', methods: mv('dna_bmt_d_ngs','dna_bmt_d_sso','dna_bmt_d_ssp','dna_bmt_d_pcr') },
+      ] },
+    { icon:'🫘', label:'Solid Organ HLA Typing', sub:'ปลูกถ่ายอวัยวะ (Kidney / Heart Transplant)', hc:'var(--blue)', hcBg:'var(--blue-lt)',
+      subs:[
+        { name:'PT.KT, HT — ผู้ป่วย', methods: mv('dna_kt_pt_ngs','dna_kt_pt_sso','dna_kt_pt_ssp','dna_kt_pt_pcr') },
+        { name:'LRD — ผู้บริจาคญาติ', methods: mv('dna_lrd_ngs','dna_lrd_sso','dna_lrd_ssp','dna_lrd_pcr') },
+      ] },
+    { icon:'🔁', label:'Post-KT (PT, LRD)', sub:'ติดตามหลังปลูกถ่ายไต (Post-transplant monitoring)', hc:'var(--teal)', hcBg:'var(--teal-lt)',
+      subs:[
+        { name:'DQA', methods:{ SSP:sumOf('dna_post_dqa',pi) }, only:'SSP' },
+        { name:'DPA, DPB', methods:{ SSO:sumOf('dna_post_dpadpb',pi) }, only:'SSO' },
+      ] },
+  ];
+
+  const METHOD_COLORS = { 'NGS':'var(--indigo)', 'SSO':'var(--amber)', 'SSP':'var(--teal)', 'RT-PCR':'var(--red)' };
+
+  document.getElementById('kpiGrid').innerHTML = cards.map(c=>{
+    // card total + aggregate method mix
+    const agg = { NGS:0, SSO:0, SSP:0, 'RT-PCR':0 };
+    c.subs.forEach(s=>{ Object.keys(s.methods).forEach(m=>{ agg[m]=(agg[m]||0)+(s.methods[m]||0); }); });
+    const cardTotal = Object.values(agg).reduce((a,b)=>a+b,0);
+
+    // segmented method bar
+    const order=['NGS','SSO','SSP','RT-PCR'];
+    const segs = order.filter(m=>agg[m]>0).map(m=>{
+      const w = cardTotal>0 ? (agg[m]/cardTotal*100) : 0;
+      return `<span style="width:${w}%; background:${METHOD_COLORS[m]};" title="${m}: ${agg[m]}"></span>`;
+    }).join('');
+    const legend = order.filter(m=>agg[m]>0).map(m=>
+      `<span class="lg"><span class="dot" style="background:${METHOD_COLORS[m]}"></span>${m} <b>${fmt(agg[m])}</b></span>`
+    ).join('');
+
+    // sub-group rows
+    const subRows = c.subs.map(s=>{
+      const sTotal = Object.values(s.methods).reduce((a,b)=>a+(b||0),0);
+      // determine lead method
+      let lead=null, leadV=-1; order.forEach(m=>{ if((s.methods[m]||0)>leadV){leadV=s.methods[m]||0; lead=m;} });
+      const chips = order.map(m=>{
+        const v = s.methods[m];
+        if(v===undefined) return `<div class="hero-chip zero"><div class="m">${m}</div><div class="n">–</div></div>`;
+        const isLead = sTotal>0 && m===lead && v>0;
+        return `<div class="hero-chip ${v===0?'zero':''} ${isLead?'lead':''}"><div class="m">${m}</div><div class="n">${fmt(v)}</div></div>`;
+      }).join('');
+      return `<div class="hero-sub-row">
+        <div class="hero-sub-head">
+          <span class="hero-sub-name"><span class="pin"></span>${s.name}</span>
+          <span class="hero-sub-total">${fmt(sTotal)} <small>ราย</small></span>
+        </div>
+        <div class="hero-chips">${chips}</div>
+      </div>`;
+    }).join('');
+
+    return `<div class="hero-card fade-up" style="--hc:${c.hc}; --hc-bg:${c.hcBg};">
+      <div class="hero-top">
+        <div class="hero-head">
+          <div class="hero-icon">${c.icon}</div>
+          <div class="hero-titles">
+            <div class="hero-label">${c.label}</div>
+            <div class="hero-sub">${c.sub}</div>
+          </div>
+        </div>
+        <div class="hero-value-row"><span class="hero-value">${fmt(cardTotal)}</span><span class="hero-unit">ราย</span></div>
+        <div class="hero-bar">${segs}</div>
+        <div class="hero-legend">${legend||'<span class="lg" style="color:var(--text-3)">ไม่มีข้อมูลในช่วงที่เลือก</span>'}</div>
+      </div>
+      <div class="hero-body">${subRows}</div>
+    </div>`;
+  }).join('');
+}
+
+// =====================================================
+//  KPI GRID 2 — Specialized (Method, Luminex, ADR, KPI)
+// =====================================================
+function renderKPI2(){
+  const idxs=getCurrentIdxs(), pi=idxs;
+
+  const ngs=sumOf('dna_m_ngs',pi), sso=sumOf('dna_m_sso',pi), ssp=sumOf('dna_m_ssp',pi), pcr=sumOf('dna_m_pcr',pi);
+  const methodTotal=ngs+sso+ssp+pcr;
+  const sh=v=>methodTotal>0?pct(v,methodTotal):0;
+
+  const methods=[
+    { icon:'🧬', label:'NGS', val:ngs, sub:'Next-Generation Sequencing — High-resolution', color:'var(--indigo)', bg:'var(--indigo-lt)' },
+    { icon:'🧫', label:'SSO', val:sso, sub:'Sequence-Specific Oligonucleotide', color:'var(--amber)', bg:'var(--amber-lt)' },
+    { icon:'⚗️', label:'SSP', val:ssp, sub:'Sequence-Specific Primer', color:'var(--teal)', bg:'var(--teal-lt)' },
+    { icon:'🔬', label:'RT-PCR', val:pcr, sub:'Real-Time PCR', color:'var(--red)', bg:'var(--red-lt)' },
+  ];
+
+  const kpis = methods.map(m=>({
+    icon:m.icon, label:`วิธีตรวจ ${m.label}`, val:fmt(m.val), sub:`ราย — ${m.sub}`,
+    color:m.color, bg:m.bg, badge:`<span class="kpi-badge target">${sh(m.val)}% ของทั้งหมด</span>`,
+    splits:[ {label:`สัดส่วน ${m.label}`, wide:true, val:`${fmt(m.val)} ราย · ${sh(m.val)}% ของงาน Typing ทั้งหมด (${fmt(methodTotal)} ราย)`} ],
+  }));
+  document.getElementById('kpiGrid2').innerHTML = kpis.map(renderKpiCard).join('');
+}
+
+// =====================================================
+//  KPI GRID — HLA for ADR / Disease association
+// =====================================================
+function renderADR(){
+  const pi=getCurrentIdxs();
+  const b1502=sumOf('dna_adr_b1502',pi), b5801=sumOf('dna_adr_b5801',pi),
+        b5701=sumOf('dna_adr_b5701',pi), b51=sumOf('dna_adr_b51',pi);
+  const total=b1502+b5801+b5701+b51;
+  const sh=v=>total>0?pct(v,total):0;
+
+  const items=[
+    { icon:'🧬', allele:'HLA-B*15:02', val:b1502, color:'var(--indigo)', bg:'var(--indigo-lt)',
+      drug:'Carbamazepine', dz:'SJS / TEN' },
+    { icon:'🧬', allele:'HLA-B*58:01', val:b5801, color:'var(--violet)', bg:'var(--violet-lt)',
+      drug:'Allopurinol', dz:'SJS / TEN / DRESS' },
+    { icon:'🧬', allele:'HLA-B*57:01', val:b5701, color:'var(--teal)', bg:'var(--teal-lt)',
+      drug:'Abacavir', dz:'Hypersensitivity' },
+    { icon:'🧬', allele:'HLA-B*51', val:b51, color:'var(--amber)', bg:'var(--amber-lt)',
+      drug:'—', dz:'Behçet’s disease' },
+  ];
+  const kpis=items.map(it=>({
+    icon:it.icon, label:it.allele, val:fmt(it.val), sub:`ราย — ${it.dz}`,
+    color:it.color, bg:it.bg, badge:`<span class="kpi-badge target">${sh(it.val)}%</span>`,
+    splits:[
+      { label:'สัดส่วน', val:`${sh(it.val)}% ของ ADR` },
+    ],
+  }));
+  document.getElementById('kpiGridADR').innerHTML = kpis.map(renderKpiCard).join('');
+}
+
+function renderKpiCard(k){
+  return `<div class="kpi-card fade-up" style="--kpi-color:${k.color}; --kpi-bg:${k.bg};">
+    <div style="display:flex; justify-content:space-between; align-items:flex-start;">
+      <div class="kpi-icon-wrap">${k.icon}</div>${k.badge||''}
+    </div>
+    <div class="kpi-label">${k.label}</div>
+    <div class="kpi-value">${k.val}</div>
+    <div class="kpi-sub">${k.sub}</div>
+    <div class="kpi-split-row">
+      ${k.splits.map(s=>`<div class="kpi-split-col" style="${s.wide?'flex:1 1 100%':''}"><span class="kpi-split-label">${s.label}</span><span class="kpi-split-value">${s.val}</span></div>`).join('')}
+    </div>
+  </div>`;
+}
+
+// =====================================================
+//  DATA TABLE
+// =====================================================
+function renderTable(){
+  const tIdxs=getAvailableIdxs();
+  const active=new Set(selectedMonth!==null?[selectedMonth]:[]);
+  const thead=`<thead><tr>
+    <th class="text-left sticky-col-1">ลำดับ</th>
+    <th class="text-left sticky-col-2">รายการตรวจ</th>
+    ${tIdxs.map(i=>`<th class="${active.has(i)?'active-month-col':''}"><span style="font-size:12px;font-weight:700;">${MONTHS_FY[i]}</span></th>`).join('')}
+    <th class="col-total">รวมปี ${selectedYear}</th>
+  </tr></thead>`;
+
+  const row=(num,name,key,maxIdx)=>{
+    const arr=currentData()[key];
+    const cells=tIdxs.map(i=>{
+      const ac=active.has(i)?'active-month-col':'';
+      const v=arr?arr[i]:null;
+      return `<td class="${ac}">${v!=null?fmt(v):'–'}</td>`;
+    }).join('');
+    const total=arr?fmt(sum(arr,tIdxs)):'–';
+    return `<tr><td class="text-left sticky-col-1">${num}</td><td class="text-left sticky-col-2">${name}</td>${cells}<td class="col-total">${total}</td></tr>`;
+  };
+  const grp=t=>`<tr class="section-header"><td colspan="${tIdxs.length+3}">${t}</td></tr>`;
+  const totalRow=(name,key)=>{
+    const arr=currentData()[key];
+    const cells=tIdxs.map(i=>{const ac=active.has(i)?'active-month-col':'';const v=arr?arr[i]:null;return `<td class="${ac}">${v!=null?fmt(v):'–'}</td>`;}).join('');
+    return `<tr class="tr-total"><td class="text-left sticky-col-1"></td><td class="text-left sticky-col-2">${name}</td>${cells}<td class="col-total">${arr?fmt(sum(arr,tIdxs)):'–'}</td></tr>`;
+  };
+
+  const tbody=`<tbody>
+    ${grp('1. BMT — HLA-DNA Typing (ราย)')}
+    ${row('1.1','PT.BMT — NGS','dna_bmt_pt_ngs')}
+    ${row('1.2','PT.BMT — SSO','dna_bmt_pt_sso')}
+    ${row('1.3','PT.BMT — SSP','dna_bmt_pt_ssp')}
+    ${row('1.4','PT.BMT — RT-PCR','dna_bmt_pt_pcr')}
+    ${row('1.5','Donor BMT — NGS','dna_bmt_d_ngs')}
+    ${row('1.6','Donor BMT — SSO','dna_bmt_d_sso')}
+    ${row('1.7','Donor BMT — SSP','dna_bmt_d_ssp')}
+    ${row('1.8','Donor BMT — RT-PCR','dna_bmt_d_pcr')}
+
+    ${grp('2. Solid Organ — HLA-DNA Typing (ราย)')}
+    ${row('2.1','PT.KT, HT — NGS','dna_kt_pt_ngs')}
+    ${row('2.2','PT.KT, HT — SSO','dna_kt_pt_sso')}
+    ${row('2.3','PT.KT, HT — SSP','dna_kt_pt_ssp')}
+    ${row('2.4','PT.KT, HT — RT-PCR','dna_kt_pt_pcr')}
+    ${row('2.5','LRD — NGS','dna_lrd_ngs')}
+    ${row('2.6','LRD — SSO','dna_lrd_sso')}
+    ${row('2.7','LRD — SSP','dna_lrd_ssp')}
+    ${row('2.8','LRD — RT-PCR','dna_lrd_pcr')}
+
+    ${grp('3. Post KT (PT, LRD) (ราย)')}
+    ${row('3.1','DQA — SSP','dna_post_dqa')}
+    ${row('3.2','DPA, DPB — SSO','dna_post_dpadpb')}
+
+    ${grp('4. สรุปตามวิธีตรวจ (Method)')}
+    ${row('4.1','NGS','dna_m_ngs')}
+    ${row('4.2','SSO','dna_m_sso')}
+    ${row('4.3','SSP','dna_m_ssp')}
+    ${row('4.4','RT-PCR','dna_m_pcr')}
+    ${totalRow('TOTAL (HLA-DNA Typing)','dna_total')}
+
+    ${grp('5. HLA for Adverse Drug Reaction / Disease Association (ราย)')}
+    ${row('5.1','B*15:02','dna_adr_b1502')}
+    ${row('5.2','B*58:01','dna_adr_b5801')}
+    ${row('5.3','B*57:01','dna_adr_b5701')}
+    ${row('5.4','B*51','dna_adr_b51')}
+
+    ${grp('6. KPI — NGS Quality')}
+    ${row('6.1','First Pass Success (ราย)','dna_kpi_firstpass')}
+    ${row('6.2','Repeat (ราย)','dna_kpi_repeat')}
+  </tbody>`;
+  document.getElementById('dataTable').innerHTML=thead+tbody;
+}
+
+// =====================================================
+//  CHARTS
+// =====================================================
+let cGroup,cMethod,cMethodTrend,cADR;
+function destroyCharts(){ [cGroup,cMethod,cMethodTrend,cADR].forEach(c=>c&&c.destroy()); }
+
+function buildCharts(){
+  destroyCharts();
+  const DL = (typeof ChartDataLabels!=='undefined') ? ChartDataLabels : null;
+  const d=currentData(), idxs=getAvailableIdxs(), lbl=idxs.map(i=>MONTHS_FY[i]);
+  const ga=key=>idxs.map(i=>d[key]?(d[key][i]||0):0);
+  const gaGroup=keys=>idxs.map(i=>keys.reduce((a,k)=>a+(d[k]&&d[k][i]!=null?d[k][i]:0),0));
+  const PAL={indigo:'#7c3aed',v2:'#a855f7',v3:'#c084fc',v4:'#d8b4fe',blue:'#2563eb',teal:'#0d9488',green:'#16a34a',amber:'#f59e0b',red:'#ef4444',pink:'#db2777',orange:'#f97316'};
+
+  // datalabels presets
+  const dlLine = { align:'top', anchor:'end', color:'#334155', font:{size:10,weight:'700'}, formatter:v=>(v&&v>0)?v:'' };
+  // stacked bar: show ONLY the column total, placed on top of the topmost segment
+  const dlStackTotal = {
+    color:'#334155', anchor:'end', align:'end', offset:2, font:{size:11,weight:'800'},
+    formatter:function(value, ctx){
+      const ds=ctx.chart.data.datasets, di=ctx.datasetIndex, idx=ctx.dataIndex;
+      // only render on the last dataset that has a non-zero value in this column (the visible top)
+      let topVisible=-1;
+      for(let k=ds.length-1;k>=0;k--){ if((ds[k].data[idx]||0)>0){ topVisible=k; break; } }
+      if(di!==topVisible) return '';
+      const total=ds.reduce((a,s)=>a+(s.data[idx]||0),0);
+      return total>0?total:'';
+    }
+  };
+
+  const baseOpts=(stacked)=>({responsive:true,maintainAspectRatio:false,layout:{padding:{top:20}},
+    plugins:{legend:{display:true,position:'top',labels:{boxWidth:12,font:{size:11}}}, datalabels: dlStackTotal},
+    scales:{x:{stacked:!!stacked},y:{beginAtZero:true,stacked:!!stacked}}});
+  const plugins = DL?[DL]:[];
+
+  // 1. Groups stacked
+  cGroup=new Chart(document.getElementById('chartGroup'),{type:'bar',plugins,data:{labels:lbl,datasets:[
+    {label:'BMT',data:gaGroup(['dna_bmt_pt_ngs','dna_bmt_pt_sso','dna_bmt_pt_ssp','dna_bmt_pt_pcr','dna_bmt_d_ngs','dna_bmt_d_sso','dna_bmt_d_ssp','dna_bmt_d_pcr']),backgroundColor:PAL.indigo,borderRadius:4},
+    {label:'Solid Organ',data:gaGroup(['dna_kt_pt_ngs','dna_kt_pt_sso','dna_kt_pt_ssp','dna_kt_pt_pcr','dna_lrd_ngs','dna_lrd_sso','dna_lrd_ssp','dna_lrd_pcr']),backgroundColor:PAL.blue,borderRadius:4},
+    {label:'Post-KT',data:gaGroup(['dna_post_dqa','dna_post_dpadpb']),backgroundColor:PAL.teal,borderRadius:4},
+  ]},options:baseOpts(true)});
+
+  // 2. Method doughnut (selected period)
+  const pi=getCurrentIdxs();
+  const methData=[sumOf('dna_m_ngs',pi),sumOf('dna_m_sso',pi),sumOf('dna_m_ssp',pi),sumOf('dna_m_pcr',pi)];
+  const methTot=methData.reduce((a,b)=>a+b,0);
+  cMethod=new Chart(document.getElementById('chartMethod'),{type:'doughnut',plugins,data:{labels:['NGS','SSO','SSP','RT-PCR'],datasets:[{data:methData,backgroundColor:[PAL.indigo,PAL.amber,PAL.teal,PAL.red],borderWidth:0}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:true,position:'bottom'},datalabels:{color:'#fff',font:{size:11,weight:'700'},formatter:(v)=>v>0?`${v}\n(${methTot?Math.round(v/methTot*100):0}%)`:'',textAlign:'center'}},cutout:'65%'}});
+
+  // 3. Method trend — line for all months, bar when a single month is selected
+  const mtHead=document.getElementById('methodTrendSubtitle');
+  if(selectedMonth!==null){
+    // single month → bar chart of the 4 methods
+    const mCols=[PAL.indigo,PAL.amber,PAL.teal,PAL.red];
+    const mData=[sumOf('dna_m_ngs',pi),sumOf('dna_m_sso',pi),sumOf('dna_m_ssp',pi),sumOf('dna_m_pcr',pi)];
+    if(mtHead) mtHead.textContent=`NGS / SSO / SSP / RT-PCR — ${MONTHS_FULL[selectedMonth]} ${selectedYear} (ราย)`;
+    cMethodTrend=new Chart(document.getElementById('chartMethodTrend'),{type:'bar',plugins,data:{labels:['NGS','SSO','SSP','RT-PCR'],datasets:[
+      {label:MONTHS_FULL[selectedMonth],data:mData,backgroundColor:mCols,borderRadius:6,maxBarThickness:90},
+    ]},options:{responsive:true,maintainAspectRatio:false,layout:{padding:{top:18}},plugins:{legend:{display:false},datalabels:{anchor:'end',align:'top',color:'#334155',font:{size:12,weight:'800'},formatter:v=>(v&&v>0)?v:''}},scales:{y:{beginAtZero:true}}}});
+  } else {
+    if(mtHead) mtHead.textContent='NGS / SSO / SSP / RT-PCR (ราย)';
+    cMethodTrend=new Chart(document.getElementById('chartMethodTrend'),{type:'bar',plugins,data:{labels:lbl,datasets:[
+      {label:'NGS',data:ga('dna_m_ngs'),backgroundColor:PAL.indigo,borderRadius:4,maxBarThickness:26},
+      {label:'SSO',data:ga('dna_m_sso'),backgroundColor:PAL.amber,borderRadius:4,maxBarThickness:26},
+      {label:'SSP',data:ga('dna_m_ssp'),backgroundColor:PAL.teal,borderRadius:4,maxBarThickness:26},
+      {label:'RT-PCR',data:ga('dna_m_pcr'),backgroundColor:PAL.red,borderRadius:4,maxBarThickness:26},
+    ]},options:{responsive:true,maintainAspectRatio:false,layout:{padding:{top:18}},plugins:{legend:{display:true,position:'top',labels:{boxWidth:12,font:{size:11}}},datalabels:{anchor:'end',align:'top',color:'#334155',font:{size:9,weight:'700'},formatter:v=>(v&&v>0)?v:''}},scales:{x:{grid:{display:false}},y:{beginAtZero:true}}}});
+  }
+
+  // 4. ADR monthly
+  cADR=new Chart(document.getElementById('chartADR'),{type:'bar',plugins,data:{labels:lbl,datasets:[
+    {label:'B*15:02',data:ga('dna_adr_b1502'),backgroundColor:PAL.indigo,borderRadius:4},
+    {label:'B*58:01',data:ga('dna_adr_b5801'),backgroundColor:PAL.v2,borderRadius:4},
+    {label:'B*57:01',data:ga('dna_adr_b5701'),backgroundColor:PAL.v4,borderRadius:4},
+    {label:'B*51',data:ga('dna_adr_b51'),backgroundColor:PAL.amber,borderRadius:4},
+  ]},options:baseOpts(true)});
+}
+
+// =====================================================
+//  REFRESH
+// =====================================================
+function refresh(){ buildYearTabs(); buildMonthTabs(); renderMonthPanel(); renderKPI(); renderKPI2(); renderADR(); renderTable(); buildCharts(); }
+window.addEventListener('DOMContentLoaded', ()=>{ refresh(); });
+function exportToPDF(){ window.print(); }
+function triggerSoftRefresh(){ const b=document.getElementById('btnRefresh'); if(b)b.classList.add('spinning'); refresh(); setTimeout(()=>{if(b)b.classList.remove('spinning');},400); }
+function toggleNavDropdown(e){ e.preventDefault(); e.stopPropagation(); const dd=e.currentTarget.nextElementSibling; if(dd)dd.classList.toggle('show'); }
+document.addEventListener('click', function(e){ document.querySelectorAll('.nav-dropdown-content').forEach(d=>{ if(!e.target.closest('.nav-item-dropdown')) d.classList.remove('show'); }); });
+function playClickSound(){ try{ const AC=window.AudioContext||window.webkitAudioContext; if(!AC)return; const ctx=new AC(); const o=ctx.createOscillator(),g=ctx.createGain(); o.connect(g);g.connect(ctx.destination); o.type='triangle'; o.frequency.setValueAtTime(2500,ctx.currentTime); o.frequency.exponentialRampToValueAtTime(800,ctx.currentTime+0.012); g.gain.setValueAtTime(0.04,ctx.currentTime); g.gain.exponentialRampToValueAtTime(0.0001,ctx.currentTime+0.012); o.start();o.stop(ctx.currentTime+0.012);}catch(e){} }
+document.addEventListener('click', e=>{ if(e.target.closest('button, a, .month-tab, [role="button"]')) playClickSound(); });
+function toggleMusic(){ const a=document.getElementById('bgMusic'); const icon=document.querySelector('#btnMusic .music-icon'); if(a.paused){a.volume=0.2;a.play();icon.textContent='⏸️';}else{a.pause();icon.textContent='🎵';} }
+</script>
+<script src="xlsx.full.min.js"></script>
+<script src="dashboard_autoload.js"></script>
+<script src="live_dna.js"></script>
+<script src="autoload_dna.js"></script>
+</body>
+</html>

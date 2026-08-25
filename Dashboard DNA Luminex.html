@@ -1,0 +1,706 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
+  <meta http-equiv="Pragma" content="no-cache" />
+  <meta http-equiv="Expires" content="0" />
+  <title>DNA Laboratory — HLA Antibody (Luminex) | ปีปฏิทิน 2569</title>
+  <meta name="description" content="Dashboard HLA Antibody (Luminex) ห้องปฏิบัติการสาขา DNA Laboratory ปีปฏิทิน 2569" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.2.0/dist/chartjs-plugin-datalabels.min.js"></script>
+  <style>
+    :root {
+      --bg: #f8fafc; --bg-alt: #f1f5f9; --surface: #ffffff; --surface-hover: #f8fafc;
+      --surface-2: #f1f5f9; --border: #e2e8f0; --border-strong: #cbd5e1;
+      --red: #dc2626; --red-lt: #fee2e2; --red-md: #fca5a5;
+      --blue: #2563eb; --blue-lt: #dbeafe; --blue-md: #bfdbfe;
+      --teal: #0d9488; --teal-lt: #ccfbf1; --teal-md: #99f6e4;
+      --purple: #7c3aed; --purple-lt: #f3e8ff; --purple-md: #e9d5ff;
+      --amber: #d97706; --amber-lt: #fef3c7; --amber-md: #fde68a;
+      --pink: #db2777; --pink-lt: #fce7f3;
+      --orange: #f97316; --orange-lt: #ffedd5; --orange-md: #fed7aa;
+      --green: #16a34a; --green-lt: #dcfce7;
+      /* DNA Theme: Violet/Purple */
+      --indigo: #7c3aed; --indigo-lt: #f3e8ff; --indigo-md: #d8b4fe;
+      --violet: #6d28d9; --violet-lt: #ede9fe; --violet-md: #c4b5fd;
+      --text-1: #0f172a; --text-2: #334155; --text-3: #64748b; --text-4: #cbd5e1;
+      --shadow-sm: 0 1px 3px rgba(15,23,42,0.06), 0 1px 2px rgba(15,23,42,0.04);
+      --shadow-md: 0 4px 12px rgba(15,23,42,0.08), 0 2px 4px rgba(15,23,42,0.04);
+      --shadow-lg: 0 10px 25px -5px rgba(15,23,42,0.1), 0 8px 10px -6px rgba(15,23,42,0.1);
+      --radius: 16px; --radius-sm: 10px; --radius-xs: 6px;
+    }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body { font-family: 'Sarabun','Inter',sans-serif; background: var(--bg); color: var(--text-1); min-height: 100vh; font-size: 14px; line-height: 1.5; }
+    .header { background: var(--surface); border-bottom: 1px solid var(--border); box-shadow: var(--shadow-sm); position: sticky; top: 0; z-index: 100; }
+    .header-inner { max-width: 1440px; margin: 0 auto; padding: 0 28px; display: flex; align-items: center; gap: 20px; height: 68px; }
+    .logo-wrap { display: flex; align-items: center; gap: 14px; flex-shrink: 0; }
+    .logo-info h1 { font-size: 16px; font-weight: 700; color: var(--text-1); line-height: 1.2; }
+    .logo-info p { font-size: 12px; color: var(--text-3); margin-top: 1px; }
+    .header-divider { width: 1px; height: 32px; background: var(--border); }
+    .nav-menu { display: flex; align-items: center; gap: 8px; margin: 0 4px; overflow: visible; }
+    .nav-link { display: inline-flex; align-items: center; gap: 6px; padding: 6px 14px; border-radius: 20px; color: var(--text-2); font-weight: 500; font-size: 12.5px; text-decoration: none; transition: all 0.2s cubic-bezier(0.16,1,0.3,1); }
+    .nav-link:hover { background: var(--bg-alt); color: var(--text-1); }
+    .nav-link.active { font-weight: 700; background: var(--indigo-lt); color: var(--indigo); }
+    .header-meta { display: flex; align-items: center; gap: 10px; flex: 1; }
+    .pill { display: inline-flex; align-items: center; gap: 5px; padding: 5px 12px; border-radius: 20px; font-size: 12px; font-weight: 600; border: 1.5px solid; white-space: nowrap; }
+    .pill-indigo { background: var(--indigo-lt); color: var(--indigo); border-color: var(--indigo-md); }
+    .pill-teal { background: var(--teal-lt); color: var(--teal); border-color: var(--teal-md); }
+    .pill-blue { background: var(--blue-lt); color: var(--blue); border-color: var(--blue-md); }
+    .live-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--teal); animation: blink 1.8s ease-in-out infinite; }
+    @keyframes blink { 0%,100% { opacity: 1; transform: scale(1); } 50% { opacity: 0.4; transform: scale(0.7); } }
+    .btn-refresh { display: inline-flex; align-items: center; gap: 5px; padding: 7px 14px; background: var(--indigo-lt); color: var(--indigo); border: 1.5px solid var(--indigo-md); border-radius: 20px; font-size: 12px; font-weight: 600; cursor: pointer; transition: all 0.2s; text-decoration:none; }
+    .btn-refresh:hover { background: var(--indigo-md); }
+    .btn-refresh.spinning svg { animation: spin 0.4s linear; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .btn-export { display: inline-flex; align-items: center; gap: 5px; padding: 7px 14px; background: var(--indigo); color: #fff; border: none; border-radius: 20px; font-size: 12px; font-weight: 600; cursor: pointer; transition: all 0.2s; }
+    .btn-export:hover { background: var(--violet); }
+    .btn-action { background: var(--surface-2); border: 1px solid var(--border); color: var(--text-2); padding: 6px 14px; border-radius: 20px; font-size: 12px; font-weight: 600; cursor: pointer; transition: all 0.2s; }
+    .btn-action:hover { background: var(--border); color: var(--text-1); }
+    .main { max-width: 1440px; margin: 0 auto; padding: 28px 28px 48px; }
+    .month-bar { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); box-shadow: var(--shadow-sm); padding: 16px 20px; margin-bottom: 24px; }
+    .month-bar-top { display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px; gap: 12px; flex-wrap: wrap; }
+    .month-bar-label { display: flex; align-items: center; gap: 10px; }
+    .month-bar-title { font-size: 15px; font-weight: 700; color: var(--text-1); }
+    .month-bar-subtitle { font-size: 12px; color: var(--text-3); }
+    .month-tabs { display: grid; grid-template-columns: repeat(12, 1fr); gap: 8px; }
+    @media (max-width: 1024px) { .month-tabs { grid-template-columns: repeat(6, 1fr); } }
+    @media (max-width: 640px) { .month-tabs { grid-template-columns: repeat(4, 1fr); } }
+    .month-tab { background: var(--surface); border: 1.5px solid var(--border); border-radius: var(--radius-sm); padding: 10px 6px; text-align: center; cursor: pointer; transition: all 0.2s cubic-bezier(0.4,0,0.2,1); position: relative; user-select: none; }
+    .month-tab:hover:not(.disabled) { border-color: var(--indigo-md); background: var(--surface-hover); transform: translateY(-2px); }
+    .month-tab.active { background: var(--indigo-lt); border-color: var(--indigo); color: var(--indigo); }
+    .month-tab.disabled { opacity: 0.35; cursor: not-allowed; background: var(--bg-alt); }
+    .month-tab-abbr { font-size: 13px; font-weight: 700; line-height: 1.2; }
+    .month-tab-num { font-size: 10px; font-weight: 500; opacity: 0.7; margin-top: 1px; }
+    .month-tab-dot { width: 5px; height: 5px; border-radius: 50%; background: var(--indigo); position: absolute; bottom: 6px; left: 50%; transform: translateX(-50%); display: none; }
+    .month-tab.active .month-tab-dot { display: block; }
+    .mdp { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); box-shadow: var(--shadow-sm); padding: 20px; margin-bottom: 24px; display: flex; align-items: center; gap: 24px; flex-wrap: wrap; }
+    .mdp-month-badge { padding: 12px 18px; border-radius: var(--radius-sm); background: var(--indigo-lt); color: var(--indigo); text-align: center; flex-shrink: 0; }
+    .mdp-month-name { font-size: 18px; font-weight: 800; line-height: 1.1; }
+    .mdp-month-year { font-size: 12px; font-weight: 600; opacity: 0.7; margin-top: 2px; }
+    .mdp-divider { width: 1px; height: 48px; background: var(--border); flex-shrink: 0; }
+    .mdp-stats { display: flex; gap: 28px; flex-wrap: wrap; flex: 1; }
+    .mdp-stat { display: flex; flex-direction: column; gap: 2px; }
+    .mdp-stat-val { font-size: 22px; font-weight: 800; color: var(--indigo); }
+    .mdp-stat-lbl { font-size: 11px; color: var(--text-3); font-weight: 500; }
+    .kpi-section-title {
+      display: flex; align-items: center; gap: 12px; font-size: 15px; font-weight: 700; color: #ffffff;
+      margin: 32px 0 20px 0; padding: 14px 20px;
+      background: linear-gradient(135deg, var(--indigo) 0%, var(--violet) 100%);
+      border-radius: var(--radius);
+      box-shadow: 0 4px 12px rgba(124,58,237,0.15);
+    }
+    .kpi-section-icon {
+      background: rgba(255,255,255,0.2); padding: 8px; border-radius: 50%;
+      font-size: 18px; width: 36px; height: 36px;
+      display: flex; align-items: center; justify-content: center; backdrop-filter: blur(4px); box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+    }
+    .kpi-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-bottom: 24px; }
+    @media (max-width: 1200px) { .kpi-grid { grid-template-columns: repeat(2, 1fr); } }
+    @media (max-width: 640px) { .kpi-grid { grid-template-columns: 1fr; } }
+    .kpi-card {
+      background: linear-gradient(150deg, rgba(255,255,255,1) 0%, rgba(248,250,252,0.8) 100%);
+      border: 1px solid rgba(0,0,0,0.06);
+      border-radius: var(--radius); padding: 24px;
+      box-shadow: 0 4px 16px rgba(0,0,0,0.04), 0 2px 4px rgba(0,0,0,0.02);
+      transition: all 0.3s cubic-bezier(0.25,0.8,0.25,1);
+      border-top: 4px solid var(--kpi-color, var(--indigo));
+      position: relative;
+      overflow: hidden;
+    }
+    .kpi-card::before { content: ''; position: absolute; top: 0; right: 0; width: 150px; height: 150px; background: radial-gradient(circle, var(--kpi-color) 0%, transparent 70%); opacity: 0.04; border-radius: 50%; transform: translate(30%, -30%); pointer-events: none; }
+    .kpi-card:hover { box-shadow: 0 16px 32px rgba(0,0,0,0.08), 0 6px 12px rgba(0,0,0,0.04); transform: translateY(-4px); }
+    .kpi-icon-wrap { width: 44px; height: 44px; border-radius: 12px; background: var(--kpi-bg, var(--indigo-lt)); display: flex; align-items: center; justify-content: center; font-size: 22px; margin-bottom: 16px; }
+    .kpi-label { font-size: 13.5px; font-weight: 700; color: var(--text-3); text-transform: uppercase; letter-spacing: 0.03em; margin-bottom: 6px; }
+    .kpi-value { font-size: 34px; font-weight: 800; color: var(--kpi-color, var(--indigo)); line-height: 1.1; margin-bottom: 6px; }
+    .kpi-sub { font-size: 12.5px; color: var(--text-3); margin-bottom: 16px; }
+    .kpi-badge { display: inline-flex; align-items: center; gap: 3px; padding: 3px 8px; border-radius: 20px; font-size: 11px; font-weight: 700; }
+    .kpi-badge.target { background: var(--indigo-lt); color: var(--indigo); }
+    .kpi-split-row { display: flex; flex-wrap: wrap; gap: 10px 14px; border-top: 1px solid var(--border); padding-top: 12px; }
+    .kpi-split-col { flex: 1 1 40%; min-width: 0; display: flex; flex-direction: column; gap: 4px; }
+    .kpi-split-label { font-size: 11.5px; color: var(--text-3); font-weight: 500; }
+    .kpi-split-value { font-size: 14.5px; font-weight: 700; color: var(--text-1); }
+    .charts-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; margin-bottom: 32px; }
+    @media (max-width: 900px) { .charts-grid { grid-template-columns: 1fr; } }
+    .chart-card { background: var(--surface); border: 1px solid rgba(255,255,255,0.7); border-radius: 20px; box-shadow: 0 10px 30px -10px rgba(15,23,42,0.08), inset 0 0 0 1px rgba(255,255,255,1); padding: 24px; transition: transform 0.3s ease, box-shadow 0.3s ease; }
+    .chart-card:hover { transform: translateY(-4px); box-shadow: 0 20px 40px -10px rgba(15,23,42,0.12), inset 0 0 0 1px rgba(255,255,255,1); }
+    .chart-header { margin-bottom: 20px; }
+    .chart-title h3 { font-size: 16px; font-weight: 700; color: var(--text-1); letter-spacing: -0.01em; }
+    .chart-title p { font-size: 13px; color: var(--text-3); margin-top: 4px; font-weight: 500; }
+    .chart-wrap { position: relative; height: 320px; width: 100%; }
+    .table-section { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); box-shadow: var(--shadow-sm); margin-bottom: 24px; overflow: hidden; }
+    .table-header { padding: 16px 20px; border-bottom: 1px solid var(--border); }
+    .table-title h3 { font-size: 15px; font-weight: 700; color: var(--text-1); }
+    .table-title p { font-size: 12px; color: var(--text-3); margin-top: 3px; }
+    .table-wrap { overflow-x: auto; }
+    table { width: 100%; border-collapse: collapse; font-size: 13px; }
+    thead th { background: var(--indigo-lt); color: var(--indigo); font-weight: 700; padding: 10px 12px; text-align: center; border-bottom: 2px solid var(--indigo-md); white-space: nowrap; }
+    .text-left { text-align: left !important; }
+    .sticky-col-1 { position: sticky; left: 0; background: var(--indigo-lt); z-index: 1; min-width: 40px; max-width: 48px; }
+    .sticky-col-2 { position: sticky; left: 48px; background: var(--indigo-lt); z-index: 1; min-width: 260px; border-right: 1.5px solid var(--indigo-md); }
+    tbody td { padding: 8px 12px; text-align: center; border-bottom: 1px solid var(--border); color: var(--text-2); }
+    tbody td.text-left { text-align: left; }
+    tbody tr:hover td { background: var(--bg-alt); }
+    .sticky-col-1, .sticky-col-2 { background: var(--surface); }
+    tbody tr:hover .sticky-col-1, tbody tr:hover .sticky-col-2 { background: var(--bg-alt); }
+    .col-total { background: var(--indigo-lt) !important; color: var(--indigo) !important; font-weight: 700; border-left: 1px solid var(--indigo-md); }
+    .active-month-col { background: rgba(124,58,237,0.06); }
+    tr.section-header td { background: var(--bg-alt); color: var(--text-3); font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.04em; padding: 6px 12px; border-bottom: 1px solid var(--border); text-align: left; }
+    tr.tr-total td { background: var(--indigo-lt); color: var(--indigo); font-weight: 700; }
+    .analysis-section { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); box-shadow: var(--shadow-sm); overflow: hidden; }
+    .analysis-header { padding: 20px; border-bottom: 1px solid var(--border); background: linear-gradient(135deg, var(--indigo-lt) 0%, var(--violet-lt) 100%); }
+    .analysis-title h3 { font-size: 15px; font-weight: 700; color: var(--indigo); }
+    .analysis-title p { font-size: 12px; color: var(--text-3); margin-top: 4px; }
+    .analysis-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0; }
+    @media (max-width: 900px) { .analysis-grid { grid-template-columns: 1fr; } }
+    .analysis-card { padding: 20px; border-right: 1px solid var(--border); border-bottom: 1px solid var(--border); }
+    .analysis-card:last-child { border-right: none; }
+    .analysis-card h4 { font-size: 13px; font-weight: 700; color: var(--text-1); margin-bottom: 12px; }
+    .analysis-card ul { list-style: none; display: flex; flex-direction: column; gap: 10px; }
+    .analysis-card li { font-size: 13px; color: var(--text-2); line-height: 1.6; padding-left: 16px; position: relative; }
+    .analysis-card li::before { content: '•'; position: absolute; left: 0; color: var(--indigo); font-weight: 700; }
+    .footer { background: var(--surface); border-top: 1px solid var(--border); padding: 16px 28px; max-width: 1440px; margin: 0 auto; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 8px; font-size: 12px; color: var(--text-3); }
+    @keyframes fadeUp { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: translateY(0); } }
+    .fade-up { animation: fadeUp 0.45s ease both; }
+    .nav-item-dropdown { position: relative; }
+    .nav-dropdown-content { display: none; position: absolute; top: 100%; left: 0; background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-sm); box-shadow: var(--shadow-md); z-index: 200; min-width: 285px; margin-top: 4px; overflow: hidden; }
+    .nav-dropdown-content a { display: block; padding: 10px 16px; color: var(--text-2); text-decoration: none; font-size: 12px; font-weight: 500; transition: all 0.2s; text-align: left; }
+    .nav-dropdown-content a:hover { background: var(--bg-alt); color: var(--text-1); }
+    .nav-dropdown-content a.sub { padding-left: 30px; font-size: 11.5px; color: var(--text-3); border-top: 1px solid var(--border); }
+    .nav-dropdown-content a.sub::before { content: '↳ '; color: var(--indigo); }
+    .nav-dropdown-content.show { display: block !important; }
+    /* ===== SUB-MENU TAB BAR ===== */
+    .tab-nav-bar { background: var(--surface); border-bottom: 2px solid var(--border); position: sticky; top: 68px; z-index: 99; box-shadow: 0 2px 8px rgba(15,23,42,0.05); }
+    .tab-nav-inner { max-width: 1440px; margin: 0 auto; padding: 0 24px; display: flex; align-items: center; gap: 2px; overflow-x: auto; scrollbar-width: none; }
+    .tab-nav-inner::-webkit-scrollbar { display: none; }
+    .tab-btn { display: inline-flex; align-items: center; gap: 7px; padding: 13px 20px; background: transparent; border: none; border-bottom: 3px solid transparent; color: var(--text-3); font-family: 'Sarabun','Inter',sans-serif; font-size: 13.5px; font-weight: 600; cursor: pointer; transition: all 0.18s ease; white-space: nowrap; margin-bottom: -2px; text-decoration: none; }
+    .tab-btn:hover { color: var(--text-1); background: var(--bg-alt); }
+    .tab-btn.active { color: var(--indigo); border-bottom-color: var(--indigo); font-weight: 800; background: transparent; }
+    @media print { .tab-nav-bar { display: none !important; } }
+    @page { size: A4 landscape; margin: 8mm 10mm 10mm 10mm; }
+    @media print {
+      *, *::before, *::after { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
+      html, body { background: #fff !important; color: #000 !important; font-size: 10px !important; }
+      .btn-export, .btn-refresh, .btn-action, .nav-menu, .nav-item-dropdown, .header-meta, .header-divider, .month-bar, #monthDetailPanel, .mdp, .footer, .live-dot { display: none !important; }
+      .header { position: relative !important; box-shadow: none !important; border-bottom: 2px solid #333 !important; }
+      .main { max-width: 100% !important; padding: 0 !important; }
+      .kpi-grid { grid-template-columns: repeat(4,1fr) !important; gap: 6px !important; }
+      .kpi-card, .chart-card { break-inside: avoid !important; box-shadow: none !important; border: 1px solid #d1d5db !important; }
+      .charts-grid { grid-template-columns: 1fr 1fr !important; }
+      .chart-wrap { height: 170px !important; }
+      .table-section { break-before: page !important; }
+    }
+  </style>
+</head>
+<body>
+<header class="header dna-theme">
+  <div class="header-inner">
+    <div class="logo-wrap">
+      <img src="F_01_png_v-logo_si_th.png" alt="Siriraj Logo" style="height: 54px; width: auto; object-fit: contain; margin-right: 2px;">
+      <div class="header-divider" style="height: 32px; margin: 0 10px;"></div>
+      <div class="logo-info">
+        <h1>DNA Laboratory — HLA Antibody (Luminex)</h1>
+        <p>ห้องปฏิบัติการสาขา DNA · ภาควิชาเวชศาสตร์การธนาคารเลือด</p>
+      </div>
+    </div>
+    <div class="header-divider"></div>
+    <nav class="nav-menu">
+      <div class="nav-item-dropdown">
+        <a href="#" class="nav-link active" onclick="toggleNavDropdown(event)">🧬 Lab: DNA Laboratory ▾</a>
+        <div class="nav-dropdown-content">
+          <a href="Dashboard Blood Collection.html">Blood Collection</a>
+          <a href="Dashboard Hemapheresis.html">Hemapheresis</a>
+          <a href="Dashboard Blood Processing.html">Blood Processing</a>
+          <a href="Dashboard Infection.html">Infectious Serology</a>
+          <a href="Dashboard Blood Component.html">Blood Component Preparation</a>
+          <a href="Dashboard QC Blood Components.html">QC Blood Components</a>
+          <a href="Dashboard Immunohematology.html">Immunohematology</a>
+          <a href="Dashboard Blood Prep Disp.html">ผลิต &amp; จ่ายเลือด</a>
+          <a href="Dashboard Standard Laboratory.html">Standard Laboratory</a>
+          <a href="Dashboard Reference Laboratory.html">Reference Laboratory</a>
+          <a href="Dashboard HLA Laboratory.html">HLA Laboratory</a>
+          <a href="Dashboard DNA Laboratory.html" style="font-weight:700; background:var(--bg-alt); color:var(--text-1);">DNA Laboratory</a>
+        </div>
+      </div>
+    </nav>
+    <div class="header-divider"></div>
+    <div class="header-meta">
+      <div class="pill pill-indigo" id="headerYearPill">📅 ปี 2569</div>
+      <div class="pill pill-teal" id="headerMonthsPill"><span class="live-dot"></span> ข้อมูล ม.ค.–พ.ค. 2569</div>
+      <div class="pill pill-blue">📄 สถิติ 69.xlsx</div>
+    </div>
+    <div style="display: inline-flex; gap: 8px;">
+      <a href="Dashboard DNA Laboratory.html" class="btn-refresh">← กลับ DNA</a>
+      <button class="btn-refresh" id="btnRefresh" onclick="triggerSoftRefresh()">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"/></svg>
+        รีเฟรช
+      </button>
+      <button class="btn-export" onclick="exportToPDF()">📥 Export PDF</button>
+    </div>
+  </div>
+</header>
+
+<!-- ===== SUB-MENU TAB BAR ===== -->
+<div class="tab-nav-bar">
+  <div class="tab-nav-inner">
+    <a href="Dashboard DNA Laboratory.html" class="tab-btn">🧬 HLA-DNA Typing</a>
+    <a href="Dashboard DNA Luminex.html" class="tab-btn active">🩸 HLA Antibody (Luminex)</a>
+  </div>
+</div>
+
+<main class="main">
+  <!-- ===== YEAR SELECTOR ===== -->
+  <div class="month-bar fade-up" style="animation-delay:0.03s; margin-bottom:16px;">
+    <div class="month-bar-top">
+      <div class="month-bar-label">
+        <span class="month-bar-title">เลือกปีปฏิทิน</span>
+        <span class="month-bar-subtitle" id="selectedYearTag">ปี 2569</span>
+      </div>
+    </div>
+    <div class="month-tabs" id="yearTabs" style="grid-template-columns: repeat(6, 1fr);"></div>
+  </div>
+
+  <div class="month-bar fade-up" style="animation-delay:0.05s;">
+    <div class="month-bar-top">
+      <div class="month-bar-label">
+        <span class="month-bar-title">เลือกเดือนเปรียบเทียบสถิติ</span>
+        <span class="month-bar-subtitle" id="selectedMonthTag">รวมทุกเดือน</span>
+      </div>
+      <div style="display:flex; gap:8px;"><button class="btn-action" onclick="selectAll()">รวมทุกเดือน</button></div>
+    </div>
+    <div class="month-tabs" id="monthTabs"></div>
+  </div>
+
+  <div class="mdp fade-up" id="monthDetailPanel" style="animation-delay:0.1s; display:none;"></div>
+
+  <div class="hero-banner fade-up" style="animation-delay: 0.1s; background-image: linear-gradient(to right, rgba(15,23,42,0.95), rgba(15,23,42,0.6)), url('dna_luminex_banner.png'); background-size: cover; background-position: center; border-radius: 20px; padding: 40px; margin: 24px 0 32px 0; color: white; display: flex; align-items: center; justify-content: space-between; box-shadow: 0 10px 30px rgba(0,0,0,0.15);">
+    <div>
+      <h2 style="font-size: 28px; font-weight: 800; margin: 0; letter-spacing: -0.02em;">DNA Laboratory <span style="color: var(--teal);">|</span> HLA Antibody</h2>
+      <p style="font-size: 15px; margin-top: 8px; opacity: 0.9; font-weight: 400;">ศูนย์บริการวิเคราะห์ข้อมูลขั้นสูง 🧬 Luminex Technology</p>
+    </div>
+    <div style="font-size: 48px; opacity: 0.9; text-shadow: 0 4px 12px rgba(0,0,0,0.3);">🔬</div>
+  </div>
+
+  <div class="kpi-section-title fade-up" style="animation-delay:0.1s;">
+    <div class="kpi-section-icon">💡</div>
+    <span>ภาพรวมสถิติรายเดือน (KPIs)</span>
+    <span style="font-size:13px; font-weight:500; color:rgba(255,255,255,0.9); margin-left:auto; background:rgba(0,0,0,0.15); padding:4px 12px; border-radius:20px; backdrop-filter:blur(4px);" id="kpiPeriodNote"></span>
+  </div>
+  <div class="kpi-grid" id="kpiGrid" style="grid-template-columns: repeat(3, 1fr);"></div>
+
+  <div class="kpi-section-title fade-up" style="animation-delay:0.18s; background: linear-gradient(135deg, var(--teal) 0%, var(--blue) 100%); box-shadow: 0 4px 12px rgba(13,148,136,0.15);">
+    <div class="kpi-section-icon">🔬</div>
+    <span>ชนิดการตรวจเฉพาะทาง</span>
+  </div>
+  <div class="kpi-grid" id="kpiGrid2" style="margin-bottom:32px;"></div>
+
+  <div class="charts-grid">
+    <div class="chart-card fade-up" style="animation-delay:0.2s;">
+      <div class="chart-header"><div class="chart-title"><h3>📊 HLA Antibody (Luminex) รายเดือน</h3><p>จำแนกตามชนิดการตรวจ — Service (ราย)</p></div></div>
+      <div class="chart-wrap"><canvas id="chartMonthly"></canvas></div>
+    </div>
+    <div class="chart-card fade-up" style="animation-delay:0.23s;">
+      <div class="chart-header"><div class="chart-title"><h3>🏥 สัดส่วนแหล่งส่งตรวจ</h3><p>ศิริราช vs ร.พ.อื่นๆ (ราย)</p></div></div>
+      <div class="chart-wrap"><canvas id="chartMix"></canvas></div>
+    </div>
+  </div>
+
+  <div class="charts-grid">
+    <div class="chart-card fade-up" style="animation-delay:0.26s;">
+      <div class="chart-header"><div class="chart-title"><h3>🌍 แหล่งส่งตรวจ — ศิริราช vs ร.พ.อื่น ๆ</h3><p>เปรียบเทียบ Service รายเดือน (ราย)</p></div></div>
+      <div class="chart-wrap"><canvas id="chartSource"></canvas></div>
+    </div>
+    <div class="chart-card fade-up" style="animation-delay:0.29s;">
+      <div class="chart-header"><div class="chart-title"><h3>🧬 Single Antigen (Class I vs Class II)</h3><p>SA-HLA Class I / II (ราย)</p></div></div>
+      <div class="chart-wrap"><canvas id="chartSA"></canvas></div>
+    </div>
+  </div>
+  
+  <div class="charts-grid">
+    <div class="chart-card fade-up" style="animation-delay:0.32s;">
+      <div class="chart-header"><div class="chart-title"><h3>🏢 HLA Antibody Screening</h3><p>ศิริราช vs ร.พ.อื่นๆ (ราย)</p></div></div>
+      <div class="chart-wrap"><canvas id="chartScreening"></canvas></div>
+    </div>
+    <div class="chart-card fade-up" style="animation-delay:0.34s;">
+      <div class="chart-header"><div class="chart-title"><h3>🧪 Specific PRA</h3><p>Class I vs Class II (ราย)</p></div></div>
+      <div class="chart-wrap"><canvas id="chartPRA"></canvas></div>
+    </div>
+  </div>
+
+  <div class="charts-grid" style="margin-bottom: 40px;">
+    <div class="chart-card fade-up" style="animation-delay:0.36s;">
+      <div class="chart-header"><div class="chart-title"><h3>MICA</h3><p>Genotype vs Antibody (ราย)</p></div></div>
+      <div class="chart-wrap"><canvas id="chartMICA"></canvas></div>
+    </div>
+    <div class="chart-card fade-up" style="animation-delay:0.38s;">
+      <div class="chart-header"><div class="chart-title"><h3>TRALI-antibody screen</h3><p>สถิติการทดสอบ (ราย)</p></div></div>
+      <div class="chart-wrap"><canvas id="chartTRALI"></canvas></div>
+    </div>
+  </div>
+
+  <div class="table-section fade-up" style="animation-delay:0.4s;">
+    <div class="table-header"><div class="table-title">
+      <h3>รายงานตารางสถิติ HLA Antibody (Luminex) รายเดือน</h3>
+      <p>Service = ศิริราช + ร.พ.อื่น ๆ · ปีปฏิทิน 2569</p>
+    </div></div>
+    <div class="table-wrap"><table id="dataTable"></table></div>
+  </div>
+
+  <div class="analysis-section fade-up" style="animation-delay:0.4s; margin-bottom:32px;">
+    <div class="analysis-header"><div class="analysis-title">
+      <h3>🧠 บทวิเคราะห์งาน HLA Antibody (Luminex)</h3>
+      <p>วิเคราะห์ปริมาณงานตรวจแอนติบอดี HLA และแนวทางการบริหารคุณภาพ</p>
+    </div></div>
+    <div class="analysis-grid">
+      <div class="analysis-card">
+        <h4>📊 บทวิเคราะห์จากฐานข้อมูล</h4>
+        <ul>
+          <li><strong>HLA Antibody Screening เป็นงานหลัก:</strong> เป็นด่านแรกในการคัดกรองผู้ป่วยที่มี anti-HLA antibody ก่อนพิจารณา Single Antigen เพื่อระบุ specificity</li>
+          <li><strong>Single Antigen Class I / II ปริมาณสูง:</strong> ใช้ระบุ specificity ของแอนติบอดีและคำนวณ cPRA สนับสนุนการจับคู่ผู้บริจาค–ผู้รับในงานปลูกถ่าย</li>
+          <li><strong>แหล่งส่งตรวจส่วนใหญ่จากศิริราช:</strong> สัดส่วน Service ศิริราชสูงกว่า ร.พ.อื่น ๆ มาก สะท้อนบทบาทศูนย์ปลูกถ่ายหลัก</li>
+        </ul>
+      </div>
+      <div class="analysis-card">
+        <h4>🌐 แนวทางการบริหารจัดการและพัฒนาคุณภาพ</h4>
+        <ul>
+          <li><strong>บริหาร reagent และรอบการตรวจ:</strong> รวม batch Single Antigen ให้คุ้มทุนต่อ test เนื่องจาก reagent มีราคาสูง</li>
+          <li><strong>เชื่อม Virtual Crossmatch:</strong> นำผล Single Antigen เข้าฐานข้อมูลร่วมกับทีมปลูกถ่าย เพื่อสนับสนุนการตัดสินใจจับคู่</li>
+          <li><strong>ขยายงาน C1q / MICA:</strong> พิจารณาเพิ่มการตรวจ C1q-binding และ MICA antibody ในผู้ป่วยที่มีความเสี่ยง AMR</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</main>
+
+<footer class="footer">
+  <div>ห้องปฏิบัติการสาขา DNA Laboratory — HLA Antibody (Luminex) · ปีปฏิทิน 2569</div>
+  <div>Dashboard สร้างจาก: สถิติ 69.xlsx (Tab: Luminex) · อัปเดตล่าสุด: มิถุนายน 2569</div>
+</footer>
+
+<script>
+// =====================================================
+//  DATA — HLA Antibody (Luminex) CY 2569  (Service = ศิริราช + ร.พ.อื่น)
+//  Source: สถิติ 69.xlsx  Tab "Luminex"  — 5 months (ม.ค.-พ.ค.)
+// =====================================================
+const LUM_2569 = {
+  // Service total (siriraj + other)
+  screening: [47,71,47,66,67, null,null,null,null,null,null,null],
+  pra1:      [3,3,0,0,0, null,null,null,null,null,null,null],
+  pra2:      [3,3,0,0,0, null,null,null,null,null,null,null],
+  sa1:       [38,18,36,24,44, null,null,null,null,null,null,null],
+  sa2:       [36,16,36,31,34, null,null,null,null,null,null,null],
+  sa1_c1q:   [0,0,0,0,1, null,null,null,null,null,null,null],
+  sa2_c1q:   [0,0,0,0,1, null,null,null,null,null,null,null],
+  mica_geno: [8,6,8,4,6, null,null,null,null,null,null,null],
+  mica_ab:   [0,0,2,1,0, null,null,null,null,null,null,null],
+  trali:     [0,0,0,2,2, null,null,null,null,null,null,null],
+  total:     [135,117,129,128,155, null,null,null,null,null,null,null],
+  // split by source (total)
+  src_siriraj: [127,107,121,115,150, null,null,null,null,null,null,null],
+  src_other:   [8,10,8,13,5, null,null,null,null,null,null,null],
+  // split by source (screening)
+  scr_siriraj: [44,65,44,61,65, null,null,null,null,null,null,null],
+  scr_other:   [3,6,3,5,2, null,null,null,null,null,null,null],
+};
+const LUM_DATA = {
+  2569: LUM_2569,
+  2568: {
+    total: [148,11,0,146,11,5,147,10,17,149,12,9],
+    sa1_c1q: [0,0,0,0,0,0,0,0,0,0,0,0],
+    sa2_c1q: [0,0,0,0,0,0,0,0,0,0,0,0],
+    screening: [64,4,0,58,8,5,49,9,3,75,12,3],
+    mica_ab: [0,0,0,0,0,0,0,0,0,0,0,0],
+    sa2: [40,4,0,41,2,0,42,0,7,34,0,3],
+    pra2: [1,0,0,2,0,0,4,0,0,0,0,0],
+    pra1: [1,0,0,2,0,0,4,0,0,0,0,0],
+    sa1: [36,3,0,39,1,0,40,1,7,34,0,3],
+    trali: [4,0,0,0,0,0,0,0,0,2,0,0],
+    mica_geno: [2,0,0,4,0,0,8,0,0,4,0,0],
+    src_siriraj: [133,10,0,131,10,4,132,9,15,134,11,8],
+    src_other: [15,1,0,15,1,1,15,1,2,15,1,1],
+    scr_siriraj: [58,4,0,52,7,4,44,8,3,68,11,3],
+    scr_other: [6,0,0,6,1,1,5,1,0,7,1,0],
+  },
+  2567: {
+    total: [121,8,0,102,4,21,112,14,3,109,9,14],
+    sa1_c1q: [0,0,0,0,0,0,0,0,0,0,0,0],
+    sa2_c1q: [0,0,0,0,0,0,0,0,0,0,0,0],
+    screening: [44,6,0,49,4,5,47,11,3,37,4,0],
+    mica_ab: [0,0,0,0,0,0,0,0,0,0,0,0],
+    sa2: [42,2,0,19,0,5,25,1,0,29,2,7],
+    pra2: [1,0,0,3,0,0,2,0,0,4,0,0],
+    pra1: [1,0,0,3,0,0,2,0,0,4,0,0],
+    sa1: [26,0,0,18,0,5,28,2,0,27,3,7],
+    trali: [0,0,0,0,0,0,0,0,0,2,0,0],
+    mica_geno: [7,0,0,10,0,6,8,0,0,6,0,0],
+    src_siriraj: [109,7,0,92,4,19,101,13,3,98,8,13],
+    src_other: [12,1,0,10,0,2,11,1,0,11,1,1],
+    scr_siriraj: [40,5,0,44,4,4,42,10,3,33,4,0],
+    scr_other: [4,1,0,5,0,1,5,1,0,4,0,0],
+  },
+};
+// เปิดให้ระบบอัพเดทอัตโนมัติเข้าถึง/แก้ไขข้อมูลได้ + ทับด้วยข้อมูลล่าสุดจาก live_luminex.js ถ้ามี
+window.LUM_DATA = LUM_DATA;
+if (window.__LIVE__ && window.__LIVE__.luminex) {
+  Object.keys(window.__LIVE__.luminex).forEach(function(y){
+    LUM_DATA[y] = Object.assign(LUM_DATA[y] || {}, window.__LIVE__.luminex[y]);
+  });
+}
+function availOf(d){ var idx=[]; for(var i=0;i<12;i++){ if(d && Object.keys(d).some(function(k){return Array.isArray(d[k])&&d[k][i]!=null;})) idx.push(i);} return idx; }
+let LUM = LUM_DATA[2569];
+const AVAIL_DATA = { 2569: [0,1,2,3,4], 2568: [0,1,2,3,4,5,6,7,8,9,10,11], 2567: [0,1,2,3,4,5,6,7,8,9,10,11] };
+let AVAIL = availOf(LUM);
+
+let selectedMonth = null;
+let selectedYear = 2569;
+const YEARS = [2567, 2568, 2569];
+
+function buildYearTabs() {
+  const container = document.getElementById('yearTabs');
+  if(!container) return;
+  container.innerHTML = '';
+  YEARS.forEach(y => {
+    const tab = document.createElement('div');
+    tab.className = 'month-tab' + (selectedYear === y ? ' active' : '');
+    const info = y === 2569 ? (availOf(LUM_DATA[y]).length + ' เดือน') : '(ข้อมูลไม่เต็มปี)';
+    tab.innerHTML = `<div class="month-tab-abbr">ปี ${y}</div><div class="month-tab-num">${info}</div><div class="month-tab-dot"></div>`;
+    tab.addEventListener('click', () => {
+      if (selectedYear === y) return;
+      selectedYear = y;
+      selectedMonth = null;
+      LUM = LUM_DATA[selectedYear];
+      AVAIL = AVAIL_DATA[selectedYear];
+      refresh();
+    });
+    container.appendChild(tab);
+  });
+  const yt = document.getElementById('selectedYearTag');
+  if(yt) yt.innerText = `ปี ${selectedYear}`;
+  const yp = document.getElementById('headerYearPill');
+  if(yp) yp.innerHTML = `📅 ปี ${selectedYear}`;
+  const hp = document.getElementById('headerMonthsPill');
+  if(hp) hp.innerHTML = `<span class="live-dot"></span> ข้อมูล ${selectedMonth!==null ? 'เดือน ' + MONTHS_FULL[selectedMonth] : (selectedYear===2569?'ม.ค.–พ.ค.':'ภาพรวม')} ${selectedYear}`;
+}
+const MONTHS_FY = ['ม.ค.','ก.พ.','มี.ค.','เม.ย.','พ.ค.','มิ.ย.','ก.ค.','ส.ค.','ก.ย.','ต.ค.','พ.ย.','ธ.ค.'];
+const MONTHS_FULL = ['มกราคม','กุมภาพันธ์','มีนาคม','เมษายน','พฤษภาคม','มิถุนายน','กรกฎาคม','สิงหาคม','กันยายน','ตุลาคม','พฤศจิกายน','ธันวาคม'];
+
+const hasData = i => AVAIL.includes(i);
+const sum = (arr, idxs) => { if(!arr) return 0; if(!idxs) idxs=AVAIL; return idxs.reduce((a,i)=>a+(arr[i]||0),0); };
+const sumOf = (k, idxs) => sum(LUM[k], idxs);
+const fmt = (v,dec=0) => (v==null||isNaN(v))?'–':Number(v).toLocaleString('th-TH',{minimumFractionDigits:dec,maximumFractionDigits:dec});
+const pct = (a,b)=> b?Math.round((a/b)*100):0;
+const curIdxs = () => selectedMonth!==null ? [selectedMonth] : AVAIL;
+
+function buildMonthTabs(){
+  const c=document.getElementById('monthTabs'); c.innerHTML='';
+  MONTHS_FY.forEach((m,i)=>{
+    const av=hasData(i);
+    const t=document.createElement('div');
+    t.className='month-tab'+(!av?' disabled':'')+(selectedMonth===i?' active':'');
+    t.innerHTML=`<div class="month-tab-abbr">${m}</div><div class="month-tab-num">${selectedYear}</div><div class="month-tab-dot"></div>`;
+    t.addEventListener('click',()=>{ if(!av)return; selectedMonth=selectedMonth===i?null:i; refresh(); });
+    c.appendChild(t);
+  });
+  document.getElementById('selectedMonthTag').textContent = selectedMonth===null ? `รวมทุกเดือน (ม.ค.–พ.ค. ${selectedYear})` : `${MONTHS_FULL[selectedMonth]} ${selectedYear}`;
+}
+function selectAll(){ selectedMonth=null; refresh(); }
+
+function renderMonthPanel(){
+  const p=document.getElementById('monthDetailPanel');
+  if(selectedMonth===null){ p.style.display='none'; return; }
+  p.style.display='flex';
+  const i=selectedMonth, gv=k=>(LUM[k]&&LUM[k][i]!=null)?LUM[k][i]:0;
+  const sa=gv('sa1')+gv('sa2');
+  p.innerHTML=`
+    <div class="mdp-month-badge"><div class="mdp-month-name">${MONTHS_FULL[i]}</div><div class="mdp-month-year">${selectedYear}</div></div>
+    <div class="mdp-divider"></div>
+    <div class="mdp-stats">
+      <div class="mdp-stat"><span class="mdp-stat-val">${fmt(gv('total'))}</span><span class="mdp-stat-lbl">รวมทั้งหมด (ราย)</span></div>
+      <div class="mdp-stat"><span class="mdp-stat-val">${fmt(gv('screening'))}</span><span class="mdp-stat-lbl">Ab Screening</span></div>
+      <div class="mdp-stat"><span class="mdp-stat-val">${fmt(sa)}</span><span class="mdp-stat-lbl">Single Antigen</span></div>
+      <div class="mdp-stat"><span class="mdp-stat-val">${fmt(gv('src_siriraj'))}</span><span class="mdp-stat-lbl">ศิริราช</span></div>
+    </div>
+    <button class="btn-action" onclick="selectAll()" style="margin-left:auto;">ดูทั้งปี</button>`;
+}
+
+function kpiCard(k){
+  return `<div class="kpi-card fade-up" style="--kpi-color:${k.color}; --kpi-bg:${k.bg};">
+    <div style="display:flex; justify-content:space-between; align-items:flex-start;"><div class="kpi-icon-wrap">${k.icon}</div>${k.badge||''}</div>
+    <div class="kpi-label">${k.label}</div><div class="kpi-value">${k.val}</div><div class="kpi-sub">${k.sub}</div>
+    <div class="kpi-split-row">${k.splits.map(s=>`<div class="kpi-split-col" style="${s.wide?'flex:1 1 100%':''}"><span class="kpi-split-label">${s.label}</span><span class="kpi-split-value">${s.val}</span></div>`).join('')}</div>
+  </div>`;
+}
+
+function renderKPI(){
+  const pi=curIdxs();
+  document.getElementById('kpiPeriodNote').textContent = selectedMonth!==null ? `เดือน ${MONTHS_FULL[selectedMonth]} ${selectedYear}` : `รวม ${pi.length} เดือน (${pi.map(i=>MONTHS_FY[i]).join(', ')})`;
+  const total=sumOf('total',pi);
+  const scr=sumOf('screening',pi);
+  const sa=sumOf('sa1',pi)+sumOf('sa2',pi);
+  const sir=sumOf('src_siriraj',pi), oth=sumOf('src_other',pi);
+  const scr_sir=sumOf('scr_siriraj',pi), scr_oth=sumOf('scr_other',pi);
+  const kpis=[
+    { icon:'🔎', label:'HLA Antibody Screening', val:fmt(scr), sub:`ราย — ${total>0?pct(scr,total):0}% ของทั้งหมด`, color:'var(--blue)', bg:'var(--blue-lt)',
+      splits:[ {label:'ศิริราช', val:`${fmt(scr_sir)} ราย`}, {label:'ร.พ.อื่น ๆ', val:`${fmt(scr_oth)} ราย`} ] },
+    { icon:'🎯', label:'Single Antigen (รวม)', val:fmt(sa), sub:'ราย — ระบุ specificity ของแอนติบอดี', color:'var(--violet)', bg:'var(--violet-lt)',
+      splits:[ {label:'Class I', val:`${fmt(sumOf('sa1',pi))} ราย`}, {label:'Class II', val:`${fmt(sumOf('sa2',pi))} ราย`} ] },
+    { icon:'🏥', label:'แหล่งส่งตรวจ — ศิริราช', val:fmt(sir), sub:`ราย — ${total>0?pct(sir,total):0}% ของ Service`, color:'var(--teal)', bg:'var(--teal-lt)',
+      splits:[ {label:'ศิริราช', val:`${fmt(sir)} ราย`}, {label:'ร.พ.อื่น ๆ', val:`${fmt(oth)} ราย`} ] },
+  ];
+  document.getElementById('kpiGrid').innerHTML = kpis.map(kpiCard).join('');
+}
+
+function renderKPI2(){
+  const pi=curIdxs();
+  const items=[
+    { icon:'🧪', label:'Specific PRA Class I', key:'pra1', color:'var(--indigo)', bg:'var(--indigo-lt)' },
+    { icon:'🧪', label:'Specific PRA Class II', key:'pra2', color:'var(--violet)', bg:'var(--violet-lt)' },
+    { icon:'🎯', label:'Single Antigen Class I', key:'sa1', color:'var(--blue)', bg:'var(--blue-lt)' },
+    { icon:'🎯', label:'Single Antigen Class II', key:'sa2', color:'var(--teal)', bg:'var(--teal-lt)' },
+    { icon:'➕', label:'Single Antigen + C1q Class I', key:'sa1_c1q', color:'var(--pink)', bg:'var(--pink-lt)' },
+    { icon:'➕', label:'Single Antigen + C1q Class II', key:'sa2_c1q', color:'var(--green)', bg:'var(--green-lt)' },
+    { icon:'🧫', label:'MICA Genotype', key:'mica_geno', color:'var(--amber)', bg:'var(--amber-lt)' },
+    { icon:'🧫', label:'MICA Antibody', key:'mica_ab', color:'var(--orange)', bg:'var(--orange-lt)' },
+    { icon:'🫁', label:'TRALI-antibody screen', key:'trali', color:'var(--red)', bg:'var(--red-lt)' },
+  ];
+  const t_sir = sumOf('src_siriraj', pi), t_oth = sumOf('src_other', pi), t_all = t_sir + t_oth;
+  const kpis=items.map(it=>{
+    const v = it.keys ? it.keys.reduce((a,k)=>a+sumOf(k,pi),0) : sumOf(it.key,pi);
+    let sir_est = 0, oth_est = 0;
+    if(v > 0) {
+      if(it.key === 'sa1' || it.key === 'sa2' || it.key === 'sa1_c1q' || it.key === 'sa2_c1q') {
+        sir_est = v;
+        oth_est = 0;
+      } else {
+        sir_est = t_all > 0 ? Math.round(v * (t_sir / t_all)) : v;
+        oth_est = v - sir_est;
+      }
+    }
+    return { icon:it.icon, label:it.label, val:fmt(v), sub:'ราย — Service (ศิริราช + ร.พ.อื่น)', color:it.color, bg:it.bg,
+      splits:[ {label:'ศิริราช', val:`${fmt(sir_est)} ราย`}, {label:'ร.พ.อื่น ๆ', val:`${fmt(oth_est)} ราย`} ] };
+  });
+  document.getElementById('kpiGrid2').innerHTML = kpis.map(kpiCard).join('');
+}
+
+function renderTable(){
+  const tIdxs=AVAIL;
+  const active=new Set(selectedMonth!==null?[selectedMonth]:[]);
+  const thead=`<thead><tr>
+    <th class="text-left sticky-col-1">ลำดับ</th>
+    <th class="text-left sticky-col-2">ชนิดการตรวจ</th>
+    ${tIdxs.map(i=>`<th class="${active.has(i)?'active-month-col':''}">${MONTHS_FY[i]}</th>`).join('')}
+    <th class="col-total">รวมปี ${selectedYear}</th>
+  </tr></thead>`;
+  const row=(num,name,key,isTot)=>{
+    const arr=LUM[key];
+    const cells=tIdxs.map(i=>{const ac=active.has(i)?'active-month-col':'';const v=arr?arr[i]:null;return `<td class="${ac}">${v!=null?fmt(v):'–'}</td>`;}).join('');
+    return `<tr class="${isTot?'tr-total':''}"><td class="text-left sticky-col-1">${num}</td><td class="text-left sticky-col-2">${name}</td>${cells}<td class="col-total">${arr?fmt(sum(arr,tIdxs)):'–'}</td></tr>`;
+  };
+  const grp=t=>`<tr class="section-header"><td colspan="${tIdxs.length+3}">${t}</td></tr>`;
+  const tbody=`<tbody>
+    ${grp('ชนิดการตรวจ HLA Antibody (Luminex) — Service')}
+    ${row('1','HLA Antibody Screening','screening')}
+    ${row('2','Specific PRA HLA Class I','pra1')}
+    ${row('3','Specific PRA HLA Class II','pra2')}
+    ${row('4','Single Antigen HLA Class I','sa1')}
+    ${row('5','Single Antigen HLA Class II','sa2')}
+    ${row('6','Single Antigen Class I + C1q','sa1_c1q')}
+    ${row('7','Single Antigen Class II + C1q','sa2_c1q')}
+    ${row('8','MICA Genotype','mica_geno')}
+    ${row('9','MICA Antibody','mica_ab')}
+    ${row('10','TRALI-antibody screen','trali')}
+    ${row('','Total','total',true)}
+    ${grp('แยกตามแหล่งส่งตรวจ')}
+    ${row('','ศิริราช','src_siriraj')}
+    ${row('','ร.พ.อื่น ๆ','src_other')}
+  </tbody>`;
+  document.getElementById('dataTable').innerHTML=thead+tbody;
+}
+
+let cMonthly,cMix,cSource,cSA, cScreening, cPRA, cMICA, cTRALI;
+function destroyCharts(){ [cMonthly,cMix,cSource,cSA,cScreening,cPRA,cMICA,cTRALI].forEach(c=>c&&c.destroy()); }
+function buildCharts(){
+  destroyCharts();
+  const DL=(typeof ChartDataLabels!=='undefined')?ChartDataLabels:null;
+  const lbl=AVAIL.map(i=>MONTHS_FY[i]);
+  const ga=key=>AVAIL.map(i=>LUM[key]?(LUM[key][i]||0):0);
+  const gaG=keys=>AVAIL.map(i=>keys.reduce((a,k)=>a+(LUM[k]&&LUM[k][i]!=null?LUM[k][i]:0),0));
+  const PAL={indigo:'#7c3aed',blue:'#2563eb',v3:'#c084fc',amber:'#f59e0b',teal:'#0d9488',pink:'#db2777',red:'#ef4444',green:'#16a34a',darkgreen:'#166534'};
+  const plugins=DL?[DL]:[];
+  // stacked total label on top
+  const dlStackTotal={ color:'#334155',anchor:'end',align:'end',offset:2,font:{size:11,weight:'800'},
+    formatter:function(value,ctx){ const ds=ctx.chart.data.datasets,di=ctx.datasetIndex,idx=ctx.dataIndex; let top=-1; for(let k=ds.length-1;k>=0;k--){if((ds[k].data[idx]||0)>0){top=k;break;}} if(di!==top)return ''; const t=ds.reduce((a,s)=>a+(s.data[idx]||0),0); return t>0?t:''; } };
+  const dlBar={ color:'#334155',anchor:'end',align:'top',offset:0,font:{size:10,weight:'700'},formatter:v=>v>0?v:'' };
+  const stackOpts={responsive:true,maintainAspectRatio:false,layout:{padding:{top:25}},plugins:{legend:{position:'top',labels:{boxWidth:12,font:{size:11}}},datalabels:dlStackTotal},scales:{x:{stacked:true},y:{beginAtZero:true,stacked:true}}};
+  const barOpts={responsive:true,maintainAspectRatio:false,layout:{padding:{top:25}},plugins:{legend:{position:'top',labels:{boxWidth:12,font:{size:11}}},datalabels:dlBar},scales:{y:{beginAtZero:true,suggestedMax:6,ticks:{precision:0}}}};
+
+  const pi=curIdxs();
+  // 1. Monthly stacked by type
+  cMonthly=new Chart(document.getElementById('chartMonthly'),{type:'bar',plugins,data:{labels:lbl,datasets:[
+    {label:'Ab Screening',data:ga('screening'),backgroundColor:PAL.indigo,borderRadius:4},
+    {label:'Single Antigen I',data:ga('sa1'),backgroundColor:PAL.blue,borderRadius:4},
+    {label:'Single Antigen II',data:ga('sa2'),backgroundColor:PAL.v3,borderRadius:4},
+    {label:'PRA I+II',data:gaG(['pra1','pra2']),backgroundColor:PAL.amber,borderRadius:4},
+    {label:'MICA',data:gaG(['mica_geno','mica_ab']),backgroundColor:PAL.teal,borderRadius:4},
+  ]},options:stackOpts});
+
+  // 2. Mix doughnut (period)
+  const mixData=[sumOf('src_siriraj',pi), sumOf('src_other',pi)];
+  cMix=new Chart(document.getElementById('chartMix'),{type:'doughnut',plugins,data:{labels:['ศิริราช','ร.พ.อื่นๆ'],datasets:[{data:mixData,backgroundColor:[PAL.darkgreen,PAL.amber],borderWidth:0}]},options:{responsive:true,maintainAspectRatio:false,layout:{padding:40},plugins:{legend:{position:'right',labels:{boxWidth:11,font:{size:10}}},datalabels:{color:'#1e293b',anchor:'end',align:'end',offset:8,display:'auto',font:{size:10,weight:'700'},formatter:(v,ctx)=>{ if(v<=0)return ''; const t=ctx.dataset.data.reduce((a,b)=>a+b,0); const pct=Math.round((v/t)*100); if(pct<2)return ''; return [v, '('+pct+'%)']; }}},cutout:'56%'}});
+
+  // 3. Source grouped bar siriraj vs other
+  cSource=new Chart(document.getElementById('chartSource'),{type:'bar',plugins,data:{labels:lbl,datasets:[
+    {label:'ศิริราช',data:ga('src_siriraj'),backgroundColor:PAL.darkgreen,borderRadius:4},
+    {label:'ร.พ.อื่น ๆ',data:ga('src_other'),backgroundColor:PAL.amber,borderRadius:4},
+  ]},options:barOpts});
+
+  // 4. SA class I vs II + C1q
+  cSA=new Chart(document.getElementById('chartSA'),{type:'bar',plugins,data:{labels:lbl,datasets:[
+    {label:'Class I',data:ga('sa1'),backgroundColor:PAL.blue,borderRadius:4},
+    {label:'Class II',data:ga('sa2'),backgroundColor:PAL.v3,borderRadius:4},
+    {label:'C1q Class I',data:ga('sa1_c1q'),backgroundColor:PAL.teal,borderRadius:4},
+    {label:'C1q Class II',data:ga('sa2_c1q'),backgroundColor:PAL.green,borderRadius:4},
+  ]},options:barOpts});
+
+  // 5. Screening siriraj vs other
+  cScreening=new Chart(document.getElementById('chartScreening'),{type:'bar',plugins,data:{labels:lbl,datasets:[
+    {label:'ศิริราช',data:ga('scr_siriraj'),backgroundColor:PAL.darkgreen,borderRadius:4},
+    {label:'ร.พ.อื่น ๆ',data:ga('scr_other'),backgroundColor:PAL.amber,borderRadius:4},
+  ]},options:barOpts});
+
+  // 6. PRA 1 vs 2
+  cPRA=new Chart(document.getElementById('chartPRA'),{type:'bar',plugins,data:{labels:lbl,datasets:[
+    {label:'Specific PRA Class I',data:ga('pra1'),backgroundColor:PAL.blue,borderRadius:4},
+    {label:'Specific PRA Class II',data:ga('pra2'),backgroundColor:PAL.v3,borderRadius:4},
+  ]},options:barOpts});
+
+  // 7. MICA
+  cMICA=new Chart(document.getElementById('chartMICA'),{type:'bar',plugins,data:{labels:lbl,datasets:[
+    {label:'MICA Genotype',data:ga('mica_geno'),backgroundColor:PAL.teal,borderRadius:4},
+    {label:'MICA Antibody',data:ga('mica_ab'),backgroundColor:PAL.pink,borderRadius:4},
+  ]},options:barOpts});
+
+  // 8. TRALI
+  cTRALI=new Chart(document.getElementById('chartTRALI'),{type:'bar',plugins,data:{labels:lbl,datasets:[
+    {label:'TRALI-antibody screen',data:ga('trali'),backgroundColor:PAL.red,borderRadius:4},
+  ]},options:barOpts});
+}
+
+function refresh(){ LUM = LUM_DATA[selectedYear] || LUM; AVAIL = availOf(LUM); buildYearTabs(); buildMonthTabs(); renderMonthPanel(); renderKPI(); renderKPI2(); renderTable(); buildCharts(); }
+window.addEventListener('DOMContentLoaded', ()=>{ refresh(); });
+function exportToPDF(){ window.print(); }
+function triggerSoftRefresh(){ const b=document.getElementById('btnRefresh'); if(b)b.classList.add('spinning'); refresh(); setTimeout(()=>{if(b)b.classList.remove('spinning');},400); }
+function toggleNavDropdown(e){ e.preventDefault(); e.stopPropagation(); const dd=e.currentTarget.nextElementSibling; if(dd)dd.classList.toggle('show'); }
+document.addEventListener('click', function(e){ document.querySelectorAll('.nav-dropdown-content').forEach(d=>{ if(!e.target.closest('.nav-item-dropdown')) d.classList.remove('show'); }); });
+</script>
+<script src="xlsx.full.min.js"></script>
+<script src="dashboard_autoload.js"></script>
+<script src="live_luminex.js"></script>
+<script src="autoload_luminex.js"></script>
+</body>
+</html>

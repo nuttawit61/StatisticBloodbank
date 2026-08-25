@@ -1,0 +1,450 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Reference Laboratory Dashboard | 2569</title>
+<link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
+<style>
+  :root{
+    --bg:#f8fafc; --bg-alt:#f1f5f9; --surface:#ffffff;
+    --border:#e2e8f0; --border-strong:#cbd5e1;
+    --primary:#0d7a5f; --primary-lt:#d1fae5; --primary-dk:#065f46;
+    --text:#0f172a; --muted:#64748b;
+    --shadow:0 1px 3px rgba(15,23,42,.06),0 1px 2px rgba(15,23,42,.04);
+    --shadow-md:0 4px 12px rgba(15,23,42,.08),0 2px 4px rgba(15,23,42,.04);
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:"Sarabun","Inter",sans-serif;background:var(--bg);color:var(--text);min-height:100vh}
+
+  /* HEADER */
+  .qc-header{position:sticky;top:0;z-index:50;background:#ffffff;border-bottom:1px solid var(--border);color:var(--text);padding:14px 26px;display:flex;align-items:center;gap:16px;box-shadow:var(--shadow);flex-wrap:wrap}
+  .qc-header img.logo{height:44px;width:auto;background:#fff;border-radius:8px;padding:4px}
+  .qc-header .htxt h1{font-size:18px;font-weight:700;color:var(--text)}
+  .qc-header .htxt p{font-size:12px;color:var(--muted);margin-top:2px}
+  .qc-pills{margin-left:auto;display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+  .qc-pill{background:var(--primary-lt);border:1.5px solid #6ee7b7;color:var(--primary-dk);padding:5px 12px;border-radius:20px;font-size:12px;font-weight:600;display:flex;align-items:center;gap:6px}
+  .qc-pill .dot{width:7px;height:7px;border-radius:50%;background:#059669;animation:pulse 2s infinite}
+  @keyframes pulse{70%{box-shadow:0 0 0 7px rgba(5,150,105,0)}100%{box-shadow:0 0 0 0 rgba(5,150,105,0)}}
+
+  /* MONTH BAR */
+  .qc-monthbar{position:sticky;top:68px;z-index:40;background:var(--surface);border-bottom:1px solid var(--border);padding:12px 26px;display:flex;align-items:center;gap:10px;flex-wrap:wrap;box-shadow:var(--shadow)}
+  .qc-monthbar .lbl{font-size:13px;font-weight:700;color:var(--muted);margin-right:4px}
+  .qc-month{border:1.5px solid var(--border-strong);background:#fff;color:var(--text);padding:7px 14px;border-radius:10px;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;transition:.15s;position:relative}
+  .qc-month:hover:not(.disabled){border-color:#6ee7b7;background:var(--primary-lt);transform:translateY(-1px)}
+  .qc-month.active{background:var(--primary-lt);color:var(--primary-dk);border-color:var(--primary);font-weight:700}
+  .qc-month.disabled{opacity:.35;cursor:not-allowed;background:var(--bg-alt)}
+  .qc-month .has{position:absolute;bottom:5px;left:50%;transform:translateX(-50%);width:5px;height:5px;border-radius:50%;background:var(--primary)}
+
+  /* MAIN */
+  .qc-main{padding:24px 30px 60px;max-width:1500px;margin:0 auto}
+  .qc-intro{display:flex;align-items:center;gap:14px;background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:16px 22px;margin-bottom:22px;box-shadow:var(--shadow)}
+  .qc-intro .big{font-size:28px}
+  .qc-intro h3{font-size:15px;font-weight:700;color:var(--text)}
+  .qc-intro p{font-size:12.5px;color:var(--muted);margin-top:3px}
+
+  /* GALLERY GRID */
+  .qc-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(400px,1fr));gap:16px}
+  .qc-card{background:var(--surface);border:1px solid var(--border);border-radius:12px;overflow:hidden;box-shadow:var(--shadow);transition:.18s}
+  .qc-card:hover{transform:translateY(-2px);box-shadow:var(--shadow-md);border-color:var(--border-strong)}
+  .qc-card-imgwrap{position:relative;cursor:zoom-in;background:#fff;border-bottom:1px solid var(--border)}
+  .qc-card-imgwrap img{width:100%;display:block;aspect-ratio:16/9;object-fit:contain;background:#fff}
+  .qc-num{position:absolute;top:10px;left:10px;background:var(--primary);color:#fff;font-size:11.5px;font-weight:700;padding:3px 9px;border-radius:20px;font-family:"Inter",sans-serif}
+  .qc-card figcaption{padding:10px 14px;font-size:13px;font-weight:600;color:var(--text)}
+
+  /* EMPTY */
+  .qc-empty{text-align:center;padding:80px 20px;color:var(--muted)}
+  .qc-empty .ico{font-size:54px;opacity:.4;margin-bottom:14px}
+  .qc-empty h3{font-size:18px;color:var(--text);margin-bottom:6px}
+  .qc-empty p{font-size:14px}
+  .qc-empty code{background:var(--primary-lt);padding:2px 8px;border-radius:6px;color:var(--primary-dk);font-size:13px}
+
+  /* LIGHTBOX */
+  .qc-lb{position:fixed;inset:0;z-index:200;background:rgba(4,20,12,.92);display:none;align-items:center;justify-content:center;flex-direction:column}
+  .qc-lb.open{display:flex}
+  .qc-lb img{max-width:94vw;max-height:82vh;border-radius:8px;box-shadow:0 20px 60px rgba(0,0,0,.5);background:#fff}
+  .qc-lb-cap{color:#fff;margin-top:14px;font-size:15px;font-weight:600;text-align:center;max-width:90vw}
+  .qc-lb-counter{color:#a7f3d0;font-size:13px;margin-top:4px}
+  .qc-lb-btn{position:absolute;top:50%;transform:translateY(-50%);background:rgba(255,255,255,.14);border:1px solid rgba(255,255,255,.3);color:#fff;width:50px;height:50px;border-radius:50%;font-size:24px;cursor:pointer;display:flex;align-items:center;justify-content:center}
+  .qc-lb-btn:hover{background:rgba(255,255,255,.28)}
+  .qc-lb-prev{left:22px} .qc-lb-next{right:22px}
+  .qc-lb-close{position:absolute;top:18px;right:24px;background:none;border:none;color:#fff;font-size:34px;cursor:pointer;line-height:1}
+  .qc-lb-fs{position:absolute;top:22px;right:74px;background:rgba(255,255,255,.14);border:1px solid rgba(255,255,255,.3);color:#fff;width:36px;height:36px;border-radius:8px;font-size:16px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:.15s}
+  .qc-lb-fs:hover{background:rgba(255,255,255,.28)}
+
+  /* EXPORT PDF */
+  .qc-export-btn{background:var(--primary);border:none;color:#fff;padding:7px 14px;border-radius:20px;font-size:12px;font-weight:600;cursor:pointer;font-family:inherit;display:flex;align-items:center;gap:7px;transition:.15s}
+  .qc-export-btn:hover{background:var(--primary-dk)}
+  .qc-export-btn:disabled{opacity:.45;cursor:not-allowed;background:var(--border-strong)}
+
+  /* PRINT */
+  .qc-print-header{display:none}
+  @media print{
+    @page{size:A4 landscape;margin:12mm}
+    header,nav,.qc-intro,.qc-lb,#pdfOrigBtn{display:none!important}
+    body{background:#fff!important;color:#000}
+    .qc-main{padding:0!important;max-width:100%!important}
+    .qc-grid{display:grid!important;grid-template-columns:1fr 1fr!important;gap:8mm!important}
+    .qc-card{break-inside:avoid;page-break-inside:avoid;box-shadow:none!important;border:1px solid #ccc!important}
+    .qc-card:hover{transform:none!important}
+    .qc-card-imgwrap img{aspect-ratio:auto!important;max-height:120mm;object-fit:contain}
+    .qc-num{background:var(--primary)!important;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+    .qc-print-header{display:block!important;text-align:center;font-size:14pt;font-weight:700;color:#065f46;margin-bottom:6mm;padding-bottom:4mm;border-bottom:1.5px solid #065f46}
+  }
+
+  /* NAV DROPDOWN */
+  .qc-nav{position:relative}
+  .qc-nav-btn{background:var(--bg-alt);border:1.5px solid var(--border-strong);color:var(--text);padding:7px 14px;border-radius:20px;font-size:12.5px;font-weight:600;cursor:pointer;font-family:inherit;display:flex;align-items:center;gap:7px;transition:.15s}
+  .qc-nav-btn:hover{background:var(--border)}
+  .qc-navdd{position:absolute;right:0;top:calc(100% + 8px);background:#fff;border:1px solid var(--border);border-radius:12px;box-shadow:0 8px 24px rgba(15,23,42,.12);min-width:260px;padding:6px;display:none;z-index:120}
+  .qc-navdd.show{display:block}
+  .qc-navdd a{display:block;padding:8px 12px;border-radius:8px;text-decoration:none;color:var(--text);font-size:13px;font-weight:500}
+  .qc-navdd a:hover{background:var(--primary-lt);color:var(--primary-dk)}
+  .qc-navdd a.cur{background:var(--primary-lt);color:var(--primary-dk);font-weight:700;border-left:3px solid var(--primary);padding-left:10px}
+  .qc-home{background:var(--bg-alt);border:1.5px solid var(--border-strong);color:var(--text);padding:7px 13px;border-radius:20px;font-size:12.5px;font-weight:600;text-decoration:none;transition:.15s}
+  .qc-home:hover{background:var(--border)}
+
+  @media(max-width:760px){.qc-grid{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+
+<header class="qc-header">
+  <img class="logo" src="F_01_png_v-logo_si_th.png" alt="logo" onerror="this.style.display='none'">
+  <div class="htxt">
+    <h1>Reference Laboratory Dashboard</h1>
+    <p>สถิติห้องปฏิบัติการอ้างอิง · ภาควิชาเวชศาสตร์การธนาคารเลือด</p>
+  </div>
+  <div class="qc-pills">
+    <div class="qc-nav">
+      <button class="qc-nav-btn" onclick="toggleNav(event)">🧪 ไปยัง Dashboard ▾</button>
+      <div class="qc-navdd" id="navDD">
+        <a href="index.html">🏠 หน้ารวม Dashboard</a>
+        <a href="Dashboard Blood Collection.html">Blood Collection</a>
+        <a href="Dashboard Hemapheresis.html">Hemapheresis</a>
+        <a href="Dashboard Blood Processing.html">Blood Processing</a>
+        <a href="Dashboard Blood Component.html">Blood Component Preparation</a>
+        <a href="Dashboard Blood Prep Disp.html">เตรียม &amp; จ่ายเลือด</a>
+        <a href="Dashboard QC Blood Components.html">QC Blood Components</a>
+        <a href="Dashboard Immunohematology.html">Immunohematology</a>
+        <a href="Dashboard Infection.html">Infectious Serology</a>
+        <a href="Dashboard Standard Laboratory.html">Standard Laboratory</a>
+        <a href="Dashboard Reference Laboratory.html" class="cur">Reference Laboratory</a>
+        <a href="Dashboard HLA Laboratory.html">HLA Laboratory</a>
+        <a href="Dashboard DNA Laboratory.html">DNA Laboratory</a>
+      </div>
+    </div>
+    <a href="index.html" class="qc-home">🏠 หน้าแรก</a>
+    <span class="qc-pill"><span class="dot"></span>ปี 2569</span>
+    <span class="qc-pill" id="pillCount">— หน้า</span>
+    <button class="qc-export-btn" id="exportPdfBtn" onclick="exportPDF()" disabled title="เลือกเดือนก่อนเพื่อ Export PDF">
+      📄 Export PDF
+    </button>
+  </div>
+</header>
+
+<nav class="qc-monthbar" id="monthbar">
+  <span class="lbl">เลือกเดือน:</span>
+</nav>
+
+<main class="qc-main">
+  <div class="qc-print-header" id="printHeader">สถิติ Reference Laboratory</div>
+  <div class="qc-intro">
+    <div class="big">🔬</div>
+    <div style="flex:1">
+      <h3 id="introTitle">รายงานสถิติห้องปฏิบัติการอ้างอิง (Reference Laboratory)</h3>
+      <p id="introSub">เลือกเดือนด้านบนเพื่อดูกราฟ · คลิกที่ภาพเพื่อขยายเต็มจอ</p>
+    </div>
+    <a id="pdfOrigBtn" style="display:none;margin-left:auto;background:var(--primary-lt);border:1px solid var(--border-strong);color:var(--primary-dk);padding:7px 14px;border-radius:20px;font-size:13px;font-weight:600;text-decoration:none;white-space:nowrap" target="_blank">📂 เปิด PDF ต้นฉบับ</a>
+  </div>
+  <div id="gallery"></div>
+</main>
+
+<div class="qc-lb" id="lightbox" onclick="if(event.target.id==='lightbox')closeLightbox()">
+  <button class="qc-lb-close" onclick="closeLightbox()">&times;</button>
+  <button class="qc-lb-fs" id="fsBtn" onclick="toggleFullscreen()" title="เต็มจอ">⛶</button>
+  <button class="qc-lb-btn qc-lb-prev" onclick="navLightbox(-1)">&#8249;</button>
+  <img id="lb-img" src="" alt="">
+  <button class="qc-lb-btn qc-lb-next" onclick="navLightbox(1)">&#8250;</button>
+  <div class="qc-lb-cap" id="lb-cap"></div>
+  <div class="qc-lb-counter" id="lb-counter"></div>
+</div>
+
+<script>
+const YEAR = "2569";
+const MONTHS = ["มกราคม","กุมภาพันธ์","มีนาคม","เมษายน","พฤษภาคม","มิถุนายน","กรกฎาคม","สิงหาคม","กันยายน","ตุลาคม","พฤศจิกายน","ธันวาคม"];
+const MONTHS_SHORT = ["ม.ค.","ก.พ.","มี.ค.","เม.ย.","พ.ค.","มิ.ย.","ก.ค.","ส.ค.","ก.ย.","ต.ค.","พ.ย.","ธ.ค."];
+
+const MANIFEST_INLINE = {
+  "2569": {
+    "เมษายน": {
+      "images": [
+        "reflab_assets/2569/เมษายน/reflab-slide-1.jpg",
+        "reflab_assets/2569/เมษายน/reflab-slide-2.jpg",
+        "reflab_assets/2569/เมษายน/reflab-slide-3.jpg",
+        "reflab_assets/2569/เมษายน/reflab-slide-4.jpg",
+        "reflab_assets/2569/เมษายน/reflab-slide-5.jpg",
+        "reflab_assets/2569/เมษายน/reflab-slide-6.jpg",
+        "reflab_assets/2569/เมษายน/reflab-slide-7.jpg",
+        "reflab_assets/2569/เมษายน/reflab-slide-8.jpg",
+        "reflab_assets/2569/เมษายน/reflab-slide-9.jpg"
+      ],
+      "count": 9,
+      "pdf": "reflab_assets/2569/เมษายน/reflab_เมษายน_2569.pdf",
+      "titles": [
+        "Reference Laboratory — รายงานสถิติ ปี 2026",
+        "Monthly Weak D Testing Workload & Rh Variant Distribution in Patients",
+        "Reference Lab Testing Statistics & Workload (Ab Identification)",
+        "Antibody Identification Test — ผลการตรวจ",
+        "Unexpected Antibodies — เมษายน 2026",
+        "Unexpected Antibody — แผนภูมิ",
+        "Reference Lab Testing Statistics & Workload (Antigen Typing & Crossmatch)",
+        "Reference Lab Testing Statistics & Workload (ABO Discrepancy & DAT)",
+        "Special Immunohematology Techniques"
+      ]
+    },
+    "พฤษภาคม": {
+      "images": [
+        "reflab_assets/2569/พฤษภาคม/reflab-slide-1.jpg",
+        "reflab_assets/2569/พฤษภาคม/reflab-slide-2.jpg",
+        "reflab_assets/2569/พฤษภาคม/reflab-slide-3.jpg",
+        "reflab_assets/2569/พฤษภาคม/reflab-slide-4.jpg",
+        "reflab_assets/2569/พฤษภาคม/reflab-slide-5.jpg",
+        "reflab_assets/2569/พฤษภาคม/reflab-slide-6.jpg",
+        "reflab_assets/2569/พฤษภาคม/reflab-slide-7.jpg",
+        "reflab_assets/2569/พฤษภาคม/reflab-slide-8.jpg",
+        "reflab_assets/2569/พฤษภาคม/reflab-slide-9.jpg"
+      ],
+      "count": 9,
+      "titles": [
+        "Reference Laboratory — รายงานสถิติ ปี 2026",
+        "Monthly Weak D Testing Workload & Rh Variant Distribution in Patients",
+        "Reference Lab Testing Statistics & Workload (Ab Identification)",
+        "Antibody Identification Test — ผลการตรวจ",
+        "Unexpected Antibodies — พฤษภาคม 2026",
+        "Unexpected Antibody — แผนภูมิ",
+        "Reference Lab Testing Statistics & Workload (Antigen Typing & Crossmatch)",
+        "Reference Lab Testing Statistics & Workload (ABO Discrepancy & DAT)",
+        "Special Immunohematology Techniques"
+      ]
+    },
+    "มิถุนายน": {
+      "images": [
+        "reflab_assets/2569/มิถุนายน/reflab-slide-1.jpg",
+        "reflab_assets/2569/มิถุนายน/reflab-slide-2.jpg",
+        "reflab_assets/2569/มิถุนายน/reflab-slide-3.jpg",
+        "reflab_assets/2569/มิถุนายน/reflab-slide-4.jpg",
+        "reflab_assets/2569/มิถุนายน/reflab-slide-5.jpg",
+        "reflab_assets/2569/มิถุนายน/reflab-slide-6.jpg",
+        "reflab_assets/2569/มิถุนายน/reflab-slide-7.jpg",
+        "reflab_assets/2569/มิถุนายน/reflab-slide-8.jpg",
+        "reflab_assets/2569/มิถุนายน/reflab-slide-9.jpg"
+      ],
+      "count": 9,
+      "pdf": "reflab_assets/2569/มิถุนายน/reflab_มิถุนายน_2569.pdf",
+      "titles": [
+        "Reference Laboratory — รายงานสถิติ ปี 2026",
+        "Monthly Weak D Testing Workload & Rh Variant Distribution in Patients",
+        "Reference Lab Testing Statistics & Workload (Ab Identification)",
+        "Antibody Identification Test — ผลการตรวจ",
+        "Unexpected Antibodies — มิถุนายน 2026",
+        "Unexpected Antibody — แผนภูมิ",
+        "Reference Lab Testing Statistics & Workload (Antigen Typing & Crossmatch)",
+        "Reference Lab Testing Statistics & Workload (ABO Discrepancy & DAT)",
+        "Special Immunohematology Techniques"
+      ]
+    },
+    "กรกฎาคม": {
+      "images": [
+        "reflab_assets/2569/กรกฎาคม/reflab-slide-1.jpg",
+        "reflab_assets/2569/กรกฎาคม/reflab-slide-2.jpg",
+        "reflab_assets/2569/กรกฎาคม/reflab-slide-3.jpg",
+        "reflab_assets/2569/กรกฎาคม/reflab-slide-4.jpg",
+        "reflab_assets/2569/กรกฎาคม/reflab-slide-5.jpg",
+        "reflab_assets/2569/กรกฎาคม/reflab-slide-6.jpg",
+        "reflab_assets/2569/กรกฎาคม/reflab-slide-7.jpg",
+        "reflab_assets/2569/กรกฎาคม/reflab-slide-8.jpg",
+        "reflab_assets/2569/กรกฎาคม/reflab-slide-9.jpg"
+      ],
+      "count": 9,
+      "pdf": "reflab_assets/2569/กรกฎาคม/reflab_กรกฎาคม_2569.pdf",
+      "titles": [
+        "Reference Laboratory — รายงานสถิติ ปี 2026",
+        "Monthly Weak D Testing Workload & Rh Variant Distribution in Patients",
+        "Reference Lab Testing Statistics & Workload (Ab Identification)",
+        "Antibody Identification Test — ผลการตรวจ",
+        "Unexpected Antibodies — กรกฎาคม 2026",
+        "Unexpected Antibody — แผนภูมิ",
+        "Reference Lab Testing Statistics & Workload (Antigen Typing & Crossmatch)",
+        "Reference Lab Testing Statistics & Workload (ABO Discrepancy & DAT)",
+        "Special Immunohematology Techniques"
+      ]
+    }
+  }
+};
+
+let MANIFEST = {};
+let curMonth = null;
+let lbSrcs = [], lbCaps = [], lbIndex = 0;
+
+function applyManifest(){
+  buildMonthBar();
+  const avail = MONTHS.filter(m => MANIFEST[YEAR] && MANIFEST[YEAR][m]);
+  selectMonth(avail.length ? avail[avail.length-1] : MONTHS[0]);
+}
+
+async function loadManifest(){
+  MANIFEST = MANIFEST_INLINE || {};
+  applyManifest();
+  try{
+    const r = await fetch('reflab_manifest.json?_='+Date.now());
+    if(r.ok){ const fresh = await r.json(); MANIFEST = fresh; applyManifest(); }
+  }catch(e){}
+}
+
+function buildMonthBar(){
+  const bar = document.getElementById('monthbar');
+  bar.querySelectorAll('.qc-month').forEach(e=>e.remove());
+  MONTHS.forEach(m=>{
+    const has = !!(MANIFEST[YEAR] && MANIFEST[YEAR][m]);
+    const b = document.createElement('button');
+    b.className = 'qc-month'+(has?'':' disabled');
+    b.innerHTML = MONTHS_SHORT[MONTHS.indexOf(m)] + (has?'<span class="has"></span>':'');
+    b.title = has ? m+' ('+MANIFEST[YEAR][m].count+' หน้า)' : m+' — ยังไม่มีข้อมูล';
+    if(has) b.onclick = ()=>selectMonth(m);
+    bar.appendChild(b);
+  });
+}
+
+function selectMonth(m){
+  curMonth = m;
+  [...document.querySelectorAll('.qc-month')].forEach(b=>{
+    b.classList.toggle('active', b.title.indexOf(m)===0);
+  });
+  renderGallery(m);
+}
+
+function renderGallery(m){
+  const g = document.getElementById('gallery');
+  const info = MANIFEST[YEAR] && MANIFEST[YEAR][m];
+  if(!info){
+    document.getElementById('pillCount').textContent = '0 หน้า';
+    document.getElementById('introTitle').textContent = 'สถิติ Reference Laboratory เดือน'+m+' '+YEAR;
+    document.getElementById('introSub').textContent = 'ยังไม่มีไฟล์ข้อมูลของเดือนนี้';
+    document.getElementById('exportPdfBtn').disabled = true;
+    document.getElementById('pdfOrigBtn').style.display = 'none';
+    g.innerHTML = '<div class="qc-empty"><div class="ico">📂</div><h3>ยังไม่มีข้อมูลเดือน '+m+'</h3>'+
+      '<p>วางไฟล์รูปภาพไว้ที่ <code>reflab_assets / '+YEAR+' / '+m+'</code><br>แล้วระบบจะอัปเดตให้อัตโนมัติ</p></div>';
+    return;
+  }
+  const titles = info.titles || [];
+  document.getElementById('pillCount').textContent = info.count+' หน้า';
+  document.getElementById('introTitle').textContent = 'สถิติ Reference Laboratory เดือน'+m+' '+YEAR;
+  document.getElementById('introSub').textContent = 'แสดงกราฟ '+info.count+' หน้า เรียงตามลำดับ · คลิกภาพเพื่อขยายเต็มจอ';
+  document.getElementById('printHeader').textContent = 'สถิติ Reference Laboratory เดือน'+m+' '+YEAR+' · ภาควิชาเวชศาสตร์การธนาคารเลือด';
+
+  const exportBtn = document.getElementById('exportPdfBtn');
+  exportBtn.disabled = false;
+  exportBtn.title = 'Export PDF เดือน'+m+' '+YEAR;
+
+  const pdfBtn = document.getElementById('pdfOrigBtn');
+  if(info.pdf){ pdfBtn.href = info.pdf; pdfBtn.style.display = ''; }
+  else { pdfBtn.style.display = 'none'; }
+
+  // PDF-view mode: embed the original PDF inline instead of the image gallery
+  if(info.view === 'pdf' && info.pdf){
+    lbSrcs = []; lbCaps = [];
+    g.innerHTML = '<div style="background:var(--surface);border:1px solid var(--border);border-radius:12px;overflow:hidden;box-shadow:var(--shadow)">'+
+      '<iframe src="'+encodeURI(info.pdf)+'#view=FitH&zoom=page-width" '+
+      'style="width:100%;height:calc(100vh - 210px);min-height:760px;border:0;display:block;background:#fff" '+
+      'title="สถิติ Reference Laboratory เดือน'+m+' '+YEAR+'"></iframe></div>';
+    window.scrollTo({top:0,behavior:'smooth'});
+    return;
+  }
+
+  lbSrcs = info.images.slice();
+  lbCaps = info.images.map((s,i)=> titles[i] || ('หน้า '+(i+1)));
+
+  let html = '<div class="qc-grid">';
+  info.images.forEach((src,i)=>{
+    const cap = titles[i] || ('หน้า '+(i+1));
+    const n = String(i+1).padStart(2,'0');
+    html += '<figure class="qc-card"><div class="qc-card-imgwrap" onclick="openLightbox('+i+')">'+
+      '<span class="qc-num">'+n+'</span>'+
+      '<img loading="lazy" src="'+src+'" alt="'+cap.replace(/"/g,'&quot;')+'">'+
+      '</div><figcaption>'+cap+'</figcaption></figure>';
+  });
+  html += '</div>';
+  g.innerHTML = html;
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+
+function openLightbox(i){ lbIndex=i; renderLb(); document.getElementById('lightbox').classList.add('open'); document.body.style.overflow='hidden'; }
+function closeLightbox(){
+  if(document.fullscreenElement) document.exitFullscreen();
+  document.getElementById('lightbox').classList.remove('open');
+  document.body.style.overflow='';
+}
+function navLightbox(d){ lbIndex=(lbIndex+d+lbSrcs.length)%lbSrcs.length; renderLb(); }
+function renderLb(){
+  document.getElementById('lb-img').src=lbSrcs[lbIndex];
+  document.getElementById('lb-cap').textContent=lbCaps[lbIndex];
+  document.getElementById('lb-counter').textContent=(lbIndex+1)+' / '+lbSrcs.length;
+}
+
+function toggleFullscreen(){
+  const lb = document.getElementById('lightbox');
+  const btn = document.getElementById('fsBtn');
+  if(!document.fullscreenElement){
+    lb.requestFullscreen().catch(()=>{});
+    btn.textContent='⊠';
+    btn.title='ออกจากเต็มจอ';
+  } else {
+    document.exitFullscreen();
+    btn.textContent='⛶';
+    btn.title='เต็มจอ';
+  }
+}
+document.addEventListener('fullscreenchange',()=>{
+  const btn=document.getElementById('fsBtn');
+  if(!document.fullscreenElement){ btn.textContent='⛶'; btn.title='เต็มจอ'; }
+});
+
+document.addEventListener('keydown',e=>{
+  if(!document.getElementById('lightbox').classList.contains('open'))return;
+  if(e.key==='Escape'){ if(document.fullscreenElement) document.exitFullscreen(); else closeLightbox(); }
+  if(e.key==='ArrowRight')navLightbox(1);
+  if(e.key==='ArrowLeft')navLightbox(-1);
+  if(e.key==='f'||e.key==='F')toggleFullscreen();
+});
+
+function exportPDF(){
+  if(!curMonth){ alert('กรุณาเลือกเดือนก่อน'); return; }
+  const btn = document.getElementById('exportPdfBtn');
+  btn.textContent = '⏳ กำลังเตรียม...';
+  btn.disabled = true;
+  const imgs = document.querySelectorAll('#gallery img');
+  let loaded = 0;
+  const total = imgs.length;
+  const doPrint = () => {
+    document.title = 'สถิติ Reference Laboratory เดือน'+curMonth+' '+YEAR;
+    window.print();
+    setTimeout(()=>{ btn.innerHTML='📄 Export PDF'; btn.disabled=false; },600);
+  };
+  if(total === 0){ doPrint(); return; }
+  imgs.forEach(img=>{
+    if(img.complete){ loaded++; if(loaded===total) doPrint(); }
+    else { img.onload = img.onerror = ()=>{ loaded++; if(loaded===total) doPrint(); }; }
+  });
+}
+
+function toggleNav(e){ e.stopPropagation(); document.getElementById('navDD').classList.toggle('show'); }
+document.addEventListener('click', function(e){
+  const dd=document.getElementById('navDD');
+  if(dd && !e.target.closest('.qc-nav')) dd.classList.remove('show');
+});
+
+loadManifest();
+</script>
+</body>
+</html>

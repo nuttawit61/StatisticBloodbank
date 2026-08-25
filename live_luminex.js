@@ -1,0 +1,5 @@
+/* ไฟล์นี้สร้างอัตโนมัติโดยระบบอัพเดท Dashboard — เก็บข้อมูลล่าสุดจาก Excel
+   เปิดหน้า Dashboard ที่เครื่องใดก็จะเห็นข้อมูลนี้ทันที โดยไม่ต้องเชื่อมโฟลเดอร์
+   อัพเดทล่าสุด: 21/8/2569 11:25:54 */
+window.__LIVE__ = window.__LIVE__ || {};
+window.__LIVE__["luminex"] = {"2569":{"screening":[47,71,47,66,67,56,71,null,null,null,null,null],"scr_siriraj":[39,61,39,57,62,52,65,null,null,null,null,null],"scr_other":[8,10,8,9,5,4,6,null,null,null,null,null],"pra1":[3,3,0,0,0,0,0,null,null,null,null,null],"pra2":[3,3,0,0,0,0,0,null,null,null,null,null],"sa1":[38,18,36,24,44,31,47,null,null,null,null,null],"sa2":[36,16,36,31,34,31,43,null,null,null,null,null],"sa1_c1q":[0,0,0,0,1,0,0,null,null,null,null,null],"sa2_c1q":[0,0,0,0,1,0,0,null,null,null,null,null],"mica_geno":[8,6,8,4,6,8,4,null,null,null,null,null],"mica_ab":[0,0,2,1,0,0,0,null,null,null,null,null],"trali":[0,0,0,2,2,0,3,null,null,null,null,null],"total":[135,117,129,128,155,126,168,null,null,null,null,null],"src_siriraj":[127,107,121,115,150,122,162,null,null,null,null,null],"src_other":[8,10,8,13,5,4,6,null,null,null,null,null]}};

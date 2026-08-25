@@ -1,0 +1,683 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Standard Laboratory Dashboard | ปีปฏิทิน 2569</title>
+<meta name="description" content="Dashboard สถิติห้องเตรียมเม็ดเลือดแดงมาตรฐาน (Standard Laboratory) และจำนวน Test ประจำปี 2564–2569" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;500;600;700;800&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.2.0/dist/chartjs-plugin-datalabels.min.js"></script>
+<script src="live_standard.js"></script>
+<style>
+:root{
+  --bg:#f5f7fa; --surface:#ffffff; --surface-2:#f1f5f9; --surface-hover:#f8fafc; --bg-alt:#eef2f7;
+  --border:#e3e8ef; --border-strong:#cbd5e1;
+  --teal:#0d9488; --teal-lt:#ccfbf1; --teal-dk:#0f766e;
+  --indigo:#4f46e5; --indigo-lt:#e0e7ff;
+  --blue:#2563eb; --blue-lt:#dbeafe;
+  --cyan:#0891b2; --cyan-lt:#cffafe;
+  --amber:#d97706; --amber-lt:#fef3c7;
+  --rose:#e11d48; --rose-lt:#ffe4e6;
+  --purple:#7c3aed; --purple-lt:#f3e8ff;
+  --green:#059669; --green-lt:#d1fae5;
+  --text-1:#0f172a; --text-2:#334155; --text-3:#64748b; --text-4:#94a3b8;
+  --shadow-sm:0 1px 3px rgba(15,23,42,.06),0 1px 2px rgba(15,23,42,.04);
+  --shadow-md:0 4px 12px rgba(15,23,42,.08),0 2px 4px rgba(15,23,42,.04);
+  --shadow-lg:0 12px 28px -8px rgba(15,23,42,.16);
+  --radius:16px; --radius-sm:10px; --radius-xs:6px;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{font-family:'Sarabun','Inter',sans-serif;background:var(--bg);color:var(--text-1);min-height:100vh;font-size:14px;line-height:1.5}
+.main{max-width:1440px;margin:0 auto;padding:24px 28px 60px}
+
+/* HEADER */
+.header{background:var(--surface);border-bottom:1px solid var(--border);box-shadow:var(--shadow-sm);position:sticky;top:0;z-index:100}
+.header-inner{max-width:1440px;margin:0 auto;padding:0 28px;display:flex;align-items:center;gap:18px;height:66px}
+.logo-wrap{display:flex;align-items:center;gap:13px;flex-shrink:0}
+.logo-icon{width:44px;height:44px;border-radius:13px;background:linear-gradient(135deg,var(--teal) 0%,var(--cyan) 50%,var(--indigo) 100%);display:flex;align-items:center;justify-content:center;color:#fff;font-size:22px;box-shadow:var(--shadow-md)}
+.logo-text h1{font-size:16px;font-weight:800;letter-spacing:-.02em;line-height:1.1}
+.logo-text p{font-size:11.5px;color:var(--text-3);font-weight:500}
+.header-divider{width:1px;height:34px;background:var(--border);flex-shrink:0}
+.nav-menu{display:flex;align-items:center}
+.nav-item-dropdown{position:relative}
+.nav-link{display:inline-flex;align-items:center;gap:6px;padding:8px 14px;border-radius:var(--radius-sm);font-size:13px;font-weight:600;color:var(--text-2);text-decoration:none;cursor:pointer;border:1px solid transparent;white-space:nowrap}
+.nav-link.active{background:var(--teal-lt);color:var(--teal-dk);border-color:#99f6e4}
+.nav-dropdown-content{display:none;position:absolute;top:calc(100% + 8px);left:0;min-width:260px;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-sm);box-shadow:var(--shadow-lg);padding:7px;z-index:200;max-height:70vh;overflow:auto}
+.nav-dropdown-content.show{display:block}
+.nav-dropdown-content a{display:block;padding:9px 12px;border-radius:var(--radius-xs);font-size:13px;color:var(--text-2);text-decoration:none;font-weight:500}
+.nav-dropdown-content a:hover{background:var(--surface-2);color:var(--teal-dk)}
+.header-meta{display:flex;align-items:center;gap:8px;margin-left:6px;flex-wrap:wrap}
+.pill{display:inline-flex;align-items:center;gap:6px;padding:6px 12px;border-radius:999px;font-size:12px;font-weight:600}
+.pill-teal{background:var(--teal-lt);color:var(--teal-dk)}
+.pill-blue{background:var(--blue-lt);color:#1e40af}
+.pill-amber{background:var(--amber-lt);color:#92400e}
+.live-dot{width:8px;height:8px;border-radius:50%;background:var(--green);box-shadow:0 0 0 0 rgba(5,150,105,.5);animation:pulse 1.8s infinite}
+@keyframes pulse{0%{box-shadow:0 0 0 0 rgba(5,150,105,.5)}70%{box-shadow:0 0 0 7px rgba(5,150,105,0)}100%{box-shadow:0 0 0 0 rgba(5,150,105,0)}}
+.header-actions{margin-left:auto;display:inline-flex;gap:8px}
+.btn{display:inline-flex;align-items:center;gap:6px;padding:8px 13px;border-radius:var(--radius-sm);font-size:12.5px;font-weight:600;cursor:pointer;border:1px solid var(--border-strong);background:var(--surface);color:var(--text-2);text-decoration:none}
+.btn:hover{background:var(--surface-2)}
+.btn-primary{background:var(--teal);color:#fff;border-color:var(--teal)}
+.btn-primary:hover{background:var(--teal-dk)}
+
+/* VIEW TABS */
+.view-tabs{display:flex;gap:8px;background:var(--surface);padding:7px;border-radius:14px;box-shadow:var(--shadow-sm);border:1px solid var(--border);margin-bottom:22px;max-width:580px}
+.view-tab{flex:1;display:flex;flex-direction:column;align-items:center;gap:2px;padding:12px 14px;border-radius:11px;cursor:pointer;font-weight:700;color:var(--text-3);transition:.15s;border:1px solid transparent;text-align:center}
+.view-tab span.t{font-size:14.5px}
+.view-tab span.s{font-size:11px;font-weight:500;color:var(--text-4)}
+.view-tab:hover{background:var(--surface-2)}
+.view-tab.active{color:#fff;background:linear-gradient(135deg,var(--teal),var(--cyan));box-shadow:var(--shadow-md)}
+.view-tab.active span.s{color:rgba(255,255,255,.85)}
+.view-tab.test.active{background:linear-gradient(135deg,var(--indigo),var(--purple))}
+
+/* SELECTOR CARDS */
+.bar{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow-sm);padding:16px 18px;margin-bottom:16px}
+.bar-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;flex-wrap:wrap;gap:8px}
+.bar-title{font-size:14px;font-weight:700}
+.bar-sub{font-size:12px;color:var(--teal-dk);font-weight:600;background:var(--teal-lt);padding:3px 10px;border-radius:999px;margin-left:8px}
+.btn-mini{padding:6px 12px;border-radius:8px;border:1px solid var(--border-strong);background:var(--surface);font-size:12px;font-weight:600;color:var(--text-2);cursor:pointer}
+.btn-mini:hover{background:var(--surface-2)}
+.tabs-grid{display:grid;gap:8px}
+.chip{display:flex;flex-direction:column;align-items:center;gap:2px;padding:10px 6px;border-radius:10px;border:1px solid var(--border);background:var(--surface);cursor:pointer;transition:.12s}
+.chip:hover:not(.disabled){border-color:var(--teal);background:var(--teal-lt)}
+.chip.active{background:linear-gradient(135deg,var(--teal),var(--cyan));border-color:var(--teal);color:#fff;box-shadow:var(--shadow-sm)}
+.chip.test.active{background:linear-gradient(135deg,var(--indigo),var(--purple));border-color:var(--indigo)}
+.chip.disabled{opacity:.4;cursor:not-allowed}
+.chip .a{font-size:13px;font-weight:700}
+.chip .n{font-size:10.5px;color:var(--text-3)}
+.chip.active .n{color:rgba(255,255,255,.85)}
+
+/* SECTION TITLE */
+.sec-title{display:flex;align-items:center;gap:8px;font-size:15px;font-weight:800;margin:26px 0 14px}
+.sec-title .note{font-size:12px;font-weight:500;color:var(--text-3);margin-left:auto}
+
+/* KPI HERO TITLE */
+.kpi-hero{display:flex;align-items:center;gap:16px;margin:30px 0 20px;padding:20px 26px;border-radius:20px;
+  background:linear-gradient(120deg,#0d9488 0%,#0891b2 55%,#4f46e5 100%);color:#fff;
+  box-shadow:0 14px 30px -10px rgba(13,148,136,.55);position:relative;overflow:hidden}
+.kpi-hero::after{content:"";position:absolute;right:-40px;top:-60px;width:220px;height:220px;border-radius:50%;background:rgba(255,255,255,.08)}
+.kpi-hero::before{content:"";position:absolute;right:60px;bottom:-80px;width:160px;height:160px;border-radius:50%;background:rgba(255,255,255,.06)}
+.kpi-hero .hero-ic{width:54px;height:54px;border-radius:15px;background:rgba(255,255,255,.18);display:flex;align-items:center;justify-content:center;font-size:28px;flex-shrink:0;box-shadow:inset 0 0 0 1px rgba(255,255,255,.25);z-index:1}
+.kpi-hero .hero-txt{z-index:1}
+.kpi-hero .hero-txt h2{font-size:23px;font-weight:800;letter-spacing:-.02em;line-height:1.15;font-family:'Sarabun',sans-serif}
+.kpi-hero .hero-txt p{font-size:13px;font-weight:500;color:rgba(255,255,255,.85);margin-top:2px}
+.kpi-hero .hero-note{margin-left:auto;font-size:13px;font-weight:600;background:rgba(255,255,255,.18);padding:8px 16px;border-radius:999px;white-space:nowrap;z-index:1}
+@media(max-width:760px){.kpi-hero{flex-wrap:wrap}.kpi-hero .hero-note{margin-left:0;width:100%;text-align:center}}
+
+/* KPI CARDS */
+.kpi-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:18px}
+.kpi{background:var(--surface);border:1px solid var(--border);border-radius:20px;box-shadow:var(--shadow-md);padding:22px 22px 18px;position:relative;overflow:hidden;transition:transform .18s,box-shadow .18s;display:flex;flex-direction:column}
+.kpi:hover{transform:translateY(-4px);box-shadow:0 18px 34px -12px rgba(15,23,42,.22)}
+.kpi::before{content:"";position:absolute;left:0;top:0;right:0;height:5px;background:var(--teal)}
+.kpi::after{content:"";position:absolute;right:-30px;top:-30px;width:110px;height:110px;border-radius:50%;opacity:.06;background:var(--teal)}
+.kpi.c-teal::before,.kpi.c-teal::after{background:var(--teal)} .kpi.c-indigo::before,.kpi.c-indigo::after{background:var(--indigo)}
+.kpi.c-blue::before,.kpi.c-blue::after{background:var(--blue)} .kpi.c-cyan::before,.kpi.c-cyan::after{background:var(--cyan)}
+.kpi.c-amber::before,.kpi.c-amber::after{background:var(--amber)} .kpi.c-rose::before,.kpi.c-rose::after{background:var(--rose)}
+.kpi.c-purple::before,.kpi.c-purple::after{background:var(--purple)} .kpi.c-green::before,.kpi.c-green::after{background:var(--green)}
+.kpi-top{display:flex;align-items:flex-start;justify-content:space-between;gap:10px;margin-bottom:11px}
+.kpi-label{font-size:13px;font-weight:700;color:var(--text-2);line-height:1.3}
+.kpi-ic{width:42px;height:42px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:21px;flex-shrink:0;box-shadow:var(--shadow-sm)}
+.kpi-val{font-size:33px;font-weight:800;letter-spacing:-.03em;font-family:'Inter',sans-serif;line-height:1;color:var(--text-1)}
+.kpi-unit{font-size:13px;font-weight:600;color:var(--text-4);margin-left:5px}
+.kpi-foot{font-size:11.5px;color:var(--text-3);margin-top:7px;font-weight:500}
+.kpi-foot b{color:var(--green);font-weight:700} .kpi-foot b.dn{color:var(--rose)}
+.kpi-details{margin-top:12px;padding-top:12px;border-top:1px solid var(--border);display:grid;grid-template-columns:1fr 1fr;gap:5px}
+.kpi-details.one{grid-template-columns:1fr}
+.kpi-details.three{grid-template-columns:1fr 1fr 1fr}
+@media(max-width:1100px){.kpi-details.three{grid-template-columns:1fr 1fr}}
+/* wide card spanning 3 columns (fills bottom row) */
+.kpi.kspan3{grid-column:span 3}
+.kpi.kspan3 .kpi-details{grid-template-columns:repeat(5,1fr)}
+@media(max-width:1100px){.kpi.kspan3{grid-column:span 2}.kpi.kspan3 .kpi-details{grid-template-columns:repeat(3,1fr)}}
+@media(max-width:680px){.kpi.kspan3 .kpi-details{grid-template-columns:repeat(2,1fr)}}
+.kpi.kspan2{grid-column:span 2}
+.kpi.kspan2 .kpi-details{grid-template-columns:repeat(4,1fr)}
+@media(max-width:1100px){.kpi.kspan2 .kpi-details{grid-template-columns:repeat(3,1fr)}}
+@media(max-width:680px){.kpi.kspan2 .kpi-details{grid-template-columns:repeat(2,1fr)}}
+.kpi-det{display:flex;align-items:center;justify-content:space-between;gap:6px;font-size:11px;background:var(--surface-2);border-radius:7px;padding:5px 8px;min-width:0}
+.kpi-det .dl{color:var(--text-3);font-weight:500;display:flex;align-items:center;gap:5px;min-width:0;overflow:hidden}
+.kpi-det .dl::before{content:"";width:6px;height:6px;border-radius:2px;flex-shrink:0;background:var(--dot,var(--text-4))}
+.kpi-det .dl .dt{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.kpi-det .dv{color:var(--text-1);font-weight:700;font-family:'Inter',sans-serif;white-space:nowrap;flex-shrink:0}
+.kpi-note{margin-top:11px;padding-top:9px;border-top:1px dashed var(--border);font-size:10.8px;line-height:1.4;color:var(--text-3);font-weight:500;display:flex;align-items:flex-start;gap:5px}
+
+/* CHARTS */
+.charts-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px}
+.chart-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow-sm);padding:18px}
+.chart-card.wide{grid-column:1/-1}
+.chart-head{margin-bottom:12px}
+.chart-head h3{font-size:14px;font-weight:700}
+.chart-head p{font-size:12px;color:var(--text-3)}
+.chart-wrap{position:relative;height:280px}
+
+/* TABLE */
+.table-section{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow-sm);overflow:hidden;margin-top:16px}
+.table-head{padding:16px 18px;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:6px}
+.table-head h3{font-size:14px;font-weight:700}
+.table-head p{font-size:12px;color:var(--text-3)}
+.table-wrap{overflow-x:auto}
+table{width:100%;border-collapse:collapse;font-size:12.5px;white-space:nowrap}
+thead th{background:var(--surface-2);color:var(--text-2);font-weight:700;text-align:center;padding:9px 11px;border-bottom:2px solid var(--border-strong);position:sticky;top:0}
+thead th:first-child{text-align:left}
+tbody td{padding:8px 11px;text-align:center;border-bottom:1px solid var(--border)}
+tbody td:first-child{text-align:left;font-weight:600;color:var(--text-2);position:sticky;left:0;background:var(--surface)}
+tbody tr:hover td{background:var(--surface-hover)}
+tbody tr.sub td{background:#f8fafc;font-weight:800;color:var(--teal-dk)}
+tbody tr.sub td:first-child{background:#f0fdfa}
+tbody tr.grp td{background:linear-gradient(90deg,var(--teal-lt),transparent);font-weight:800;color:var(--teal-dk);text-align:left;font-size:12px}
+td.total-col{font-weight:800;color:var(--text-1);background:#f8fafc!important}
+.muted{color:var(--text-4)}
+
+/* ANALYSIS */
+.analysis{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow-sm);padding:22px;margin-top:18px}
+.analysis h3{font-size:15px;font-weight:800;margin-bottom:4px}
+.analysis>p{font-size:12.5px;color:var(--text-3);margin-bottom:16px}
+.analysis-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.ac{background:var(--surface-2);border:1px solid var(--border);border-radius:var(--radius-sm);padding:16px}
+.ac h4{font-size:13.5px;font-weight:700;margin-bottom:9px;color:var(--teal-dk)}
+.ac ul{list-style:none;display:flex;flex-direction:column;gap:8px}
+.ac li{font-size:12.5px;color:var(--text-2);line-height:1.55;padding-left:16px;position:relative}
+.ac li::before{content:"▸";position:absolute;left:0;color:var(--teal);font-weight:700}
+.ac li b{color:var(--text-1)}
+
+.footer{text-align:center;color:var(--text-4);font-size:12px;margin-top:34px;padding-top:18px;border-top:1px solid var(--border)}
+
+@media(max-width:1100px){.kpi-grid{grid-template-columns:repeat(2,1fr)}.charts-grid{grid-template-columns:1fr}.analysis-grid{grid-template-columns:1fr}}
+@media print{
+  .header,.view-tabs,.bar,.header-actions,#btnTop{display:none!important}
+  .main{padding:0}.chart-card,.kpi,.table-section,.analysis{box-shadow:none;border:1px solid #d1d5db}
+  .charts-grid{grid-template-columns:1fr 1fr}.kpi:hover{transform:none}
+}
+</style>
+</head>
+<body>
+
+<header class="header">
+  <div class="header-inner">
+    <div class="logo-wrap">
+      <div class="logo-icon">🧪</div>
+      <div class="logo-text">
+        <h1>Standard Laboratory</h1>
+        <p>ห้องเตรียมเม็ดเลือดแดงมาตรฐาน · ภาควิชาเวชศาสตร์การธนาคารเลือดฯ</p>
+      </div>
+    </div>
+    <div class="header-divider"></div>
+    <nav class="nav-menu">
+      <div class="nav-item-dropdown">
+        <a href="#" class="nav-link active" onclick="toggleNav(event)">🏥 Lab: Standard Laboratory ▾</a>
+        <div class="nav-dropdown-content" id="navDrop">
+          <a href="Dashboard Blood Collection.html">Blood Collection</a>
+          <a href="Dashboard Hemapheresis.html">Hemapheresis</a>
+          <a href="Dashboard Blood Processing.html">Blood Processing</a>
+          <a href="Dashboard Infection.html">Infectious Serology</a>
+          <a href="Dashboard Blood Component.html">Blood Component Preparation</a>
+          <a href="Dashboard QC Blood Components.html">QC Blood Components</a>
+          <a href="Dashboard Immunohematology.html">Immunohematology</a>
+          <a href="Dashboard Blood Prep Disp.html">ผลิต &amp; จ่ายเลือด</a>
+          <a href="Dashboard Standard Laboratory (ใหม่).html" style="font-weight:700;background:var(--bg-alt);color:var(--text-1)">Standard Laboratory ★</a>
+          <a href="Dashboard Reference Laboratory.html">Reference Laboratory</a>
+          <a href="Dashboard HLA Laboratory.html">HLA Laboratory</a>
+          <a href="Dashboard DNA Laboratory.html">DNA Laboratory</a>
+        </div>
+      </div>
+    </nav>
+    <div class="header-divider"></div>
+    <div class="header-meta">
+      <div class="pill pill-amber" id="pillYear">📅 ปี 2569</div>
+      <div class="pill pill-teal"><span class="live-dot"></span><span id="pillMonths">ม.ค.–พ.ค. 2569</span></div>
+      <div class="pill pill-blue">📄 สถิติ 69.xlsx</div>
+    </div>
+    <div class="header-actions">
+      <a href="index.html" class="btn">🏠 หน้าแรก</a>
+      <button class="btn" onclick="location.reload()">↻ รีเฟรช</button>
+      <button class="btn btn-primary" onclick="window.print()">📥 Export PDF</button>
+    </div>
+  </div>
+</header>
+
+<main class="main">
+  <!-- VIEW TABS -->
+  <div class="view-tabs">
+    <div class="view-tab lab active" id="tabLab" onclick="setView('lab')">
+      <span class="t">🧫 Standard Laboratory</span>
+      <span class="s">งานตรวจ HDFN · ANC · หมู่เลือด · Standard cells</span>
+    </div>
+    <div class="view-tab test" id="tabTest" onclick="setView('test')">
+      <span class="t">🔬 Standard Test</span>
+      <span class="s">จำนวน Test รายเดือน (ABO/Rh/DAT/IAT...)</span>
+    </div>
+  </div>
+
+  <!-- YEAR SELECTOR -->
+  <div class="bar">
+    <div class="bar-top">
+      <div><span class="bar-title">เลือกปีปฏิทิน</span><span class="bar-sub" id="yearTag">ปี 2569</span></div>
+    </div>
+    <div class="tabs-grid" id="yearTabs" style="grid-template-columns:repeat(6,1fr)"></div>
+  </div>
+
+  <!-- MONTH SELECTOR -->
+  <div class="bar">
+    <div class="bar-top">
+      <div><span class="bar-title">เลือกเดือนเปรียบเทียบ</span><span class="bar-sub" id="monthTag">รวมทุกเดือน</span></div>
+      <button class="btn-mini" onclick="selectAllMonths()">รวมทุกเดือน</button>
+    </div>
+    <div class="tabs-grid" id="monthTabs" style="grid-template-columns:repeat(12,1fr)"></div>
+  </div>
+
+  <!-- KPI HERO -->
+  <div class="kpi-hero">
+    <div class="hero-ic" id="kpiHeroIc">🧫</div>
+    <div class="hero-txt">
+      <h2 id="kpiTitle">ดัชนีชี้วัดหลัก Standard Laboratory</h2>
+      <p id="kpiHeroSub">สรุปภาระงานหลักของห้องปฏิบัติการมาตรฐาน</p>
+    </div>
+    <div class="hero-note" id="kpiNote"></div>
+  </div>
+  <div class="kpi-grid" id="kpiGrid"></div>
+
+  <!-- CHARTS -->
+  <div class="sec-title">📊 กราฟวิเคราะห์แนวโน้มและสัดส่วน</div>
+  <div id="chartsArea"></div>
+
+  <!-- TABLE -->
+  <div class="table-section">
+    <div class="table-head">
+      <div><h3 id="tableTitle">รายงานตารางสถิติรายเดือน</h3><p id="tableSub"></p></div>
+    </div>
+    <div class="table-wrap"><table id="dataTable"></table></div>
+  </div>
+
+  <!-- ANALYSIS -->
+  <div class="analysis">
+    <h3>🧠 บทวิเคราะห์ภาพรวม Standard Laboratory (2564–2569)</h3>
+    <p id="analysisSub">วิเคราะห์แนวโน้มภาระงานห้องปฏิบัติการมาตรฐานและงานทดสอบหมู่เลือด</p>
+    <div class="analysis-grid" id="analysisGrid"></div>
+  </div>
+
+  <div class="footer">
+    Dashboard Standard Laboratory · ภาควิชาเวชศาสตร์การธนาคารเลือดและจุลชีววิทยาคลินิก ·
+    แหล่งข้อมูล: สถิติ 69.xlsx (Tab: Standard Lab / Standard Test) · ปีปฏิทิน 2564–2569
+  </div>
+</main>
+
+<script>
+/* ===== DATA (embedded fallback; overridden by live_standard.js if present) ===== */
+const EMBED = {"2564":{"test_abo":[947,1301,1616,896,909,1270,882,847,1121,1204,1326,1164],"test_rh":[947,1301,1616,896,909,1270,882,847,1121,1204,1326,1164],"test_dat":[217,237,262,222,239,216,185,220,191,224,210,209],"test_iat":[419,634,752,376,373,625,441,368,632,584,592,504],"test_iat_ab_cells":[28,32,45,35,41,36,28,44,24,39,29,29],"test_xmatch":[69,53,101,80,101,83,53,74,73,71,81,61],"test_iden":[12,31,27,8,6,15,10,9,23,22,21,17],"lab_abo_rh_hdfn":[185,273,261,210,230,206,180,190,183,201,197,168],"lab_dat":[217,208,262,222,239,216,185,220,191,224,210,209],"lab_iat_abo":[28,237,45,35,41,36,28,44,24,39,29,29],"lab_iat_ab_screen":[127,32,206,143,160,134,150,138,145,149,136,120],"lab_xmatch_hdfn":[69,142,101,80,101,83,53,74,73,71,81,61],"lab_ab_iden_hdfn":[1,53,7,1,0,4,1,3,4,6,3,5],"lab_exchange":[1,7,10,8,1,1,null,2,0,0,0,0],"lab_total_case_hdfn":[243,273,325,259,273,248,216,236,245,270,249,233],"lab_intra_uterine":[0,1,1,0,1,1,1,1,0,0,0,1],"lab_anc_abo_rh":[292,492,546,233,213,491,291,230,487,435,456,384],"lab_anc_rh_ve":[3,2,3,3,5,6,3,2,4,0,2,4],"lab_anc_rh_del":[null,null,null,null,null,null,null,null,null,null,null,null],"lab_anc_ab_iden":[11,24,20,7,6,11,9,6,19,16,18,12],"lab_anc_weak_d":[null,null,null,null,null,null,null,null,null,null,null,null],"lab_bg_abo":[253,364,538,231,227,357,226,207,260,344,463,403],"lab_bg_rh":[253,364,538,231,227,357,226,207,260,344,463,403],"lab_bg_rh_del":[null,null,null,null,null,null,null,null,null,null,null,null],"lab_bg_ab_screen":[null,null,null,null,null,null,null,null,null,null,null,null],"lab_bg_ab_iden":[null,null,null,null,null,null,null,null,null,null,null,null],"lab_cell_alsever":[2,2,1,2,4,1,1,1,2,0,0,2],"lab_cell_5_glycerol":[1,1,0,2,0,0,0,1,0,1,0,2],"lab_cell_12_glycerol":[1,1,0,1,1,0,0,1,0,1,0,2],"lab_cell_40_glycerol":[0,1,0,0,1,2,0,0,0,0,0,1],"lab_cell_ph_6_0":[0,0,0,0,0,0,0,1,0,0,0,0],"lab_cell_ph_5_4":[0,0,0,0,0,0,0,0,0,0,0,0],"lab_cell_1_papain":[0,0,0,0,0,0,0,0,0,0,0,0],"lab_cell_abo":[9,6,9,3,12,3,9,3,9,6,3,6],"lab_bg_weak_d":[null,null,null,null,null,null,null,null,null,null,null,null],"lab_org_abo":[null,null,null,null,null,null,null,null,null,null,null,null],"lab_org_rh":[null,null,null,null,null,null,null,null,null,null,null,null],"lab_org_rh_del":[null,null,null,null,null,null,null,null,null,null,null,null],"lab_org_weak_d":[null,null,null,null,null,null,null,null,null,null,null,null],"lab_org_ab_screen":[null,null,null,null,null,null,null,null,null,null,null,null],"lab_org_ab_iden":[null,null,null,null,null,null,null,null,null,null,null,null],"lab_cell_coombs_ctrl":[2,2,2,1,3,3,2,0,2,2,1,2],"lab_cell_screen_o3":[9,10,9,3,7,5,5,7,5,7,4,10],"lab_cell_panel11":[8,8,9,9,9,8,9,9,7,9,8,10],"lab_cell_papain_panel11":[8,8,9,9,9,8,9,9,7,9,8,10],"lab_cell_diluent2":[8,8,9,9,9,8,9,9,7,9,8,10],"lab_lewis":[null,null,null,null,null,null,null,null,null,null,null,null]},"2565":{"test_abo":[1241,1197,1345,1117,1358,1290,1133,1443,1334,1371,1332,1378],"test_rh":[1241,1197,1345,1117,1358,1290,1133,1443,1334,1371,1332,1378],"test_dat":[206,173,189,186,207,205,205,219,208,233,198,259],"test_iat":[568,536,611,489,637,577,501,720,543,529,556,572],"test_iat_ab_cells":[38,33,35,43,33,33,30,40,35,32,30,45],"test_xmatch":[55,57,62,59,53,74,63,84,74,63,78,146],"test_iden":[18,14,19,13,24,33,18,35,28,17,15,15],"lab_abo_rh_hdfn":[173,163,178,161,183,176,172,203,191,194,179,216],"lab_dat":[206,173,189,186,207,205,205,219,208,233,198,259],"lab_iat_abo":[38,33,35,43,33,33,30,40,35,32,30,45],"lab_iat_ab_screen":[135,124,140,114,165,144,148,163,132,154,127,146],"lab_xmatch_hdfn":[55,57,62,59,53,74,63,84,74,63,78,100],"lab_ab_iden_hdfn":[2,2,2,2,2,1,0,6,8,5,4,1],"lab_exchange":[1,1,0,1,2,3,1,2,0,0,1,1],"lab_total_case_hdfn":[230,212,226,217,251,247,239,267,246,267,234,299],"lab_intra_uterine":[2,0,0,0,2,0,1,0,0,0,0,0],"lab_anc_abo_rh":[433,412,471,375,472,433,353,464,411,375,429,426],"lab_anc_rh_ve":[0,2,5,5,3,3,1,2,2,0,3,0],"lab_anc_rh_del":[null,null,null,null,null,null,null,null,null,null,null,null],"lab_anc_ab_iden":[16,12,17,11,22,29,18,29,20,12,11,14],"lab_anc_weak_d":[null,null,null,null,null,null,null,null,null,null,null,null],"lab_bg_abo":[429,449,507,395,496,476,403,557,524,496,471,477],"lab_bg_rh":[429,449,507,395,496,476,403,557,524,496,471,477],"lab_bg_rh_del":[null,null,null,null,null,null,null,null,null,null,null,null],"lab_bg_ab_screen":[null,null,null,null,null,null,null,null,null,null,null,null],"lab_bg_ab_iden":[null,null,null,null,null,null,null,null,null,null,null,null],"lab_cell_alsever":[1,0,2,2,2,0,3,0,0,2,0,2],"lab_cell_5_glycerol":[2,1,1,0,1,0,1,2,2,1,2,3],"lab_cell_12_glycerol":[1,1,1,0,1,0,1,2,0,2,1,2],"lab_cell_40_glycerol":[0,0,2,0,2,0,2,1,0,0,2,2],"lab_cell_ph_6_0":[0,1,0,0,0,0,0,0,0,0,0,1],"lab_cell_ph_5_4":[0,1,0,0,0,0,0,0,0,0,0,0],"lab_cell_1_papain":[0,1,0,0,0,0,0,0,0,0,0,0],"lab_cell_abo":[6,6,6,3,6,3,3,6,3,6,6,9],"lab_bg_weak_d":[null,null,null,null,null,null,null,null,null,null,null,null],"lab_org_abo":[null,null,null,null,null,null,null,null,null,null,null,null],"lab_org_rh":[null,null,null,null,null,null,null,null,null,null,null,null],"lab_org_rh_del":[null,null,null,null,null,null,null,null,null,null,null,null],"lab_org_weak_d":[null,null,null,null,null,null,null,null,null,null,null,null],"lab_org_ab_screen":[null,null,null,null,null,null,null,null,null,null,null,null],"lab_org_ab_iden":[null,null,null,null,null,null,null,null,null,null,null,null],"lab_cell_coombs_ctrl":[1,1,1,1,1,1,1,1,2,3,3,5],"lab_cell_screen_o3":[7,5,5,4,5,8,7,7,7,7,6,7],"lab_cell_panel11":[8,9,9,7,9,7,7,9,9,7,8,7],"lab_cell_papain_panel11":[8,9,9,7,9,7,7,9,9,7,8,7],"lab_cell_diluent2":[8,9,9,7,9,7,7,9,9,7,8,7],"lab_lewis":[null,null,null,null,null,null,null,null,null,null,null,null]},"2566":{"test_abo":[1478,1344,1459,1139,1393,1330,1360,1522,1351,1290,1294,1211],"test_rh":[1478,1344,1459,1139,1393,1330,1360,1522,1351,1290,1294,1211],"test_dat":[238,201,242,167,207,186,229,279,225,253,219,246],"test_iat":[563,555,640,612,777,771,778,833,781,694,685,648],"test_iat_ab_cells":[30,53,39,35,28,29,39,37,27,28,32,32],"test_xmatch":[114,73,68,46,54,68,64,97,87,86,75,104],"test_iden":[23,21,17,18,18,19,25,33,25,10,22,38],"lab_abo_rh_hdfn":[221,176,200,139,182,156,178,236,199,226,196,222],"lab_dat":[238,201,242,167,207,186,229,279,225,253,219,246],"lab_iat_abo":[30,53,39,35,28,29,39,37,27,28,32,32],"lab_iat_ab_screen":[138,130,159,107,152,124,144,177,162,159,136,161],"lab_xmatch_hdfn":[114,73,68,46,54,68,64,97,87,86,75,104],"lab_ab_iden_hdfn":[6,3,3,3,0,2,5,2,0,2,4,4],"lab_exchange":[0,0,1,0,0,0,0,0,2,0,0,2],"lab_total_case_hdfn":[286,234,279,192,249,228,263,323,283,308,268,306],"lab_intra_uterine":[2,2,0,0,0,1,1,2,0,1,1,0],"lab_anc_abo_rh":[425,425,481,405,417,428,420,443,422,371,352,299],"lab_anc_rh_ve":[1,1,2,1,0,3,4,3,5,0,3,1],"lab_anc_rh_del":[null,null,null,null,null,null,null,null,null,null,null,null],"lab_anc_ab_iden":[17,18,14,2,18,11,18,24,18,6,10,22],"lab_anc_weak_d":[null,null,null,null,null,null,null,null,null,null,null,null],"lab_bg_abo":[594,542,536,428,587,560,533,564,505,440,497,444],"lab_bg_rh":[594,542,536,428,587,560,533,564,505,440,497,444],"lab_bg_rh_del":[null,null,null,null,null,null,null,null,null,null,null,null],"lab_bg_ab_screen":[0,0,0,100,208,219,214,213,197,164,197,188],"lab_bg_ab_iden":[0,0,0,5,7,6,2,7,7,2,8,12],"lab_cell_alsever":[1,0,1,0,1,1,0,1,1,0,2,1],"lab_cell_5_glycerol":[1,0,1,0,1,1,0,1,1,1,1,1],"lab_cell_12_glycerol":[1,0,1,0,1,1,0,1,1,0,1,1],"lab_cell_40_glycerol":[0,0,1,2,0,0,0,1,0,0,1,1],"lab_cell_ph_6_0":[0,0,0,0,1,0,0,0,0,0,0,0],"lab_cell_ph_5_4":[0,0,0,0,0,0,0,0,0,0,0,0],"lab_cell_1_papain":[0,0,0,0,0,0,0,0,0,0,0,0],"lab_cell_abo":[6,3,6,3,6,0,3,6,3,6,6,3],"lab_bg_weak_d":[null,null,null,null,null,null,null,null,null,null,null,null],"lab_org_abo":[null,null,null,null,null,null,null,null,null,null,null,null],"lab_org_rh":[null,null,null,null,null,null,null,null,null,null,null,null],"lab_org_rh_del":[null,null,null,null,null,null,null,null,null,null,null,null],"lab_org_weak_d":[null,null,null,null,null,null,null,null,null,null,null,null],"lab_org_ab_screen":[null,null,null,null,null,null,null,null,null,null,null,null],"lab_org_ab_iden":[null,null,null,null,null,null,null,null,null,null,null,null],"lab_cell_coombs_ctrl":[4,2,2,1,5,6,3,2,2,1,2,1],"lab_cell_screen_o3":[7,13,8,5,6,5,7,6,8,6,7,5],"lab_cell_panel11":[9,8,8,9,8,6,9,8,9,9,8,9],"lab_cell_papain_panel11":[9,8,8,9,8,8,9,8,9,9,8,9],"lab_cell_diluent2":[9,0,0,0,0,8,0,0,0,0,8,9],"lab_lewis":[null,null,null,null,null,null,null,null,null,null,null,null]},"2567":{"test_abo":[1239,1110,1234,1002,1294,1109,1130,1145,1104,1147,996,905],"test_rh":[1239,1110,1234,1002,1294,1109,1130,1145,1104,1147,996,905],"test_dat":[210,184,219,190,195,203,218,193,211,248,199,195],"test_iat":[774,665,761,618,838,676,707,705,673,697,640,568],"test_iat_ab_cells":[18,17,31,31,34,28,23,17,33,33,31,28],"test_xmatch":[91,67,64,79,64,70,76,67,67,77,62,59],"test_iden":[36,18,32,25,25,29,19,10,36,20,11,25],"lab_abo_rh_hdfn":[185,161,187,184,175,186,185,167,183,227,173,156],"lab_dat":[210,184,219,190,195,203,218,193,211,248,199,195],"lab_iat_abo":[18,17,31,31,34,28,23,17,33,33,31,28],"lab_iat_ab_screen":[131,120,140,131,155,140,142,125,138,176,140,111],"lab_xmatch_hdfn":[91,67,64,79,64,70,76,67,67,77,62,59],"lab_ab_iden_hdfn":[3,3,5,3,3,5,1,0,3,1,1,8],"lab_exchange":[1,1,1,2,0,0,0,0,3,1,0,0],"lab_total_case_hdfn":[253,227,252,240,247,239,256,226,261,301,240,218],"lab_intra_uterine":[1,0,1,0,0,1,0,0,0,0,2,1],"lab_anc_abo_rh":[438,372,395,298,420,341,325,343,319,280,282,238],"lab_anc_rh_ve":[1,0,1,0,2,2,1,0,0,2,0,2],"lab_anc_rh_del":[null,null,null,null,null,null,null,null,null,null,null,null],"lab_anc_ab_iden":[24,10,20,15,11,16,11,6,20,14,10,11],"lab_anc_weak_d":[null,null,null,null,null,null,null,null,null,null,null,null],"lab_bg_abo":[485,457,512,389,544,442,478,510,464,464,401,400],"lab_bg_rh":[485,457,512,389,544,442,478,510,464,464,401,400],"lab_bg_rh_del":[null,null,null,null,null,null,null,null,null,null,null,null],"lab_bg_ab_screen":[205,173,226,189,263,195,240,237,216,241,218,219],"lab_bg_ab_iden":[9,5,7,7,11,8,7,4,13,5,6,6],"lab_cell_alsever":[0,1,0,1,1,0,1,1,1,1,0,0],"lab_cell_5_glycerol":[1,0,1,0,3,1,2,1,1,1,0,0],"lab_cell_12_glycerol":[1,0,1,0,1,1,2,1,1,1,0,0],"lab_cell_40_glycerol":[0,0,0,0,2,2,0,1,0,0,1,0],"lab_cell_ph_6_0":[0,0,1,0,0,0,2,0,0,0,0,0],"lab_cell_ph_5_4":[0,0,0,0,0,0,0,0,0,0,0,0],"lab_cell_1_papain":[0,0,0,0,0,0,0,0,0,0,0,0],"lab_cell_abo":[3,6,6,6,6,3,3,6,6,6,3,9],"lab_bg_weak_d":[null,null,null,null,null,null,null,null,null,null,null,null],"lab_org_abo":[null,null,null,null,null,null,null,null,null,null,null,null],"lab_org_rh":[null,null,null,null,null,null,null,null,null,null,null,null],"lab_org_rh_del":[null,null,null,null,null,null,null,null,null,null,null,null],"lab_org_weak_d":[null,null,null,null,null,null,null,null,null,null,null,null],"lab_org_ab_screen":[null,null,null,null,null,null,null,null,null,null,null,null],"lab_org_ab_iden":[null,null,null,null,null,null,null,null,null,null,null,null],"lab_cell_coombs_ctrl":[2,1,2,1,2,1,1,2,2,2,1,2],"lab_cell_screen_o3":[7,5,7,4,4,4,4,7,7,8,8,5],"lab_cell_panel11":[9,8,9,9,9,8,9,9,8,9,9,8],"lab_cell_papain_panel11":[9,8,9,9,9,8,9,9,8,9,9,8],"lab_cell_diluent2":[9,8,9,9,9,8,9,9,8,9,9,8],"lab_lewis":[null,null,null,null,null,null,null,null,null,null,null,null]},"2568":{"test_abo":[1076,979,1064,892,1087,980,949,1024,988,959,903,957],"test_rh":[1076,979,1064,892,1087,980,949,1024,988,959,903,957],"test_dat":[193,176,201,165,166,157,219,189,174,185,170,185],"test_iat":[698,654,658,580,682,607,636,656,642,602,565,590],"test_iat_ab_cells":[30,16,20,16,23,11,24,23,22,17,18,22],"test_xmatch":[67,65,77,51,56,60,57,67,47,53,31,59],"test_iden":[24,24,29,16,37,29,27,27,22,25,27,37],"lab_abo_rh_hdfn":[181,146,185,136,152,150,188,176,150,144,139,156],"lab_dat":[193,176,201,165,166,157,219,189,174,185,170,185],"lab_iat_abo":[30,16,20,16,23,11,24,23,22,17,18,22],"lab_iat_ab_screen":[143,100,133,105,120,105,121,131,125,113,107,120],"lab_xmatch_hdfn":[67,65,77,51,56,60,57,67,47,53,31,59],"lab_ab_iden_hdfn":[5,0,3,1,4,2,4,5,3,4,2,5],"lab_exchange":[0,0,0,0,2,0,2,1,0,0,1,2],"lab_total_case_hdfn":[244,206,247,195,207,192,249,225,217,227,207,247],"lab_intra_uterine":[2,0,2,1,1,0,0,0,3,3,0,0],"lab_anc_abo_rh":[299,290,272,253,326,254,260,264,255,251,234,234],"lab_anc_rh_ve":[2,4,4,0,4,4,2,0,2,3,3,0],"lab_anc_rh_del":[0,0,0,1,1,1,0,0,0,2,0,0],"lab_anc_ab_iden":[8,15,12,8,24,16,17,9,10,13,16,19],"lab_anc_weak_d":[null,null,null,null,null,null,null,null,null,null,null,null],"lab_bg_abo":[453,443,474,398,489,471,380,453,458,451,423,447],"lab_bg_rh":[453,443,474,398,489,471,380,453,458,451,423,447],"lab_bg_rh_del":[null,null,null,null,null,null,null,null,null,null,null,null],"lab_bg_ab_screen":[256,264,253,222,236,248,255,261,262,238,224,236],"lab_bg_ab_iden":[11,15,9,7,9,11,6,13,9,8,9,13],"lab_cell_alsever":[1,1,0,1,0,1,4,4,1,2,0,1],"lab_cell_5_glycerol":[0,2,2,1,2,0,2,0,1,1,1,1],"lab_cell_12_glycerol":[0,2,2,1,2,0,2,0,1,1,1,1],"lab_cell_40_glycerol":[0,2,2,0,2,0,2,0,0,1,1,0],"lab_cell_ph_6_0":[0,0,0,1,0,0,0,0,0,0,0,0],"lab_cell_ph_5_4":[0,0,0,0,0,0,0,0,0,0,0,0],"lab_cell_1_papain":[0,0,0,0,0,0,0,0,0,0,0,0],"lab_cell_abo":[6,6,6,6,6,6,6,12,3,3,6,6],"lab_bg_weak_d":[null,null,null,null,null,null,null,null,null,null,null,null],"lab_org_abo":[null,null,null,null,null,null,null,null,null,null,null,null],"lab_org_rh":[null,null,null,null,null,null,null,null,null,null,null,null],"lab_org_rh_del":[null,null,null,null,null,null,null,null,null,null,null,null],"lab_org_weak_d":[null,null,null,null,null,null,null,null,null,null,null,null],"lab_org_ab_screen":[null,null,null,null,null,null,null,null,null,null,null,null],"lab_org_ab_iden":[null,null,null,null,null,null,null,null,null,null,null,null],"lab_cell_coombs_ctrl":[2,2,2,2,2,2,2,4,1,1,2,2],"lab_cell_screen_o3":[7,7,7,7,6,5,7,4,7,8,9,7],"lab_cell_panel11":[9,8,8,8,9,8,9,8,9,9,8,9],"lab_cell_papain_panel11":[9,8,8,8,9,8,9,8,9,9,8,9],"lab_cell_diluent2":[9,8,8,8,9,8,9,8,9,9,8,9],"lab_lewis":[null,null,null,null,null,null,null,null,null,null,null,null]},"2569":{"test_abo":[857,935,1039,862,883,null,null,null,null,null,null,null],"test_rh":[857,935,1039,862,883,null,null,null,null,null,null,null],"test_dat":[145,160,170,195,163,null,null,null,null,null,null,null],"test_iat":[558,550,649,528,622,null,null,null,null,null,null,null],"test_iat_ab_cells":[13,14,18,19,10,null,null,null,null,null,null,null],"test_xmatch":[44,49,53,40,60,null,null,null,null,null,null,null],"test_iden":[21,39,24,17,29,null,null,null,null,null,null,null],"lab_abo_rh_hdfn":[132,121,158,141,138,null,null,null,null,null,null,null],"lab_dat":[178,160,170,195,163,null,null,null,null,null,null,null],"lab_iat_abo":[15,14,18,19,10,null,null,null,null,null,null,null],"lab_iat_ab_screen":[116,85,130,116,108,null,null,null,null,null,null,null],"lab_xmatch_hdfn":[52,49,53,40,66,null,null,null,null,null,null,null],"lab_ab_iden_hdfn":[3,4,2,4,2,null,null,null,null,null,null,null],"lab_exchange":[0,1,2,0,2,null,null,null,null,null,null,null],"lab_total_case_hdfn":[227,193,225,239,222,null,null,null,null,null,null,null],"lab_intra_uterine":[0,0,1,0,0,null,null,null,null,null,null,null],"lab_anc_abo_rh":[234,219,260,197,237,null,null,null,null,null,null,null],"lab_anc_rh_ve":[0,1,1,2,1,null,null,null,null,null,null,null],"lab_anc_rh_del":[0,0,0,0,0,null,null,null,null,null,null,null],"lab_anc_ab_iden":[5,17,11,9,0,null,null,null,null,null,null,null],"lab_anc_weak_d":[0,0,0,0,0,null,null,null,null,null,null,null],"lab_bg_abo":[414,438,491,408,515,null,null,null,null,null,null,null],"lab_bg_rh":[0,0,1,0,1,null,null,null,null,null,null,null],"lab_bg_rh_del":[0,1,0,0,0,null,null,null,null,null,null,null],"lab_bg_ab_screen":[223,246,259,215,254,null,null,null,null,null,null,null],"lab_bg_ab_iden":[13,18,11,4,10,null,null,null,null,null,null,null],"lab_cell_alsever":[0,1,1,1,0,null,null,null,null,null,null,null],"lab_cell_5_glycerol":[0,1,1,1,1,null,null,null,null,null,null,null],"lab_cell_12_glycerol":[0,1,1,0,1,null,null,null,null,null,null,null],"lab_cell_40_glycerol":[0,1,0,1,0,null,null,null,null,null,null,null],"lab_cell_ph_6_0":[0,1,0,0,0,null,null,null,null,null,null,null],"lab_cell_ph_5_4":[0,0,0,0,0,null,null,null,null,null,null,null],"lab_cell_1_papain":[0,0,0,0,0,null,null,null,null,null,null,null],"lab_cell_abo":[6,6,6,6,6,null,null,null,null,null,null,null],"lab_bg_weak_d":[0,0,0,0,1,null,null,null,null,null,null,null],"lab_org_abo":[null,null,null,null,23,null,null,null,null,null,null,null],"lab_org_rh":[null,null,null,null,0,null,null,null,null,null,null,null],"lab_org_rh_del":[null,null,null,null,0,null,null,null,null,null,null,null],"lab_org_weak_d":[null,null,null,null,0,null,null,null,null,null,null,null],"lab_org_ab_screen":[null,null,null,null,23,null,null,null,null,null,null,null],"lab_org_ab_iden":[null,null,null,null,2,null,null,null,null,null,null,null],"lab_cell_coombs_ctrl":[2,2,2,2,2,null,null,null,null,null,null,null],"lab_cell_screen_o3":[8,7,6,7,9,null,null,null,null,null,null,null],"lab_cell_panel11":[11,8,8,7,9,null,null,null,null,null,null,null],"lab_cell_papain_panel11":[11,8,8,7,9,null,null,null,null,null,null,null],"lab_cell_diluent2":[11,8,8,7,0,null,null,null,null,null,null,null],"lab_lewis":[null,null,null,null,null,null,null,null,null,null,null,null]}};
+const DATA = (window.__LIVE__ && window.__LIVE__.standard) ? window.__LIVE__.standard : EMBED;
+
+const YEARS = ['2564','2565','2566','2567','2568','2569'];
+const MABBR = ['ม.ค.','ก.พ.','มี.ค.','เม.ย.','พ.ค.','มิ.ย.','ก.ค.','ส.ค.','ก.ย.','ต.ค.','พ.ย.','ธ.ค.'];
+const C = {teal:'#0d9488',cyan:'#0891b2',indigo:'#4f46e5',blue:'#2563eb',amber:'#d97706',rose:'#e11d48',purple:'#7c3aed',green:'#059669',slate:'#64748b'};
+
+let view='lab', selYear='2569', selMonth=null;
+let charts=[];
+
+const TEST_METRICS=[
+  {k:'test_abo',label:'ABO',c:'teal',ic:'🅰️'},
+  {k:'test_rh',label:'Rh',c:'cyan',ic:'➕'},
+  {k:'test_dat',label:'DAT',c:'indigo',ic:'🧷'},
+  {k:'test_iat',label:'IAT',c:'blue',ic:'🧬'},
+  {k:'test_iat_ab_cells',label:'IAT AB/cells',c:'purple',ic:'🔎'},
+  {k:'test_xmatch',label:'X-match',c:'amber',ic:'🔗'},
+  {k:'test_iden',label:'Ab Identification',c:'rose',ic:'🪪'},
+];
+const LAB_GROUPS=[
+  {id:'hdfn', title:'1. การตรวจ Blood group / Coombs’ Test ใน HDFN', rows:[
+    {k:'lab_abo_rh_hdfn',label:'ABO, Rh'},
+    {k:'lab_dat',label:'DAT'},
+    {k:'lab_iat_abo',label:'IAT-ABO'},
+    {k:'lab_iat_ab_screen',label:'IAT-Ab screening'},
+    {k:'lab_xmatch_hdfn',label:'X-match HDFN'},
+    {k:'lab_ab_iden_hdfn',label:'Ab-Identification'},
+    {k:'lab_exchange',label:'Exchange'},
+  ], extra:[
+    {k:'lab_total_case_hdfn',label:'Total case (ราย)'},
+    {k:'lab_intra_uterine',label:'Intra Uterine'},
+  ]},
+  {id:'anc', title:'2. ตรวจผู้ป่วย ANC', rows:[
+    {k:'lab_anc_abo_rh',label:'ABO, Rh, Ab Screen'},
+    {k:'lab_anc_rh_ve',label:'Rh-ve'},
+    {k:'lab_anc_rh_del',label:'RhDel'},
+    {k:'lab_anc_weak_d',label:'Weak D'},
+    {k:'lab_anc_ab_iden',label:'Ab Identification'},
+  ]},
+  {id:'bg', title:'3. การตรวจ Blood group ABO Rh (ทั่วไป)', rows:[
+    {k:'lab_bg_abo',label:'ABO'},
+    {k:'lab_bg_rh',label:'Rh'},
+    {k:'lab_bg_rh_del',label:'RhDel'},
+    {k:'lab_bg_weak_d',label:'Weak D'},
+    {k:'lab_bg_ab_screen',label:'Ab screening'},
+    {k:'lab_bg_ab_iden',label:'Ab-Identification'},
+  ]},
+  {id:'organ', title:'4. การตรวจ Blood group (หน่วยงานเปลี่ยนอวัยวะ) — เริ่ม antibody screening 12 พ.ค. 2569', rows:[
+    {k:'lab_org_abo',label:'ABO'},
+    {k:'lab_org_rh',label:'Rh'},
+    {k:'lab_org_rh_del',label:'RhDel'},
+    {k:'lab_org_weak_d',label:'Weak D'},
+    {k:'lab_org_ab_screen',label:'Ab screening'},
+    {k:'lab_org_ab_iden',label:'Ab-Identification'},
+  ]},
+  {id:'cells', title:'5. การเตรียม Standard cells', rows:[
+    {k:'lab_cell_alsever',label:'Alsever'},
+    {k:'lab_cell_5_glycerol',label:'5% Glycerol Citrate'},
+    {k:'lab_cell_12_glycerol',label:'12% Glycerol Citrate'},
+    {k:'lab_cell_40_glycerol',label:'40% Glycerol Buffer'},
+    {k:'lab_cell_ph_6_0',label:'Phosphate Buffer pH 6.0'},
+    {k:'lab_cell_ph_5_4',label:'Phosphate Buffer pH 5.4'},
+    {k:'lab_cell_1_papain',label:'1% Papain'},
+    {k:'lab_cell_abo',label:'ABO Cell (A,B,O)'},
+    {k:'lab_cell_coombs_ctrl',label:"Coombs' Control cell"},
+    {k:'lab_cell_screen_o3',label:'Screen cells (O3)'},
+    {k:'lab_cell_panel11',label:'Panel Cells 11 tube'},
+    {k:'lab_cell_papain_panel11',label:'Papainized Panel cells 11 tubes'},
+    {k:'lab_cell_diluent2',label:'Diluent II Panel Cells 11 tube'},
+  ]},
+  {id:'lewis', title:'6. งานเตรียม Type Lewis', rows:[
+    {k:'lab_lewis',label:'Type Lewis'},
+  ]},
+];
+const G=id=>LAB_GROUPS.find(g=>g.id===id);
+
+/* helpers */
+const arr=(y,k)=> (DATA[y] && DATA[y][k]) ? DATA[y][k] : new Array(12).fill(null);
+function monthIdx(){ if(selMonth!==null) return [selMonth]; return [...Array(availMonths(selYear)).keys()]; }
+function sumK(y,k,idx){ const a=arr(y,k); return idx.reduce((s,i)=> s+(a[i]==null?0:a[i]),0); }
+function availMonths(y){ let n=0; for(let i=0;i<12;i++){ if(TEST_METRICS.some(m=>arr(y,m.k)[i]!=null)||LAB_GROUPS.some(g=>g.rows.some(r=>arr(y,r.k)[i]!=null))) n=i+1; } return n; }
+const fmt=v=> v==null?'–':Math.round(v).toLocaleString('en-US');
+function periodDen(){ return selMonth!==null?1:Math.max(availMonths(selYear),1); }
+function pct(part,whole){ return whole>0?(part/whole*100).toFixed(1)+'%':'–'; }
+
+/* nav */
+function toggleNav(e){e.preventDefault();document.getElementById('navDrop').classList.toggle('show');}
+document.addEventListener('click',e=>{if(!e.target.closest('.nav-item-dropdown'))document.getElementById('navDrop').classList.remove('show');});
+
+/* year/month tabs */
+function buildYearTabs(){
+  const el=document.getElementById('yearTabs'); el.innerHTML='';
+  YEARS.forEach(y=>{
+    const n=availMonths(y);
+    const d=document.createElement('div');
+    d.className='chip'+(view==='test'?' test':'')+(y===selYear?' active':'');
+    d.innerHTML=`<div class="a">ปี ${y}</div><div class="n">${n} เดือน</div>`;
+    d.onclick=()=>{selYear=y;selMonth=null;render();};
+    el.appendChild(d);
+  });
+}
+function buildMonthTabs(){
+  const el=document.getElementById('monthTabs'); el.innerHTML='';
+  const n=availMonths(selYear);
+  MABBR.forEach((m,i)=>{
+    const has=i<n;
+    const d=document.createElement('div');
+    d.className='chip'+(view==='test'?' test':'')+(selMonth===i?' active':'')+(has?'':' disabled');
+    d.innerHTML=`<div class="a">${m}</div><div class="n">${has?'มีข้อมูล':'–'}</div>`;
+    if(has) d.onclick=()=>{selMonth=(selMonth===i?null:i);render();};
+    el.appendChild(d);
+  });
+}
+function selectAllMonths(){selMonth=null;render();}
+
+/* KPI card with sub-details */
+function detRows(details){
+  if(!details||!details.length) return '';
+  const cls=details.length===1?' one':(details.length>=10?' three':'');
+  return `<div class="kpi-details${cls}">`+details.map(d=>
+    `<div class="kpi-det"><span class="dl" style="--dot:${d.color||'var(--text-4)'}"><span class="dt" title="${d.l}">${d.l}</span></span><span class="dv">${d.v}</span></div>`
+  ).join('')+`</div>`;
+}
+function kpiCard(label,val,unit,color,ic,foot,details,note,cardClass){
+  return `<div class="kpi c-${color}${cardClass?' '+cardClass:''}"><div class="kpi-top"><div class="kpi-label">${label}</div>
+    <div class="kpi-ic" style="background:var(--${color}-lt)">${ic}</div></div>
+    <div><span class="kpi-val">${fmt(val)}</span><span class="kpi-unit">${unit||''}</span></div>
+    <div class="kpi-foot">${foot||''}</div>${detRows(details)}${note?`<div class="kpi-note">${note}</div>`:''}</div>`;
+}
+function deltaFoot(cur,prev){
+  if(prev==null||prev===0) return '<span class="muted">— เทียบช่วงก่อนหน้า</span>';
+  const p=((cur-prev)/prev*100), up=p>=0;
+  return `<b class="${up?'':'dn'}">${up?'▲':'▼'} ${Math.abs(p).toFixed(1)}%</b> เทียบช่วงเดียวกันปีก่อน (${fmt(prev)})`;
+}
+function prevYear(){ const i=YEARS.indexOf(selYear); return i>0?YEARS[i-1]:null; }
+
+function renderKPI(){
+  const idx=monthIdx(), grid=document.getElementById('kpiGrid'), py=prevYear(), den=periodDen();
+  const hero=document.querySelector('.kpi-hero');
+  let html='';
+  if(view==='test'){
+    document.getElementById('kpiTitle').textContent='จำนวน Test ประจำปี '+selYear;
+    document.getElementById('kpiHeroSub').textContent='สรุปปริมาณงานทดสอบหมู่เลือดและภูมิคุ้มกัน (Standard Test)';
+    document.getElementById('kpiHeroIc').textContent='🔬';
+    hero.style.background='linear-gradient(120deg,#4f46e5 0%,#7c3aed 55%,#0891b2 100%)';
+    hero.style.boxShadow='0 14px 30px -10px rgba(79,70,229,.55)';
+    const totals=TEST_METRICS.map(m=>sumK(selYear,m.k,idx));
+    const total=totals.reduce((a,b)=>a+b,0);
+    const ptot=py?TEST_METRICS.reduce((s,m)=>s+sumK(py,m.k,idx),0):null;
+    // overview card with top breakdown
+    const ranked=TEST_METRICS.map((m,i)=>({m,v:totals[i]})).sort((a,b)=>b.v-a.v);
+    html+=kpiCard('รวม Test ทั้งหมด',total,'รายการ','indigo','🧮',deltaFoot(total,ptot),
+      ranked.map(r=>({l:r.m.label,v:fmt(r.v)+' · '+pct(r.v,total),color:C[r.m.c]})));
+    TEST_METRICS.forEach((m,i)=>{
+      const cur=totals[i], prev=py?sumK(py,m.k,idx):null;
+      html+=kpiCard(m.label,cur,'รายการ',m.c,m.ic,deltaFoot(cur,prev),[
+        {l:'เฉลี่ย/เดือน',v:fmt(cur/den),color:C[m.c]},
+        {l:'สัดส่วนของ Test รวม',v:pct(cur,total),color:C[m.c]},
+      ]);
+    });
+  }else{
+    document.getElementById('kpiTitle').textContent='ดัชนีชี้วัดหลัก Standard Laboratory '+selYear;
+    document.getElementById('kpiHeroSub').textContent='สรุปภาระงานหลัก: HDFN · ANC · หมู่เลือด · Standard cells';
+    document.getElementById('kpiHeroIc').textContent='🧫';
+    hero.style.background='linear-gradient(120deg,#0d9488 0%,#0891b2 55%,#4f46e5 100%)';
+    hero.style.boxShadow='0 14px 30px -10px rgba(13,148,136,.55)';
+    const S=k=>sumK(selYear,k,idx), P=k=>py?sumK(py,k,idx):null;
+    const PAL=[C.teal,C.cyan,C.indigo,C.blue,C.purple,C.amber,C.rose,C.green,C.slate];
+    const SHORT={lab_abo_rh_hdfn:'ABO, Rh',lab_dat:'DAT',lab_iat_abo:'IAT-ABO',lab_iat_ab_screen:'IAT-Ab screen',lab_xmatch_hdfn:'X-match',lab_ab_iden_hdfn:'Ab-Iden',lab_exchange:'Exchange',
+      lab_anc_abo_rh:'ABO,Rh,Screen',lab_anc_rh_ve:'Rh-ve',lab_anc_rh_del:'RhDel',lab_anc_weak_d:'Weak D',lab_anc_ab_iden:'Ab-Iden',
+      lab_bg_abo:'ABO',lab_bg_rh:'Rh',lab_bg_rh_del:'RhDel',lab_bg_weak_d:'Weak D',lab_bg_ab_screen:'Ab screen',lab_bg_ab_iden:'Ab-Iden',
+      lab_org_abo:'ABO',lab_org_rh:'Rh',lab_org_rh_del:'RhDel',lab_org_weak_d:'Weak D',lab_org_ab_screen:'Ab screen',lab_org_ab_iden:'Ab-Iden',
+      lab_cell_alsever:'Alsever',lab_cell_5_glycerol:'5% Glycerol',lab_cell_12_glycerol:'12% Glycerol',lab_cell_40_glycerol:'40% Glycerol',lab_cell_ph_6_0:'Buffer pH6.0',lab_cell_ph_5_4:'Buffer pH5.4',lab_cell_1_papain:'1% Papain',lab_cell_abo:'ABO Cell',lab_cell_coombs_ctrl:'Coombs Ctrl',lab_cell_screen_o3:'Screen O3',lab_cell_panel11:'Panel 11t',lab_cell_papain_panel11:'Papain Panel',lab_cell_diluent2:'Diluent II'};
+    // build full breakdown of every row in a group (short labels)
+    const gdet=(id)=>G(id).rows.map((r,i)=>({l:SHORT[r.k]||r.label,v:fmt(S(r.k)),color:PAL[i%PAL.length]}));
+    const sumG=id=>G(id).rows.reduce((s,r)=>s+S(r.k),0), sumGp=id=>py?G(id).rows.reduce((s,r)=>s+P(r.k),0):null;
+    const hdfn=sumG('hdfn'), phd=sumGp('hdfn');
+    const cells=sumG('cells'), pcells=sumGp('cells');
+    const organ=sumG('organ');
+    const cards=[
+      ['ตรวจ Blood group Coombs\' Test ใน HDFN',hdfn,'รายการ','teal','🧫',deltaFoot(hdfn,phd), gdet('hdfn')],
+      ['จำนวนเคส HDFN (ราย)',S('lab_total_case_hdfn'),'ราย','cyan','📋',deltaFoot(S('lab_total_case_hdfn'),P('lab_total_case_hdfn')),[
+        {l:'เฉลี่ย/เดือน',v:fmt(S('lab_total_case_hdfn')/den),color:C.cyan},
+        {l:'Intra Uterine',v:fmt(S('lab_intra_uterine')),color:C.rose},
+        {l:'Exchange transfusion',v:fmt(S('lab_exchange')),color:C.amber},
+      ]],
+      ['ตรวจผู้ป่วย ANC (รวม)',sumG('anc'),'ราย','blue','🤰',deltaFoot(sumG('anc'),sumGp('anc')), gdet('anc')],
+      ['Blood Group ABO Rh ทั่วไป (รวม)',sumG('bg'),'ราย','indigo','🅰️',deltaFoot(sumG('bg'),sumGp('bg')), gdet('bg')],
+      ['Blood Group (หน่วยเปลี่ยนอวัยวะ)',organ,'ราย','teal','🫀','', gdet('organ'),'🗓️ หมายเหตุ: เริ่มทำ antibody screening 12 พ.ค. 2569', 'kspan2'],
+      ['เตรียม Standard cells',cells,'ครั้ง','green','⚗️',deltaFoot(cells,pcells), G('cells').rows.map((r,i)=>({l:SHORT[r.k]||r.label,v:fmt(S(r.k)),_n:S(r.k),color:PAL[i%PAL.length]})).sort((a,b)=>b._n-a._n),'', 'kspan2'],
+    ];
+    cards.forEach(c=>html+=kpiCard(...c));
+  }
+  grid.innerHTML=html;
+  document.getElementById('kpiNote').textContent= selMonth!==null?('เฉพาะเดือน '+MABBR[selMonth]+' '+selYear):('รวม '+availMonths(selYear)+' เดือน · ปี '+selYear);
+}
+
+/* CHARTS */
+function destroyCharts(){charts.forEach(c=>c.destroy());charts=[];}
+function mkCanvas(id,wide){return `<div class="chart-card${wide?' wide':''}"><div class="chart-head"><h3>${id.t}</h3><p>${id.p}</p></div><div class="chart-wrap"><canvas id="${id.id}"></canvas></div></div>`;}
+if(window.Chart && window.ChartDataLabels){ try{ Chart.register(window.ChartDataLabels); }catch(e){} }
+const DLfmt=v=>(v==null)?null:Math.round(v).toLocaleString('en-US');
+const DLfmtNo0=v=>(v==null||v===0)?null:Math.round(v).toLocaleString('en-US');
+// values on line/bar (top of point/bar) — auto-hide on overlap
+const DL_PT={display:'auto',anchor:'end',align:'top',offset:3,clamp:true,font:{family:'Sarabun',size:9.5,weight:'700'},color:'#334155',formatter:DLfmt};
+// values inside doughnut slices
+const DL_PIE={display:'auto',color:'#ffffff',font:{family:'Sarabun',size:10.5,weight:'700'},formatter:DLfmtNo0};
+// stacked bar → show only the column TOTAL at the top
+const DL_TOTAL={anchor:'end',align:'end',offset:1,clamp:true,color:'#0f172a',font:{family:'Sarabun',size:10,weight:'700'},
+  display:c=>c.datasetIndex===c.chart.data.datasets.length-1,
+  formatter:(v,c)=>{const t=c.chart.data.datasets.reduce((s,ds)=>s+(ds.data[c.dataIndex]||0),0);return t>0?Math.round(t).toLocaleString('en-US'):null;}};
+const baseOpts={responsive:true,maintainAspectRatio:false,datasets:{bar:{maxBarThickness:52,categoryPercentage:0.72,barPercentage:0.9}},layout:{padding:{top:20}},plugins:{legend:{labels:{font:{family:'Sarabun',size:12},usePointStyle:true,boxWidth:8}},datalabels:DL_PT},scales:{x:{grid:{display:false},ticks:{font:{family:'Sarabun',size:11}}},y:{beginAtZero:true,grid:{color:'#eef2f7'},ticks:{font:{family:'Sarabun'}}}}};
+
+function renderCharts(){
+  destroyCharts();
+  const area=document.getElementById('chartsArea');
+  const n=availMonths(selYear);
+  const selIdxs=selMonth!==null?[selMonth]:[...Array(Math.max(n,1)).keys()];
+  const labels=selIdxs.map(i=>MABBR[i]);
+  const pick=k=>selIdxs.map(i=>arr(selYear,k)[i]);
+  if(view==='test'){
+    area.innerHTML=`<div class="charts-grid">`+
+      mkCanvas({id:'cTrend',t:'แนวโน้มจำนวน Test รายเดือน',p:'ABO · DAT · IAT · X-match (รายการ)'})+
+      mkCanvas({id:'cComp',t:'สัดส่วนประเภท Test',p:(selMonth!==null?'เดือน '+MABBR[selMonth]+' ':'รวมทั้งปี ')+selYear})+
+      `</div><div class="charts-grid">`+
+      mkCanvas({id:'cYoY',t:'เปรียบเทียบจำนวน Test รวมรายปี',p:'2564–2569 (รายการ)'},true)+`</div>`;
+    const ds=(k,c)=>({label:TEST_METRICS.find(m=>m.k===k).label,data:pick(k),backgroundColor:c,borderRadius:5});
+    charts.push(new Chart(cTrend,{type:'bar',data:{labels,datasets:[ds('test_abo',C.teal),ds('test_dat',C.indigo),ds('test_iat',C.blue),ds('test_xmatch',C.amber)]},options:baseOpts}));
+    const idx=selIdxs;
+    charts.push(new Chart(cComp,{type:'doughnut',data:{labels:TEST_METRICS.map(m=>m.label),datasets:[{data:TEST_METRICS.map(m=>sumK(selYear,m.k,idx)),backgroundColor:[C.teal,C.cyan,C.indigo,C.blue,C.purple,C.amber,C.rose],borderWidth:2,borderColor:'#fff'}]},options:{responsive:true,maintainAspectRatio:false,cutout:'58%',plugins:{legend:{position:'right',labels:{font:{family:'Sarabun',size:11},usePointStyle:true,boxWidth:8}},datalabels:DL_PIE}}}));
+    const yoy=YEARS.map(y=>{const a=selMonth!==null?[selMonth]:[...Array(availMonths(y)).keys()];return TEST_METRICS.reduce((s,m)=>s+sumK(y,m.k,a),0);});
+    charts.push(new Chart(cYoY,{type:'bar',data:{labels:YEARS.map(y=>'ปี '+y),datasets:[{label:'จำนวน Test รวม',data:yoy,backgroundColor:YEARS.map(y=>y===selYear?C.indigo:'#c7d2fe'),borderRadius:6}]},options:baseOpts}));
+  }else{
+    area.innerHTML=`<div class="charts-grid">`+
+      mkCanvas({id:'cLabTrend',t:'แนวโน้มภาระงานหลักรายเดือน',p:'HDFN · ANC · Blood Group ABO (รายการ/ราย)'})+
+      mkCanvas({id:'cHdfn',t:'องค์ประกอบงานตรวจ HDFN',p:(selMonth!==null?'เดือน '+MABBR[selMonth]+' ':'รวมทั้งปี ')+selYear})+
+      `</div><div class="charts-grid">`+
+      mkCanvas({id:'cAnc',t:'งานตรวจ ANC รายเดือน',p:'ABO/Rh/Ab Screen · Rh-ve · RhDel · Weak D · Ab Identification'})+
+      mkCanvas({id:'cOrgan',t:'งานตรวจ Blood group (หน่วยงานเปลี่ยนอวัยวะ) รายเดือน',p:'เริ่ม antibody screening 12 พ.ค. 2569 · ABO/Rh/RhDel/Weak D/Ab screen/Ab-Iden'})+
+      `</div><div class="charts-grid">`+
+      mkCanvas({id:'cCells',t:'การเตรียม Standard cells รายเดือน',p:'จำแนกตามชนิดน้ำยา/เซลล์ (ครั้ง)'},true)+`</div>`;
+    const idx=selIdxs;
+    const hdfnKeys=['lab_abo_rh_hdfn','lab_dat','lab_iat_abo','lab_iat_ab_screen','lab_xmatch_hdfn','lab_ab_iden_hdfn','lab_exchange'];
+    const hdfnMonthly=selIdxs.map(mi=>hdfnKeys.reduce((s,k)=>s+(arr(selYear,k)[mi]||0),0));
+    if(selMonth===null){
+    charts.push(new Chart(cLabTrend,{type:'bar',data:{labels,datasets:[
+      {label:'HDFN รวม',data:hdfnMonthly,backgroundColor:C.teal,borderRadius:4},
+      {label:'ANC',data:pick('lab_anc_abo_rh'),backgroundColor:C.blue,borderRadius:4},
+      {label:'Blood Group ABO',data:pick('lab_bg_abo'),backgroundColor:C.amber,borderRadius:4},
+    ].sort((a,b)=>b.data.reduce((s,v)=>s+(v||0),0)-a.data.reduce((s,v)=>s+(v||0),0))},options:{...baseOpts,scales:{x:{stacked:true,grid:{display:false},ticks:{font:{family:'Sarabun',size:11}}},y:{stacked:true,beginAtZero:true,grid:{color:'#eef2f7'},ticks:{font:{family:'Sarabun'}}}},plugins:{...baseOpts.plugins,datalabels:{...DL_PT,anchor:'center',align:'center',offset:0,color:'#fff'}}}}));
+    } else {
+    const detKeys=['lab_abo_rh_hdfn','lab_dat','lab_iat_abo','lab_iat_ab_screen','lab_xmatch_hdfn','lab_ab_iden_hdfn','lab_exchange','lab_anc_abo_rh','lab_bg_abo'].sort((a,b)=>(pick(b)[0]||0)-(pick(a)[0]||0));
+    const detLbl={lab_abo_rh_hdfn:'HDFN: ABO,Rh',lab_dat:'HDFN: DAT',lab_iat_abo:'HDFN: IAT-ABO',lab_iat_ab_screen:'HDFN: IAT-Ab screen',lab_xmatch_hdfn:'HDFN: X-match',lab_ab_iden_hdfn:'HDFN: Ab-Iden',lab_exchange:'HDFN: Exchange',lab_anc_abo_rh:'ANC (ABO,Rh,Screen)',lab_bg_abo:'Blood Group ABO'};
+    const detPal=[C.teal,C.cyan,C.indigo,C.blue,C.purple,C.rose,C.amber,C.green,C.slate];
+    charts.push(new Chart(cLabTrend,{type:'bar',data:{labels,datasets:detKeys.map((k,i)=>({label:detLbl[k],data:pick(k),backgroundColor:detPal[i%detPal.length],borderRadius:5}))},options:{...baseOpts,plugins:{...baseOpts.plugins,legend:{position:'bottom',labels:{font:{family:'Sarabun',size:9},usePointStyle:true,boxWidth:8,padding:7}}}}}));
+    }
+    charts.push(new Chart(cHdfn,{type:'doughnut',data:{labels:G('hdfn').rows.map(r=>r.label),datasets:[{data:G('hdfn').rows.map(r=>sumK(selYear,r.k,idx)),backgroundColor:[C.teal,C.cyan,C.indigo,C.blue,C.purple,C.rose,C.amber],borderWidth:2,borderColor:'#fff'}]},options:{responsive:true,maintainAspectRatio:false,cutout:'58%',plugins:{legend:{position:'right',labels:{font:{family:'Sarabun',size:10.5},usePointStyle:true,boxWidth:8}},datalabels:DL_PIE}}}));
+    charts.push(new Chart(cAnc,{type:'bar',data:{labels,datasets:[
+      {label:'ABO/Rh/Ab Screen',data:pick('lab_anc_abo_rh'),backgroundColor:C.blue,borderRadius:5},
+      {label:'Rh-ve',data:pick('lab_anc_rh_ve'),backgroundColor:C.teal,borderRadius:5},
+      {label:'RhDel',data:pick('lab_anc_rh_del'),backgroundColor:C.cyan,borderRadius:5},
+      {label:'Weak D',data:pick('lab_anc_weak_d'),backgroundColor:C.amber,borderRadius:5},
+      {label:'Ab Identification',data:pick('lab_anc_ab_iden'),backgroundColor:C.purple,borderRadius:5},
+    ]},options:baseOpts}));
+    charts.push(new Chart(cOrgan,{type:'bar',data:{labels,datasets:[
+      {label:'ABO',data:pick('lab_org_abo'),backgroundColor:C.teal,borderRadius:5},
+      {label:'Rh',data:pick('lab_org_rh'),backgroundColor:C.cyan,borderRadius:5},
+      {label:'RhDel',data:pick('lab_org_rh_del'),backgroundColor:C.indigo,borderRadius:5},
+      {label:'Weak D',data:pick('lab_org_weak_d'),backgroundColor:C.amber,borderRadius:5},
+      {label:'Ab screening',data:pick('lab_org_ab_screen'),backgroundColor:C.blue,borderRadius:5},
+      {label:'Ab-Identification',data:pick('lab_org_ab_iden'),backgroundColor:C.purple,borderRadius:5},
+    ]},options:baseOpts}));
+    const cellRows=G('cells').rows.filter(r=>sumK(selYear,r.k,idx)>0).sort((a,b)=>sumK(selYear,b.k,idx)-sumK(selYear,a.k,idx));
+    const palette=[C.teal,C.cyan,C.indigo,C.blue,C.purple,C.amber,C.rose,C.green];
+    charts.push(new Chart(cCells,{type:'bar',data:{labels,datasets:cellRows.map((r,i)=>({label:r.label,data:pick(r.k),backgroundColor:palette[i%palette.length],borderRadius:3}))},options:{...baseOpts,layout:{padding:{top:32,bottom:4}},scales:{x:{grid:{display:false},ticks:{font:{family:'Sarabun',size:11}}},y:{beginAtZero:true,grid:{color:'#eef2f7'},ticks:{font:{family:'Sarabun',size:10}}}},plugins:{legend:{position:'bottom',align:'start',labels:{font:{family:'Sarabun',size:9.5},usePointStyle:true,pointStyle:'circle',boxWidth:7,padding:10}},datalabels:DL_PT}}}));
+  }
+}
+
+/* TABLE */
+function renderTable(){
+  const n=availMonths(selYear), t=document.getElementById('dataTable');
+  let head='<thead><tr><th>รายการ</th>';
+  for(let i=0;i<n;i++) head+=`<th>${MABBR[i]}</th>`;
+  head+='<th class="total-col">รวม</th></tr></thead>';
+  let body='<tbody>';
+  const rowHtml=(label,k,cls)=>{
+    let r=`<tr class="${cls||''}"><td>${label}</td>`, tot=0, any=false;
+    for(let i=0;i<n;i++){const v=arr(selYear,k)[i];if(v!=null){tot+=v;any=true;}r+=`<td>${v==null?'<span class=muted>–</span>':fmt(v)}</td>`;}
+    r+=`<td class="total-col">${any?fmt(tot):'–'}</td></tr>`; return r;
+  };
+  if(view==='test'){
+    document.getElementById('tableTitle').textContent='ตารางจำนวน Test รายเดือน · ปี '+selYear;
+    document.getElementById('tableSub').textContent='หน่วย: รายการ (test) — แหล่งข้อมูล Tab Standard Test';
+    TEST_METRICS.forEach(m=>body+=rowHtml(m.label,m.k));
+    let tr='<tr class="sub"><td>รวม Test ทั้งหมด</td>',gt=0;
+    for(let i=0;i<n;i++){let s=TEST_METRICS.reduce((a,m)=>a+(arr(selYear,m.k)[i]||0),0);gt+=s;tr+=`<td>${fmt(s)}</td>`;}
+    tr+=`<td class="total-col">${fmt(gt)}</td></tr>`; body+=tr;
+  }else{
+    document.getElementById('tableTitle').textContent='ตารางสถิติ Standard Laboratory รายเดือน · ปี '+selYear;
+    document.getElementById('tableSub').textContent='หน่วย: รายการ/ราย/ครั้ง — แหล่งข้อมูล Tab Standard Lab';
+    LAB_GROUPS.forEach(g=>{
+      body+=`<tr class="grp"><td colspan="${n+2}">${g.title}</td></tr>`;
+      g.rows.forEach(r=>body+=rowHtml(r.label,r.k));
+      let st='<tr class="sub"><td>Total</td>',gt=0;
+      for(let i=0;i<n;i++){let s=g.rows.reduce((a,r)=>a+(arr(selYear,r.k)[i]||0),0);gt+=s;st+=`<td>${fmt(s)}</td>`;}
+      st+=`<td class="total-col">${fmt(gt)}</td></tr>`; body+=st;
+      if(g.extra) g.extra.forEach(r=>body+=rowHtml(r.label,r.k));
+    });
+  }
+  body+='</tbody>';
+  t.innerHTML=head+body;
+}
+
+/* ANALYSIS */
+function renderAnalysis(){
+  const g=document.getElementById('analysisGrid');
+  const idxFull=y=>[...Array(availMonths(y)).keys()];
+  if(view==='test'){
+    document.getElementById('analysisSub').textContent='เปรียบเทียบปริมาณงานทดสอบหมู่เลือดและภูมิคุ้มกันรายปี (Standard Test)';
+    const tot=y=>TEST_METRICS.reduce((s,m)=>s+sumK(y,m.k,idxFull(y)),0);
+    const t68=tot('2568'),t67=tot('2567');
+    g.innerHTML=`
+    <div class="ac"><h4>📊 ภาพรวมปริมาณงานทดสอบ</h4><ul>
+      <li><b>ABO/Rh</b> เป็นรายการที่มีปริมาณสูงสุดอย่างชัดเจน สะท้อนภาระงานหลักด้านการยืนยันหมู่เลือดเพื่อความปลอดภัยของผู้ป่วย</li>
+      <li>ปี 2567 มีปริมาณ Test รวม <b>${fmt(t67)}</b> รายการ และปี 2568 <b>${fmt(t68)}</b> รายการ ${t68<t67?'ปรับลดลงเล็กน้อย':'เพิ่มขึ้น'} — แนวโน้มทรงตัวในระดับสูง</li>
+      <li><b>IAT</b> (รวม Ab screening) เป็นกลุ่มงานรองที่มีสัดส่วนสูง บ่งชี้การคัดกรองแอนติบอดีอย่างเข้มงวด</li>
+    </ul></div>
+    <div class="ac"><h4>🎯 ข้อสังเกตเชิงคุณภาพ</h4><ul>
+      <li><b>X-match</b> และ <b>Ab Identification</b> เป็นงานเชิงลึกที่ปริมาณไม่มากแต่ใช้ความเชี่ยวชาญสูง ควรคงบุคลากรที่ชำนาญ</li>
+      <li>ปี 2569 มีข้อมูล ${availMonths('2569')} เดือน (ม.ค.–พ.ค.) ใช้ติดตามแนวโน้มระหว่างปีได้</li>
+      <li>แนะนำติดตามอัตราส่วน IAT/ABO เพื่อประเมินภาระงานคัดกรองเทียบกับงานพื้นฐาน</li>
+    </ul></div>`;
+  }else{
+    document.getElementById('analysisSub').textContent='วิเคราะห์ภาระงานตรวจ HDFN, ANC, หมู่เลือดทั่วไป และการเตรียม Standard cells';
+    const hk=['lab_abo_rh_hdfn','lab_dat','lab_iat_abo','lab_iat_ab_screen','lab_xmatch_hdfn','lab_ab_iden_hdfn','lab_exchange'];
+    const hd=y=>hk.reduce((s,k)=>s+sumK(y,k,idxFull(y)),0);
+    g.innerHTML=`
+    <div class="ac"><h4>🧫 งานตรวจ HDFN และทารกแรกเกิด</h4><ul>
+      <li>งานตรวจ HDFN เป็นภาระงานหลักของห้อง โดยปี 2568 มีรวม <b>${fmt(hd('2568'))}</b> รายการ จาก <b>${fmt(sumK('2568','lab_total_case_hdfn',idxFull('2568')))}</b> เคส</li>
+      <li><b>DAT</b> และ <b>IAT-Ab screening</b> เป็นองค์ประกอบหลักของงาน Coombs’ test ใน HDFN</li>
+      <li>ยังพบงาน <b>Exchange / Intra-uterine transfusion</b> ต่อเนื่อง บ่งชี้บทบาทในการดูแลทารกที่มีภาวะรุนแรง</li>
+    </ul></div>
+    <div class="ac"><h4>⚗️ ANC, หมู่เลือดทั่วไป และ Standard cells</h4><ul>
+      <li>งานตรวจ <b>ANC</b> (ABO/Rh/Ab screen) มีปริมาณสม่ำเสมอ เป็นการคัดกรองหญิงตั้งครรภ์เชิงป้องกัน</li>
+      <li>เริ่มเก็บ <b>Ab screening</b> ในงานหมู่เลือดทั่วไปตั้งแต่ปี 2566 และทำ antibody screening หน่วยเปลี่ยนอวัยวะตั้งแต่ พ.ค. 2569</li>
+      <li>การเตรียม <b>Standard cells</b> (ABO cell, Glycerol/Buffer, Alsever) เป็นงานสนับสนุนคุณภาพที่ทำสม่ำเสมอทุกเดือน</li>
+    </ul></div>`;
+  }
+}
+
+/* ORCHESTRATION */
+function setView(v){
+  view=v; selMonth=null;
+  document.getElementById('tabLab').classList.toggle('active',v==='lab');
+  document.getElementById('tabTest').classList.toggle('active',v==='test');
+  render();
+}
+function render(){
+  if(selMonth!==null && selMonth>=availMonths(selYear)) selMonth=null;
+  buildYearTabs(); buildMonthTabs();
+  document.getElementById('yearTag').textContent='ปี '+selYear;
+  document.getElementById('monthTag').textContent= selMonth!==null?('เดือน '+MABBR[selMonth]):'รวมทุกเดือน';
+  document.getElementById('pillYear').textContent='📅 ปี '+selYear;
+  const n=availMonths(selYear);
+  document.getElementById('pillMonths').textContent= n>0?(MABBR[0]+'–'+MABBR[n-1]+' '+selYear):('ปี '+selYear);
+  renderKPI(); renderCharts(); renderTable(); renderAnalysis();
+}
+render();
+</script>
+<script src="xlsx.full.min.js"></script>
+<script src="dashboard_autoload.js"></script>
+<script src="autoload_standard.js"></script>
+</body>
+</html>
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               

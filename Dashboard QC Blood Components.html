@@ -1,0 +1,428 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>QC Blood Components Dashboard | 2569</title>
+<link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
+<style>
+  :root{
+    --bg:#f0f7ff; --bg-alt:#e8f2ff; --surface:#ffffff;
+    --border:#d0e4f7; --border-strong:#a8c8ef;
+    --primary:#0369a1; --primary-lt:#e0f2fe; --primary-dk:#075985;
+    --violet:#7c3aed; --text:#0f2540; --muted:#5b7796;
+    --shadow:0 8px 28px rgba(3,105,161,.10);
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:"Sarabun","Inter",sans-serif;background:linear-gradient(160deg,var(--bg),var(--bg-alt));color:var(--text);min-height:100vh}
+  .qc-header{position:sticky;top:0;z-index:50;background:linear-gradient(100deg,var(--primary-dk),var(--primary));color:#fff;padding:14px 26px;display:flex;align-items:center;gap:16px;box-shadow:0 4px 20px rgba(3,105,161,.25);flex-wrap:wrap}
+  .qc-header img.logo{height:44px;width:auto;background:#fff;border-radius:8px;padding:4px}
+  .qc-header .htxt h1{font-size:20px;font-weight:700}
+  .qc-header .htxt p{font-size:12.5px;opacity:.9;margin-top:2px}
+  .qc-pills{margin-left:auto;display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+  .qc-pill{background:rgba(255,255,255,.16);border:1px solid rgba(255,255,255,.25);padding:6px 13px;border-radius:20px;font-size:12.5px;font-weight:600;display:flex;align-items:center;gap:7px}
+  .qc-pill .dot{width:8px;height:8px;border-radius:50%;background:#34d399;animation:pulse 2s infinite}
+  @keyframes pulse{70%{box-shadow:0 0 0 8px rgba(52,211,153,0)}100%{box-shadow:0 0 0 0 rgba(52,211,153,0)}}
+  /* month bar */
+  .qc-monthbar{position:sticky;top:72px;z-index:40;background:var(--surface);border-bottom:1px solid var(--border);padding:12px 26px;display:flex;align-items:center;gap:10px;flex-wrap:wrap;box-shadow:0 2px 10px rgba(3,105,161,.05)}
+  .qc-monthbar .lbl{font-size:13px;font-weight:700;color:var(--muted);margin-right:4px}
+  .qc-month{border:1px solid var(--border-strong);background:#fff;color:var(--primary-dk);padding:7px 14px;border-radius:20px;font-size:13.5px;font-weight:600;cursor:pointer;font-family:inherit;transition:.15s;position:relative}
+  .qc-month:hover:not(.disabled){background:var(--primary-lt)}
+  .qc-month.active{background:var(--primary);color:#fff;border-color:var(--primary)}
+  .qc-month.disabled{opacity:.4;cursor:not-allowed;border-style:dashed}
+  .qc-month .has{position:absolute;top:-3px;right:-3px;width:9px;height:9px;border-radius:50%;background:#34d399;border:2px solid #fff}
+  .qc-main{padding:24px 30px 60px;max-width:1500px;margin:0 auto}
+  .qc-intro{display:flex;align-items:center;gap:14px;background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:16px 22px;margin-bottom:22px;box-shadow:var(--shadow)}
+  .qc-intro .big{font-size:30px}
+  .qc-intro h3{font-size:16px;color:var(--primary-dk)}
+  .qc-intro p{font-size:13px;color:var(--muted);margin-top:2px}
+  .qc-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(400px,1fr));gap:20px}
+  .qc-card{background:var(--surface);border:1px solid var(--border);border-radius:14px;overflow:hidden;box-shadow:var(--shadow);transition:.18s}
+  .qc-card:hover{transform:translateY(-3px);box-shadow:0 14px 34px rgba(3,105,161,.18);border-color:var(--border-strong)}
+  .qc-card-imgwrap{position:relative;cursor:zoom-in;background:#fff;border-bottom:1px solid var(--border)}
+  .qc-card-imgwrap img{width:100%;display:block;aspect-ratio:16/9;object-fit:contain;background:#fff}
+  .qc-num{position:absolute;top:10px;left:10px;background:var(--primary);color:#fff;font-size:12px;font-weight:700;padding:3px 9px;border-radius:20px;font-family:"Inter",sans-serif}
+  .qc-card figcaption{padding:11px 15px;font-size:13.5px;font-weight:600}
+  .qc-empty{text-align:center;padding:80px 20px;color:var(--muted)}
+  .qc-empty .ico{font-size:54px;opacity:.5;margin-bottom:14px}
+  .qc-empty h3{font-size:18px;color:var(--text);margin-bottom:6px}
+  .qc-empty p{font-size:14px}
+  .qc-empty code{background:var(--primary-lt);padding:2px 8px;border-radius:6px;color:var(--primary-dk);font-size:13px}
+  /* lightbox */
+  .qc-lb{position:fixed;inset:0;z-index:200;background:rgba(8,24,44,.92);display:none;align-items:center;justify-content:center;flex-direction:column}
+  .qc-lb.open{display:flex}
+  .qc-lb img{max-width:94vw;max-height:82vh;border-radius:8px;box-shadow:0 20px 60px rgba(0,0,0,.5);background:#fff}
+  .qc-lb-cap{color:#fff;margin-top:14px;font-size:15px;font-weight:600;text-align:center;max-width:90vw}
+  .qc-lb-counter{color:#9ec5ff;font-size:13px;margin-top:4px}
+  .qc-lb-btn{position:absolute;top:50%;transform:translateY(-50%);background:rgba(255,255,255,.14);border:1px solid rgba(255,255,255,.3);color:#fff;width:50px;height:50px;border-radius:50%;font-size:24px;cursor:pointer;display:flex;align-items:center;justify-content:center}
+  .qc-lb-btn:hover{background:rgba(255,255,255,.28)}
+  .qc-lb-prev{left:22px} .qc-lb-next{right:22px}
+  .qc-lb-close{position:absolute;top:18px;right:24px;background:none;border:none;color:#fff;font-size:34px;cursor:pointer;line-height:1}
+  .qc-lb-fs{position:absolute;top:22px;right:74px;background:rgba(255,255,255,.14);border:1px solid rgba(255,255,255,.3);color:#fff;width:36px;height:36px;border-radius:8px;font-size:16px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:.15s}
+  .qc-lb-fs:hover{background:rgba(255,255,255,.28)}
+  @media(max-width:760px){.qc-grid{grid-template-columns:1fr}}
+
+  /* ===== Export PDF button ===== */
+  .qc-export-btn{background:rgba(255,255,255,.16);border:1px solid rgba(255,255,255,.3);color:#fff;padding:7px 14px;border-radius:20px;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;display:flex;align-items:center;gap:7px;transition:.15s}
+  .qc-export-btn:hover{background:rgba(255,255,255,.28)}
+  .qc-export-btn:disabled{opacity:.45;cursor:not-allowed}
+
+  /* ===== Print / PDF styles ===== */
+  @media print{
+    @page{size:A4 landscape;margin:12mm}
+    header,nav,.qc-intro,.qc-lb,#pdfOrigBtn{display:none!important}
+    body{background:#fff!important;color:#000}
+    .qc-main{padding:0!important;max-width:100%!important}
+    .qc-grid{display:grid!important;grid-template-columns:1fr 1fr!important;gap:8mm!important}
+    .qc-card{break-inside:avoid;page-break-inside:avoid;box-shadow:none!important;border:1px solid #ccc!important}
+    .qc-card:hover{transform:none!important}
+    .qc-card-imgwrap img{aspect-ratio:auto!important;max-height:120mm;object-fit:contain}
+    .qc-num{background:#0369a1!important;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+    .qc-print-header{display:block!important;text-align:center;font-size:14pt;font-weight:700;color:#0369a1;margin-bottom:6mm;padding-bottom:4mm;border-bottom:1.5px solid #0369a1}
+  }
+  .qc-print-header{display:none}
+
+  /* ===== nav dropdown ข้าม Dashboard ===== */
+  .qc-nav{position:relative}
+  .qc-nav-btn{background:rgba(255,255,255,.16);border:1px solid rgba(255,255,255,.3);color:#fff;padding:7px 14px;border-radius:20px;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;display:flex;align-items:center;gap:7px}
+  .qc-nav-btn:hover{background:rgba(255,255,255,.28)}
+  .qc-navdd{position:absolute;right:0;top:calc(100% + 8px);background:#fff;border:1px solid var(--border);border-radius:12px;box-shadow:0 12px 34px rgba(3,105,161,.22);min-width:248px;padding:6px;display:none;z-index:120}
+  .qc-navdd.show{display:block}
+  .qc-navdd a{display:block;padding:9px 13px;border-radius:8px;text-decoration:none;color:var(--text);font-size:13.5px;font-weight:500}
+  .qc-navdd a:hover{background:var(--primary-lt)}
+  .qc-navdd a.cur{background:var(--violet);color:#fff;font-weight:700}
+  .qc-home{background:rgba(255,255,255,.16);border:1px solid rgba(255,255,255,.3);color:#fff;padding:7px 13px;border-radius:20px;font-size:13px;font-weight:600;text-decoration:none}
+  .qc-home:hover{background:rgba(255,255,255,.28)}
+</style>
+</head>
+<body>
+  <header class="qc-header">
+    <img class="logo" src="F_01_png_v-logo_si_th.png" alt="logo" onerror="this.style.display='none'">
+    <div class="htxt">
+      <h1>QC Blood Components Dashboard</h1>
+      <p>การควบคุมคุณภาพส่วนประกอบโลหิต · ภาควิชาเวชศาสตร์การธนาคารเลือด</p>
+    </div>
+    <div class="qc-pills">
+    <div class="qc-nav">
+      <button class="qc-nav-btn" onclick="toggleQcNav(event)">🧪 ไปยัง Dashboard ▾</button>
+      <div class="qc-navdd" id="qcNavDD">
+        <a href="index.html">🏠 หน้ารวม Dashboard</a>
+        <a href="Dashboard Blood Collection.html">Blood Collection</a>
+        <a href="Dashboard Hemapheresis.html">Hemapheresis</a>
+        <a href="Dashboard Blood Processing.html">Blood Processing</a>
+        <a href="Dashboard Blood Component.html">Blood Component Preparation</a>
+        <a href="Dashboard Blood Prep Disp.html">เตรียม &amp; จ่ายเลือด</a>
+        <a href="Dashboard QC Blood Components.html" class="cur">QC Blood Components</a>
+        <a href="Dashboard Immunohematology.html">Immunohematology</a>
+        <a href="Dashboard Infection.html">Infectious Serology</a>
+        <a href="Dashboard Standard Laboratory.html">Standard Laboratory</a>
+        <a href="Dashboard Reference Laboratory.html">Reference Laboratory</a>
+        <a href="Dashboard HLA Laboratory.html">HLA Laboratory</a>
+        <a href="Dashboard DNA Laboratory.html">DNA Laboratory</a>
+        
+      </div>
+    </div>
+    <a href="index.html" class="qc-home">🏠 หน้าแรก</a>
+      <span class="qc-pill"><span class="dot"></span>ปี 2569</span>
+      <span class="qc-pill" id="pillCount">— หน้า</span>
+      <button class="qc-export-btn" id="exportPdfBtn" onclick="exportPDF()" disabled title="เลือกเดือนก่อนเพื่อ Export PDF">
+        📄 Export PDF
+      </button>
+    </div>
+  </header>
+
+  <nav class="qc-monthbar" id="monthbar">
+    <span class="lbl">เลือกเดือน:</span>
+  </nav>
+
+  <main class="qc-main">
+    <div class="qc-print-header" id="printHeader">สถิติ QC Blood Components</div>
+    <div class="qc-intro">
+      <div class="big">🩸</div>
+      <div style="flex:1">
+        <h3 id="introTitle">รายงานผลการควบคุมคุณภาพ (QC) ส่วนประกอบโลหิต</h3>
+        <p id="introSub">เลือกเดือนด้านบนเพื่อดูกราฟ · คลิกที่ภาพเพื่อขยายเต็มจอ</p>
+      </div>
+      <a id="pdfOrigBtn" style="display:none;margin-left:auto;background:var(--primary-lt);border:1px solid var(--border-strong);color:var(--primary-dk);padding:7px 14px;border-radius:20px;font-size:13px;font-weight:600;text-decoration:none;white-space:nowrap" target="_blank">📂 เปิด PDF ต้นฉบับ</a>
+    </div>
+    <div id="gallery"></div>
+  </main>
+
+  <div class="qc-lb" id="lightbox" onclick="if(event.target.id==='lightbox')closeLightbox()">
+    <button class="qc-lb-close" onclick="closeLightbox()">&times;</button>
+    <button class="qc-lb-fs" id="fsBtn" onclick="toggleFullscreen()" title="เต็มจอ">⛶</button>
+    <button class="qc-lb-btn qc-lb-prev" onclick="navLightbox(-1)">&#8249;</button>
+    <img id="lb-img" src="" alt="">
+    <button class="qc-lb-btn qc-lb-next" onclick="navLightbox(1)">&#8250;</button>
+    <div class="qc-lb-cap" id="lb-cap"></div>
+    <div class="qc-lb-counter" id="lb-counter"></div>
+  </div>
+
+<script>
+  const YEAR = "2569";
+  const MONTHS = ["มกราคม","กุมภาพันธ์","มีนาคม","เมษายน","พฤษภาคม","มิถุนายน","กรกฎาคม","สิงหาคม","กันยายน","ตุลาคม","พฤศจิกายน","ธันวาคม"];
+  const MONTHS_SHORT = ["ม.ค.","ก.พ.","มี.ค.","เม.ย.","พ.ค.","มิ.ย.","ก.ค.","ส.ค.","ก.ย.","ต.ค.","พ.ย.","ธ.ค."];
+  const QC_MANIFEST_INLINE = {
+ "2569": {
+  "พฤษภาคม": {
+   "pdf": "สถิติห้องปฏิบัติการ QC/QC 2569/พฤษภาคม/Chart-QC.Data 05-MAY-69.pdf",
+   "images": [
+    "qc_assets/2569/พฤษภาคม/qc-01.png",
+    "qc_assets/2569/พฤษภาคม/qc-02.png",
+    "qc_assets/2569/พฤษภาคม/qc-03.png",
+    "qc_assets/2569/พฤษภาคม/qc-04.png",
+    "qc_assets/2569/พฤษภาคม/qc-05.png",
+    "qc_assets/2569/พฤษภาคม/qc-06.png",
+    "qc_assets/2569/พฤษภาคม/qc-07.png",
+    "qc_assets/2569/พฤษภาคม/qc-08.png",
+    "qc_assets/2569/พฤษภาคม/qc-09.png",
+    "qc_assets/2569/พฤษภาคม/qc-10.png",
+    "qc_assets/2569/พฤษภาคม/qc-11.png",
+    "qc_assets/2569/พฤษภาคม/qc-12.png",
+    "qc_assets/2569/พฤษภาคม/qc-13.png",
+    "qc_assets/2569/พฤษภาคม/qc-14.png",
+    "qc_assets/2569/พฤษภาคม/qc-15.png"
+   ],
+   "count": 15,
+   "titles": [
+    "QC Blood Component",
+    "2569",
+    "% Pass in Blood Components:  2569",
+    "% Pass in Blood Components: MAY 69",
+    "% Pass in Red Cell Components: MAY 69",
+    "% Pass in Platelet Components: MAY 69",
+    "% Pass in Plasma Components : MAY 69",
+    "Whole blood - MAY  2569",
+    "LDRC: WB-450 mL – MAY 2569",
+    "LDRC: WB-Low /Over Volume   MAY - 2569",
+    "LDPC MAY - 2569",
+    "SDP MAY -2569",
+    "FFP MAY - 2569",
+    "CRYO MAY- 2569",
+    "Pooled Granulocyte"
+   ]
+  },
+  "มิถุนายน": {
+   "pdf": "สถิติห้องปฏิบัติการ QC/QC 2569/มิถุนายน/Chart-QC.Data 06-JUN-69.pdf",
+   "images": [
+    "qc_assets/2569/มิถุนายน/qc-01.png",
+    "qc_assets/2569/มิถุนายน/qc-02.png",
+    "qc_assets/2569/มิถุนายน/qc-03.png",
+    "qc_assets/2569/มิถุนายน/qc-04.png",
+    "qc_assets/2569/มิถุนายน/qc-05.png",
+    "qc_assets/2569/มิถุนายน/qc-06.png",
+    "qc_assets/2569/มิถุนายน/qc-07.png",
+    "qc_assets/2569/มิถุนายน/qc-08.png",
+    "qc_assets/2569/มิถุนายน/qc-09.png",
+    "qc_assets/2569/มิถุนายน/qc-10.png",
+    "qc_assets/2569/มิถุนายน/qc-11.png",
+    "qc_assets/2569/มิถุนายน/qc-12.png",
+    "qc_assets/2569/มิถุนายน/qc-13.png",
+    "qc_assets/2569/มิถุนายน/qc-14.png",
+    "qc_assets/2569/มิถุนายน/qc-15.png"
+   ],
+   "count": 15,
+   "titles": [
+    "QC Blood Component",
+    "2569",
+    "% Pass in Blood Components: 2569",
+    "% Pass in Blood Components: JUNE 69",
+    "% Pass in Red Cell Components: JUNE 69",
+    "% Pass in Platelet Components: JUNE 69",
+    "% Pass in Plasma Components : JUNE 69",
+    "Whole blood - JUNE 2569",
+    "LDRC: WB-450 mL – JUNE 2569",
+    "LDRC: WB-Low /Over Volume JUNE- 2569",
+    "LDPC JUNE - 2569",
+    "SDP JUNE -2569",
+    "FFP JUNE - 2569",
+    "CRYO JUNE - 2569",
+    "Pooled Granulocyte"
+   ]
+  },
+  "กรกฎาคม": {
+   "pdf": "สถิติห้องปฏิบัติการ QC/QC 2569/กรกฎาคม/Chart-QC.Data 06-JULY-69.pdf",
+   "images": [
+    "qc_assets/2569/กรกฎาคม/qc-01.png",
+    "qc_assets/2569/กรกฎาคม/qc-02.png",
+    "qc_assets/2569/กรกฎาคม/qc-03.png",
+    "qc_assets/2569/กรกฎาคม/qc-04.png",
+    "qc_assets/2569/กรกฎาคม/qc-05.png",
+    "qc_assets/2569/กรกฎาคม/qc-06.png",
+    "qc_assets/2569/กรกฎาคม/qc-07.png",
+    "qc_assets/2569/กรกฎาคม/qc-08.png",
+    "qc_assets/2569/กรกฎาคม/qc-09.png",
+    "qc_assets/2569/กรกฎาคม/qc-10.png",
+    "qc_assets/2569/กรกฎาคม/qc-11.png",
+    "qc_assets/2569/กรกฎาคม/qc-12.png",
+    "qc_assets/2569/กรกฎาคม/qc-13.png",
+    "qc_assets/2569/กรกฎาคม/qc-14.png",
+    "qc_assets/2569/กรกฎาคม/qc-15.png"
+   ],
+   "count": 15,
+   "titles": [
+    "QC Blood Component",
+    "2569",
+    "% Pass in Blood Components: 2569",
+    "% Pass in Blood Components: JULY 69",
+    "% Pass in Red Cell Components: JULY 69",
+    "% Pass in Platelet Components: JULY 69",
+    "% Pass in Plasma Components : JULY 69",
+    "Whole blood - JULY 2569",
+    "LDRC: WB-450 mL – JULY 2569",
+    "LDRC: WB-Low /Over Volume JULY- 2569",
+    "LDPC JULY - 2569",
+    "SDP JULY -2569",
+    "FFP JULY - 2569",
+    "CRYO JULY - 2569",
+    "Pooled Granulocyte"
+   ]
+  }
+ }
+};
+  let MANIFEST = {};
+  let curMonth = null;
+  let lbSrcs = [], lbCaps = [], lbIndex = 0;
+
+  function applyManifest(){
+    buildMonthBar();
+    const avail = MONTHS.filter(m => MANIFEST[YEAR] && MANIFEST[YEAR][m]);
+    selectMonth(avail.length ? avail[avail.length-1] : MONTHS[0]);
+  }
+  async function loadManifest(){
+    // ใช้ข้อมูลฝังในไฟล์ก่อน (เปิดแบบดับเบิลคลิกก็ทำงาน) แล้วลองดึงไฟล์ล่าสุดมาอัปเดตทับ
+    MANIFEST = QC_MANIFEST_INLINE || {};
+    applyManifest();
+    try{
+      const r = await fetch('qc_manifest.json?_='+Date.now());
+      if(r.ok){ const fresh = await r.json(); MANIFEST = fresh; applyManifest(); }
+    }catch(e){ /* file:// บล็อก fetch — ใช้ inline ต่อไป */ }
+  }
+
+  function buildMonthBar(){
+    const bar = document.getElementById('monthbar');
+    bar.querySelectorAll('.qc-month').forEach(e=>e.remove());
+    MONTHS.forEach(m=>{
+      const has = !!(MANIFEST[YEAR] && MANIFEST[YEAR][m]);
+      const b = document.createElement('button');
+      b.className = 'qc-month'+(has?'':' disabled');
+      b.innerHTML = MONTHS_SHORT[MONTHS.indexOf(m)] + (has?'<span class="has"></span>':'');
+      b.title = has ? m+' ('+MANIFEST[YEAR][m].count+' หน้า)' : m+' — ยังไม่มีข้อมูล';
+      if(has) b.onclick = ()=>selectMonth(m);
+      bar.appendChild(b);
+    });
+  }
+
+  function selectMonth(m){
+    curMonth = m;
+    [...document.querySelectorAll('.qc-month')].forEach(b=>{
+      b.classList.toggle('active', b.title.indexOf(m)===0);
+    });
+    renderGallery(m);
+  }
+
+  function renderGallery(m){
+    const g = document.getElementById('gallery');
+    const info = MANIFEST[YEAR] && MANIFEST[YEAR][m];
+    if(!info){
+      document.getElementById('pillCount').textContent = '0 หน้า';
+      document.getElementById('introTitle').textContent = 'สถิติ QC Blood Components เดือน'+m+' '+YEAR;
+      document.getElementById('introSub').textContent = 'ยังไม่มีไฟล์ข้อมูลของเดือนนี้';
+      document.getElementById('exportPdfBtn').disabled = true;
+      document.getElementById('pdfOrigBtn').style.display = 'none';
+      g.innerHTML = '<div class="qc-empty"><div class="ico">📂</div><h3>ยังไม่มีข้อมูลเดือน '+m+'</h3>'+
+        '<p>วางไฟล์ PDF ไว้ที่ <code>สถิติห้องปฏิบัติการ QC / QC '+YEAR+' / '+m+'</code><br>แล้วระบบจะอัปเดตให้อัตโนมัติ</p></div>';
+      return;
+    }
+    const titles = info.titles || [];
+    document.getElementById('pillCount').textContent = info.count+' หน้า';
+    document.getElementById('introTitle').textContent = 'สถิติ QC Blood Components เดือน'+m+' '+YEAR;
+    document.getElementById('introSub').textContent = 'แสดงกราฟ '+info.count+' หน้า เรียงตามลำดับจากไฟล์ · คลิกภาพเพื่อขยายเต็มจอ';
+    document.getElementById('printHeader').textContent = 'สถิติ QC Blood Components เดือน'+m+' '+YEAR+' · ภาควิชาเวชศาสตร์การธนาคารเลือด';
+    const exportBtn = document.getElementById('exportPdfBtn');
+    exportBtn.disabled = false;
+    exportBtn.title = 'Export PDF กราฟ QC เดือน'+m+' '+YEAR;
+    const pdfBtn = document.getElementById('pdfOrigBtn');
+    if(info.pdf){ pdfBtn.href = info.pdf; pdfBtn.style.display = ''; }
+    else { pdfBtn.style.display = 'none'; }
+    lbSrcs = info.images.slice();
+    lbCaps = info.images.map((s,i)=> titles[i] || ('หน้า '+(i+1)));
+    let html = '<div class="qc-grid">';
+    info.images.forEach((src,i)=>{
+      const cap = titles[i] || ('หน้า '+(i+1));
+      const n = String(i+1).padStart(2,'0');
+      html += '<figure class="qc-card"><div class="qc-card-imgwrap" onclick="openLightbox('+i+')">'+
+        '<span class="qc-num">'+n+'</span><img loading="lazy" src="'+src+'" alt="'+cap.replace(/"/g,'&quot;')+'">'+
+        '</div><figcaption>'+cap+'</figcaption></figure>';
+    });
+    html += '</div>';
+    g.innerHTML = html;
+    window.scrollTo({top:0,behavior:'smooth'});
+  }
+
+  function openLightbox(i){ lbIndex=i; renderLb(); document.getElementById('lightbox').classList.add('open'); document.body.style.overflow='hidden'; }
+  function closeLightbox(){
+    if(document.fullscreenElement) document.exitFullscreen();
+    document.getElementById('lightbox').classList.remove('open');
+    document.body.style.overflow='';
+  }
+  function navLightbox(d){ lbIndex=(lbIndex+d+lbSrcs.length)%lbSrcs.length; renderLb(); }
+  function renderLb(){
+    document.getElementById('lb-img').src=lbSrcs[lbIndex];
+    document.getElementById('lb-cap').textContent=lbCaps[lbIndex];
+    document.getElementById('lb-counter').textContent=(lbIndex+1)+' / '+lbSrcs.length;
+  }
+  function toggleFullscreen(){
+    const lb = document.getElementById('lightbox');
+    const btn = document.getElementById('fsBtn');
+    if(!document.fullscreenElement){
+      lb.requestFullscreen().catch(()=>{});
+      btn.textContent='⊠'; btn.title='ออกจากเต็มจอ';
+    } else {
+      document.exitFullscreen();
+      btn.textContent='⛶'; btn.title='เต็มจอ';
+    }
+  }
+  document.addEventListener('fullscreenchange',()=>{
+    const btn=document.getElementById('fsBtn');
+    if(!document.fullscreenElement){ btn.textContent='⛶'; btn.title='เต็มจอ'; }
+  });
+  document.addEventListener('keydown',e=>{
+    if(!document.getElementById('lightbox').classList.contains('open'))return;
+    if(e.key==='Escape'){ if(document.fullscreenElement) document.exitFullscreen(); else closeLightbox(); }
+    if(e.key==='ArrowRight')navLightbox(1);
+    if(e.key==='ArrowLeft')navLightbox(-1);
+    if(e.key==='f'||e.key==='F')toggleFullscreen();
+  });
+
+  function exportPDF(){
+    if(!curMonth){ alert('กรุณาเลือกเดือนก่อน'); return; }
+    const btn = document.getElementById('exportPdfBtn');
+    btn.textContent = '⏳ กำลังเตรียม...';
+    btn.disabled = true;
+    // รอให้ภาพ load ครบก่อน print
+    const imgs = document.querySelectorAll('#gallery img');
+    let loaded = 0;
+    const total = imgs.length;
+    const doPrint = () => {
+      document.title = 'สถิติ QC Blood Components เดือน'+curMonth+' '+YEAR;
+      window.print();
+      setTimeout(()=>{ btn.innerHTML='📄 Export PDF'; btn.disabled=false; },600);
+    };
+    if(total === 0){ doPrint(); return; }
+    imgs.forEach(img=>{
+      if(img.complete){ loaded++; if(loaded===total) doPrint(); }
+      else { img.onload = img.onerror = ()=>{ loaded++; if(loaded===total) doPrint(); }; }
+    });
+  }
+
+  function toggleQcNav(e){ e.stopPropagation(); document.getElementById('qcNavDD').classList.toggle('show'); }
+  document.addEventListener('click', function(e){
+    const dd=document.getElementById('qcNavDD');
+    if(dd && !e.target.closest('.qc-nav')) dd.classList.remove('show');
+  });
+
+  loadManifest();
+</script>
+</body>
+</html>

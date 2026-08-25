@@ -1,0 +1,350 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>เข้าสู่ระบบ · Dashboard สถิติ</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body { height: 100%; }
+
+    body {
+      font-family: 'Sarabun', sans-serif;
+      min-height: 100vh;
+      background: linear-gradient(145deg, #eef2f7 0%, #f8fafc 50%, #e8f0fb 100%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    /* decorative blobs */
+    body::before {
+      content: '';
+      position: absolute;
+      top: -120px; right: -80px;
+      width: 480px; height: 480px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(220,38,38,0.07) 0%, transparent 70%);
+      pointer-events: none;
+    }
+    body::after {
+      content: '';
+      position: absolute;
+      bottom: -100px; left: -80px;
+      width: 420px; height: 420px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(37,99,235,0.07) 0%, transparent 70%);
+      pointer-events: none;
+    }
+
+    /* extra blob top-left */
+    .blob-extra {
+      position: fixed;
+      top: 60px; left: -60px;
+      width: 300px; height: 300px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(220,38,38,0.05) 0%, transparent 70%);
+      pointer-events: none;
+    }
+
+    .card {
+      background: #ffffff;
+      border-radius: 24px;
+      box-shadow: 0 8px 32px rgba(15,23,42,0.10), 0 2px 8px rgba(15,23,42,0.06);
+      width: 100%;
+      max-width: 420px;
+      overflow: hidden;
+      position: relative;
+      z-index: 1;
+      border: 1px solid rgba(226,232,240,0.8);
+    }
+
+    /* top accent stripe */
+    .card-stripe {
+      height: 5px;
+      background: linear-gradient(90deg, #dc2626 0%, #ef4444 50%, #b91c1c 100%);
+    }
+
+    /* Card header — light */
+    .card-header {
+      background: #ffffff;
+      padding: 28px 36px 22px;
+      text-align: center;
+      border-bottom: 1px solid #f1f5f9;
+    }
+
+    .logo-row {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 18px;
+    }
+
+    .logo-row img {
+      height: 80px;
+      width: auto;
+      object-fit: contain;
+    }
+
+    .card-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: #fef2f2;
+      border: 1px solid #fecaca;
+      border-radius: 20px;
+      padding: 4px 14px;
+      font-size: 11px;
+      font-weight: 700;
+      color: #dc2626;
+      letter-spacing: 0.04em;
+      margin-bottom: 10px;
+    }
+
+    .card-title {
+      font-size: 17px;
+      font-weight: 800;
+      color: #0f172a;
+      line-height: 1.3;
+    }
+
+    .card-sub {
+      font-size: 12px;
+      color: #94a3b8;
+      margin-top: 4px;
+      font-weight: 500;
+    }
+
+    /* Form area */
+    .card-body {
+      padding: 28px 36px 32px;
+      background: #fafbfc;
+    }
+
+    .form-label {
+      font-size: 12.5px;
+      font-weight: 700;
+      color: #334155;
+      margin-bottom: 6px;
+      display: block;
+    }
+
+    .form-group {
+      margin-bottom: 16px;
+    }
+
+    .input-wrap {
+      position: relative;
+    }
+
+    .input-icon {
+      position: absolute;
+      left: 14px;
+      top: 50%;
+      transform: translateY(-50%);
+      font-size: 15px;
+      pointer-events: none;
+      opacity: 0.45;
+    }
+
+    .form-input {
+      width: 100%;
+      padding: 11px 14px 11px 40px;
+      border: 1.5px solid #e2e8f0;
+      border-radius: 12px;
+      font-size: 14px;
+      font-family: 'Sarabun', sans-serif;
+      color: #0f172a;
+      background: #ffffff;
+      transition: all 0.2s;
+      outline: none;
+    }
+
+    .form-input:focus {
+      border-color: #dc2626;
+      background: #fff;
+      box-shadow: 0 0 0 3px rgba(220,38,38,0.08);
+    }
+
+    .form-input.error {
+      border-color: #dc2626;
+      background: #fff5f5;
+      box-shadow: 0 0 0 3px rgba(220,38,38,0.10);
+    }
+
+    .btn-login {
+      width: 100%;
+      padding: 13px;
+      background: #dc2626;
+      color: #fff;
+      border: none;
+      border-radius: 12px;
+      font-size: 15px;
+      font-weight: 700;
+      font-family: 'Sarabun', sans-serif;
+      cursor: pointer;
+      transition: all 0.2s;
+      margin-top: 6px;
+      box-shadow: 0 4px 12px rgba(220,38,38,0.25);
+      letter-spacing: 0.01em;
+    }
+
+    .btn-login:hover {
+      background: #b91c1c;
+      transform: translateY(-1px);
+      box-shadow: 0 8px 20px rgba(220,38,38,0.30);
+    }
+
+    .btn-login:active {
+      transform: translateY(0);
+      box-shadow: 0 2px 6px rgba(220,38,38,0.20);
+    }
+
+    .btn-login:disabled {
+      background: #94a3b8;
+      box-shadow: none;
+      cursor: not-allowed;
+      transform: none;
+    }
+
+    .error-msg {
+      display: none;
+      background: #fef2f2;
+      border: 1px solid #fecaca;
+      border-radius: 10px;
+      padding: 10px 14px;
+      font-size: 13px;
+      color: #dc2626;
+      font-weight: 600;
+      margin-bottom: 16px;
+      text-align: center;
+    }
+
+    .error-msg.show { display: block; }
+
+    .footer-note {
+      text-align: center;
+      font-size: 11.5px;
+      color: #94a3b8;
+      margin-top: 20px;
+      line-height: 1.7;
+    }
+
+    .footer-note span {
+      display: inline-block;
+      width: 4px; height: 4px;
+      border-radius: 50%;
+      background: #cbd5e1;
+      vertical-align: middle;
+      margin: 0 5px 2px;
+    }
+
+    /* shake animation */
+    @keyframes shake {
+      0%,100% { transform: translateX(0); }
+      20%      { transform: translateX(-6px); }
+      40%      { transform: translateX(6px); }
+      60%      { transform: translateX(-4px); }
+      80%      { transform: translateX(4px); }
+    }
+    .shake { animation: shake 0.35s ease; }
+  </style>
+</head>
+<body>
+<div class="blob-extra"></div>
+
+<div class="card">
+  <div class="card-stripe"></div>
+
+  <!-- Header -->
+  <div class="card-header">
+    <div class="logo-row">
+      <img src="F_01_png_v-logo_si_th.png" alt="Siriraj Logo" onerror="this.style.display='none'">
+    </div>
+    <div class="card-badge">🔒 ระบบเข้าสู่ระบบ</div>
+    <div class="card-title">Dashboard สถิติห้องปฏิบัติการ</div>
+    <div class="card-sub">ภาควิชาเวชศาสตร์การธนาคารเลือด<span></span>ศิริราชพยาบาล</div>
+  </div>
+
+  <!-- Body -->
+  <div class="card-body">
+
+    <div class="error-msg" id="errorMsg">❌ Username หรือ Password ไม่ถูกต้อง</div>
+
+    <form id="loginForm" onsubmit="handleLogin(event)" autocomplete="off">
+
+      <div class="form-group">
+        <label class="form-label" for="username">Username</label>
+        <div class="input-wrap">
+          <span class="input-icon">👤</span>
+          <input class="form-input" type="text" id="username" placeholder="กรอก Username" autocomplete="username" />
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label" for="password">Password</label>
+        <div class="input-wrap">
+          <span class="input-icon">🔑</span>
+          <input class="form-input" type="password" id="password" placeholder="กรอก Password" autocomplete="current-password" />
+        </div>
+      </div>
+
+      <button class="btn-login" type="submit" id="btnLogin">เข้าสู่ระบบ →</button>
+
+    </form>
+
+    <div class="footer-note">
+      ระบบนี้สงวนสิทธิ์สำหรับบุคลากร<br>ภาควิชาเวชศาสตร์การธนาคารเลือดเท่านั้น
+    </div>
+
+  </div>
+</div>
+
+<script>
+  const VALID_USER = 'sibloodbank';
+  const VALID_PASS = 'Statbloodbank';
+
+  function handleLogin(e) {
+    e.preventDefault();
+    const user = document.getElementById('username').value.trim();
+    const pass = document.getElementById('password').value;
+    const errorMsg = document.getElementById('errorMsg');
+    const form = document.getElementById('loginForm');
+
+    if (user === VALID_USER && pass === VALID_PASS) {
+      sessionStorage.setItem('auth', 'ok');
+      document.getElementById('btnLogin').textContent = '✅ กำลังเข้าสู่ระบบ...';
+      document.getElementById('btnLogin').disabled = true;
+      setTimeout(() => { location.replace('index.html'); }, 600);
+    } else {
+      errorMsg.classList.add('show');
+      document.getElementById('username').classList.add('error');
+      document.getElementById('password').classList.add('error');
+      form.classList.remove('shake');
+      void form.offsetWidth;
+      form.classList.add('shake');
+      document.getElementById('password').value = '';
+      document.getElementById('password').focus();
+    }
+  }
+
+  if (sessionStorage.getItem('auth') === 'ok') {
+    location.replace('index.html');
+  }
+
+  ['username','password'].forEach(id => {
+    document.getElementById(id).addEventListener('input', () => {
+      document.getElementById('errorMsg').classList.remove('show');
+      document.getElementById(id).classList.remove('error');
+    });
+  });
+</script>
+
+</body>
+</html>
