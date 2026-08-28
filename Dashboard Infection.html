@@ -2172,7 +2172,7 @@ function renderKPI() {
       <div class="kpi-label">เลือดที่จำหน่ายทิ้ง (Reactive)</div>
       <div class="kpi-value" style="color: var(--red);">${fmt(discardedVal)}</div>
       <div class="kpi-sub">คิดเป็นอัตรา <b>${discardRate.toFixed(3)}%</b> ของส่งตรวจ</div>
-      <div class="kpi-split-row">
+      <div class="kpi-split-row kpi-split-row--quad">
         <div class="kpi-split-col">
           <div class="kpi-split-label">Syphilis</div>
           <div class="kpi-split-value">${fmt(sum(c.discarded.Syphilis, idxs))}</div>
@@ -2182,8 +2182,12 @@ function renderKPI() {
           <div class="kpi-split-value">${fmt(sum(c.discarded.HBsAg, idxs))}</div>
         </div>
         <div class="kpi-split-col">
-          <div class="kpi-split-label">HIV/HCV</div>
-          <div class="kpi-split-value">${fmt(sum(c.discarded.AntiHIV, idxs) + sum(c.discarded.AntiHCV, idxs))}</div>
+          <div class="kpi-split-label">Anti-HIV</div>
+          <div class="kpi-split-value">${fmt(sum(c.discarded.AntiHIV, idxs))}</div>
+        </div>
+        <div class="kpi-split-col">
+          <div class="kpi-split-label">Anti-HCV</div>
+          <div class="kpi-split-value">${fmt(sum(c.discarded.AntiHCV, idxs))}</div>
         </div>
       </div>
     </div>
@@ -2197,18 +2201,22 @@ function renderKPI() {
       <div class="kpi-label">ผลการตรวจยืนยันเป็นบวกจริง</div>
       <div class="kpi-value" style="color: var(--teal);">${fmt(tpVal)}</div>
       <div class="kpi-sub">คิดเป็นสัดส่วน <b>${tpRate.toFixed(1)}%</b> จากคัดกรองบวก</div>
-      <div class="kpi-split-row">
+      <div class="kpi-split-row kpi-split-row--quad">
         <div class="kpi-split-col">
           <div class="kpi-split-label">Syphilis TP</div>
-          <div class="kpi-split-value" style="color:var(--teal);">${fmt(sum(c.truePositive.Syphilis, idxs))}</div>
+          <div class="kpi-split-value">${fmt(sum(c.truePositive.Syphilis, idxs))}</div>
         </div>
         <div class="kpi-split-col">
           <div class="kpi-split-label">HBsAg TP</div>
           <div class="kpi-split-value">${fmt(sum(c.truePositive.HBsAg, idxs))}</div>
         </div>
         <div class="kpi-split-col">
-          <div class="kpi-split-label">HIV/HCV TP</div>
-          <div class="kpi-split-value">${fmt(sum(c.truePositive.AntiHIV, idxs) + sum(c.truePositive.AntiHCV, idxs))}</div>
+          <div class="kpi-split-label">Anti-HIV TP</div>
+          <div class="kpi-split-value">${fmt(sum(c.truePositive.AntiHIV, idxs))}</div>
+        </div>
+        <div class="kpi-split-col">
+          <div class="kpi-split-label">Anti-HCV TP</div>
+          <div class="kpi-split-value">${fmt(sum(c.truePositive.AntiHCV, idxs))}</div>
         </div>
       </div>
     </div>
