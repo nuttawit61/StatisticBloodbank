@@ -554,6 +554,9 @@ const currentData = () => getYearData(selectedYear);
 // DNA tab has 5 months of data
 function getAvailableIdx(year) { return [0,1,2,3,4]; }
 const getAvailableIdxs = () => getAvailableIdx(selectedYear);
+// ป้ายช่วงเดือน — คำนวณจากข้อมูลจริง ไม่ใช่ค่าตายตัว
+function monthRangeLabel(y, sep){ const ix=getAvailableIdx(y===undefined?selectedYear:y); if(!ix||!ix.length) return '–'; sep=sep||'–'; return ix.length===1 ? MONTHS_FY[ix[0]] : (MONTHS_FY[ix[0]]+sep+MONTHS_FY[ix[ix.length-1]]); }
+function monthCount(y){ const ix=getAvailableIdx(y===undefined?selectedYear:y); return ix?ix.length:0; }
 const hasData = i => getAvailableIdxs().includes(i);
 
 const sum = (arr, idxs) => { if (!arr) return 0; if (!idxs) idxs = getAvailableIdxs(); return idxs.reduce((a,i)=>a+(arr[i]||0),0); };
@@ -570,13 +573,13 @@ function buildYearTabs(){
   YEARS.forEach(y=>{
     const t=document.createElement('div');
     t.className='month-tab'+(selectedYear===y?' active':'');
-    t.innerHTML=`<div class="month-tab-abbr">ปี ${y}</div><div class="month-tab-num">ม.ค. - พ.ค. (5 เดือน)</div><div class="month-tab-dot"></div>`;
+    t.innerHTML=`<div class="month-tab-abbr">ปี ${y}</div><div class="month-tab-num">${monthRangeLabel(y,' - ')} (${monthCount(y)} เดือน)</div><div class="month-tab-dot"></div>`;
     t.addEventListener('click',()=>{ if(selectedYear===y)return; selectedYear=y; refresh(); buildCharts(); });
     c.appendChild(t);
   });
   document.getElementById('selectedYearTag').textContent=`ปีปฏิทิน ${selectedYear}`;
   document.getElementById('headerYearPill').innerHTML=`📅 ปี ${selectedYear}`;
-  document.getElementById('headerMonthsPill').innerHTML=`<span class="live-dot"></span> ข้อมูล ม.ค.–พ.ค. ${selectedYear}`;
+  document.getElementById('headerMonthsPill').innerHTML=`<span class="live-dot"></span> ข้อมูล ${monthRangeLabel(selectedYear)} ${selectedYear}`;
   document.getElementById('headerFilePill').textContent=`📄 สถิติ ${selectedYear-2500}.xlsx`;
 }
 
@@ -591,7 +594,7 @@ function buildMonthTabs(){
     c.appendChild(t);
   });
   const tag=document.getElementById('selectedMonthTag');
-  tag.textContent = selectedMonth===null ? `รวมทุกเดือน (ม.ค.–พ.ค. ${selectedYear})` : `${MONTHS_FULL[selectedMonth]} ${selectedYear}`;
+  tag.textContent = selectedMonth===null ? `รวมทุกเดือน (${monthRangeLabel(selectedYear)} ${selectedYear})` : `${MONTHS_FULL[selectedMonth]} ${selectedYear}`;
 }
 function selectAll(){ selectedMonth=null; refresh(); }
 
