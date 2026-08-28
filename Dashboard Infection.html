@@ -2055,9 +2055,10 @@ function renderKPI() {
   const seroPltAph = sum(c.serology.pltApheresis, idxs);
   const seroBmt = sum(c.serology.bmt, idxs);
 
-  const natVal = sum(c.nat.total, idxs);
   const natInHouse = sum(c.nat.inHouse, idxs);
   const natMobile = sum(c.nat.mobile, idxs);
+  // KPI card: NAT total counts In-House + Mobile only (excludes BMT / Prescreen / breast milk / sample-only / sero-weak)
+  const natVal = natInHouse + natMobile;
   const natBmt = sum(c.nat.bmt, idxs);
   const natPrescreen = sum(c.nat.prescreen, idxs);
   const natMilk = sum(c.nat.breastMilk, idxs);
@@ -2080,7 +2081,7 @@ function renderKPI() {
   let seroDelta = null, natDelta = null, discDelta = null, tpDelta = null;
   if (p) {
     const seroPrev = sum(p.serology.total, idxs);
-    const natPrev = sum(p.nat.total, idxs);
+    const natPrev = sum(p.nat.inHouse, idxs) + sum(p.nat.mobile, idxs);
     
     let discPrev = 0;
     Object.keys(p.discarded).forEach(key => {
@@ -2137,7 +2138,7 @@ function renderKPI() {
       </div>
       <div class="kpi-label">สิ่งส่งตรวจ NAT ทั้งหมด</div>
       <div class="kpi-value" style="color:var(--blue);">${fmt(natVal)}</div>
-      <div class="kpi-sub">สิ่งส่งตรวจเพื่อตรวจกรอง DNA/RNA</div>
+      <div class="kpi-sub">สิ่งส่งตรวจเพื่อตรวจกรอง DNA/RNA (In-House + Mobile)</div>
       <div class="kpi-split-row kpi-split-row--trio">
         <div class="kpi-split-col">
           <div class="kpi-split-label">In-House</div>
