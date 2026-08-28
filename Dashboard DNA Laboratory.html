@@ -754,8 +754,6 @@ function renderADR(){
       drug:'Allopurinol', dz:'SJS / TEN / DRESS' },
     { icon:'🧬', allele:'HLA-B*57:01', val:b5701, color:'var(--teal)', bg:'var(--teal-lt)',
       drug:'Abacavir', dz:'Hypersensitivity' },
-    { icon:'🧬', allele:'HLA-B*51', val:b51, color:'var(--amber)', bg:'var(--amber-lt)',
-      drug:'—', dz:'Behçet’s disease' },
   ];
   const kpis=items.map(it=>({
     icon:it.icon, label:it.allele, val:fmt(it.val), sub:`ราย — ${it.dz}`,
@@ -805,6 +803,17 @@ function renderTable(){
     return `<tr><td class="text-left sticky-col-1">${num}</td><td class="text-left sticky-col-2">${name}</td>${cells}<td class="col-total">${total}</td></tr>`;
   };
   const grp=t=>`<tr class="section-header"><td colspan="${tIdxs.length+3}">${t}</td></tr>`;
+  // แถวรวมที่คำนวณจากหลายคีย์ (ใช้กับหมวดที่ไม่มีคีย์ total ของตัวเองใน Excel)
+  const totalRowCalc=(name,keys)=>{
+    const d=currentData();
+    const arr=Array.from({length:12},(_,i)=>{
+      let s=null;
+      keys.forEach(k=>{ const a=d[k]; if(a&&a[i]!=null) s=(s||0)+a[i]; });
+      return s;
+    });
+    const cells=tIdxs.map(i=>{const ac=active.has(i)?'active-month-col':'';const v=arr[i];return `<td class="${ac}">${v!=null?fmt(v):'–'}</td>`;}).join('');
+    return `<tr class="tr-total"><td class="text-left sticky-col-1"></td><td class="text-left sticky-col-2">${name}</td>${cells}<td class="col-total">${fmt(sum(arr,tIdxs))}</td></tr>`;
+  };
   const totalRow=(name,key)=>{
     const arr=currentData()[key];
     const cells=tIdxs.map(i=>{const ac=active.has(i)?'active-month-col':'';const v=arr?arr[i]:null;return `<td class="${ac}">${v!=null?fmt(v):'–'}</td>`;}).join('');
@@ -848,6 +857,7 @@ function renderTable(){
     ${row('5.2','B*58:01','dna_adr_b5801')}
     ${row('5.3','B*57:01','dna_adr_b5701')}
     ${row('5.4','B*51','dna_adr_b51')}
+    ${totalRowCalc('TOTAL (HLA for ADR)',['dna_adr_b1502','dna_adr_b5801','dna_adr_b5701','dna_adr_b51'])}
 
     ${grp('6. KPI — NGS Quality')}
     ${row('6.1','First Pass Success (ราย)','dna_kpi_firstpass')}
