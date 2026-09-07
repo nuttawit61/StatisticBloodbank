@@ -2096,7 +2096,7 @@ if (sessionStorage.getItem('auth') !== 'ok') { location.replace('login.html'); }
           { id: "ExpiredBlood", title: "เลือดหมดอายุ (RBC)", value: stats.expiredBloodTotal, color: "var(--crimson)", bg: "var(--crimson-lt)", icon: "⏰", growth: stats.expiredBloodGrowth, tab: "ExpiredBlood", groupSplit: stats.expiredByGroup, groupDonor: stats.donorByGroup }
         ],
         RequestedBlood: [
-          { id: "RequestedRedCross", title: "ขอเลือด สภากาชาดไทย", value: stats.requestedRedCross, color: "var(--crimson)", bg: "var(--crimson-lt)", icon: "สภากาชาดไทย.png", growth: null, tab: "RequestedBlood", groupSplit: stats.requestedRedCrossSplit, subNote: "ยูนิตที่ขอจากสภากาชาดไทย", noPct: true },
+          { id: "RequestedRedCross", title: "ขอเลือด สภากาชาดไทย", value: stats.requestedRedCross, color: "var(--crimson)", bg: "var(--crimson-lt)", icon: "thai_red_cross.png", growth: null, tab: "RequestedBlood", groupSplit: stats.requestedRedCrossSplit, subNote: "ยูนิตที่ขอจากสภากาชาดไทย", noPct: true },
           { id: "RequestedOthers", title: "ขอเลือด รพ.อื่นๆ", value: stats.requestedOthers, color: "var(--blue)", bg: "var(--blue-lt)", icon: "🏥", growth: null, tab: "RequestedBlood", groupSplit: stats.requestedOthersSplit, subNote: "ยูนิตที่ขอจาก รพ.อื่นๆ", noPct: true }
         ],
         FFPExpired: [

@@ -2557,11 +2557,11 @@ const BLOOD_IMMUNO_DATA = {
                                                         ]
                              },
                  "plateletExpired": {
-                     "ldppc":  [0,0,0,11,0,0,1,0,0,0,0,0],
-                     "ldppcA": [0,0,0,1,1,0,1,0,0,0,0,0],
-                     "sdp":    [0,0,0,5,3,0,0,0,0,0,0,0],
-                     "sdpA":   [0,0,0,6,3,0,6,0,0,0,0,0],
-                     "total":  [0,0,0,23,7,0,8,0,0,0,0,0]
+                     "ldppc":  [11,0,1,2,24,6,6,0,0,0,0,0],
+                     "ldppcA": [1,1,1,1,1,0,0,0,0,0,0,0],
+                     "sdp":    [5,3,0,0,8,8,5,0,0,0,0,0],
+                     "sdpA":   [6,3,6,8,3,4,1,0,0,0,0,0],
+                     "total":  [23,7,8,11,36,18,12,0,0,0,0,0]
                  }
              },
     "2566":  {
@@ -5300,3 +5300,555 @@ const COMPONENT_PRODUCTION_DATA = {
 };
 
 
+
+/* ---------------------------------------------------------------
+ * HTFDC Issue (Heat-treated freeze-dried cryoprecipitate) และ
+ * Bovine Thrombin Issue — ที่มา: สถิติ XX.xlsx ชีต "HTFDC Issue"
+ * (ค่าตั้งต้นสำรอง — จะถูกทับด้วยข้อมูลล่าสุดจาก live_immuno.js / autoload)
+ * --------------------------------------------------------------- */
+(function () {
+  var HTFDC_ISSUE = {
+    "2567": { htfdc: [0,0,16,46,3,12,70,37,66,48,44,55],
+             thrombin: [0,0,0,0,0,0,0,0,19,3,20,16] },
+    "2568": { htfdc: [144,76,90,92,76,132,91,110,185,83,38,2],
+             thrombin: [16,21,7,19,11,31,8,11,14,18,18,14] },
+    "2569": { htfdc: [0,0,0,0,0,10,43,null,null,null,null,null],
+             thrombin: [19,30,22,17,13,14,11,null,null,null,null,null] },
+  };
+  Object.keys(HTFDC_ISSUE).forEach(function (y) {
+    if (BLOOD_IMMUNO_DATA[y]) BLOOD_IMMUNO_DATA[y].htfdcIssue = HTFDC_ISSUE[y];
+  });
+})();
+
+/* ---------------------------------------------------------------
+ * Massive Transfusion Protocol (MTP) — ที่มา: สถิติ XX.xlsx ชีต "MTP"
+ * แยก MTP (Non-TE) และ MTP-TE · null = เดือนที่ยังไม่ได้บันทึก
+ * (ค่าตั้งต้นสำรอง — จะถูกทับด้วยข้อมูลล่าสุดจาก live_immuno.js / autoload)
+ * --------------------------------------------------------------- */
+(function () {
+  var MTP_DATA = {
+    "2568": {
+      "nonTE": {
+        "cases": [
+          14,
+          11,
+          17,
+          12,
+          10,
+          15,
+          10,
+          7,
+          6,
+          11,
+          7,
+          12
+        ],
+        "rbc": [
+          72,
+          77,
+          117,
+          76,
+          72,
+          114,
+          60,
+          52,
+          26,
+          60,
+          51,
+          52
+        ],
+        "ffp": [
+          56,
+          57,
+          98,
+          60,
+          62,
+          90,
+          44,
+          40,
+          16,
+          46,
+          46,
+          36
+        ],
+        "platelet": [
+          8,
+          10,
+          13,
+          11,
+          12,
+          10,
+          8,
+          5,
+          4,
+          10,
+          9,
+          5
+        ],
+        "cryo": [
+          16,
+          10,
+          23,
+          18,
+          10,
+          35,
+          5,
+          4,
+          5,
+          5,
+          22,
+          null
+        ],
+        "sets": {
+          "s1": [
+            11,
+            7,
+            9,
+            7,
+            5,
+            10,
+            5,
+            3,
+            5,
+            8,
+            5,
+            10
+          ],
+          "s2": [
+            2,
+            2,
+            4,
+            3,
+            3,
+            1,
+            3,
+            3,
+            0,
+            2,
+            1,
+            2
+          ],
+          "s3": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "s4": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "s5": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "s6": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "s7": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "s8": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ]
+        }
+      },
+      "te": {
+        "cases": [
+          0,
+          0,
+          0,
+          0,
+          1,
+          1,
+          1,
+          4,
+          6,
+          2,
+          1,
+          1
+        ],
+        "rbc": [
+          null,
+          null,
+          null,
+          null,
+          4,
+          8,
+          4,
+          25,
+          43,
+          8,
+          4,
+          4
+        ],
+        "ffp": [
+          null,
+          null,
+          null,
+          null,
+          2,
+          4,
+          2,
+          16,
+          36,
+          6,
+          2,
+          2
+        ],
+        "platelet": [
+          null,
+          null,
+          null,
+          null,
+          0,
+          0,
+          null,
+          3,
+          9,
+          1,
+          null,
+          null
+        ],
+        "cryo": [
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          20,
+          23,
+          4,
+          null,
+          null
+        ]
+      }
+    },
+    "2569": {
+      "nonTE": {
+        "cases": [
+          12,
+          11,
+          12,
+          11,
+          12,
+          12,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null
+        ],
+        "rbc": [
+          66,
+          36,
+          99,
+          52,
+          63,
+          25,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null
+        ],
+        "ffp": [
+          66,
+          37,
+          92,
+          53,
+          46,
+          31,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null
+        ],
+        "platelet": [
+          11,
+          8,
+          17,
+          8,
+          6,
+          6,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null
+        ],
+        "cryo": [
+          40,
+          16,
+          82,
+          34,
+          22,
+          38,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null
+        ],
+        "sets": {
+          "s1": [
+            7,
+            8,
+            4,
+            9,
+            8,
+            10,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null
+          ],
+          "s2": [
+            3,
+            1,
+            5,
+            1,
+            2,
+            2,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null
+          ],
+          "s3": [
+            1,
+            1,
+            2,
+            0,
+            1,
+            0,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null
+          ],
+          "s4": [
+            1,
+            1,
+            0,
+            1,
+            1,
+            0,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null
+          ],
+          "s5": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null
+          ],
+          "s6": [
+            0,
+            0,
+            1,
+            0,
+            0,
+            0,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null
+          ],
+          "s7": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null
+          ],
+          "s8": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null
+          ]
+        }
+      },
+      "te": {
+        "cases": [
+          2,
+          0,
+          0,
+          1,
+          2,
+          1,
+          1,
+          null,
+          null,
+          null,
+          null,
+          null
+        ],
+        "rbc": [
+          4,
+          0,
+          0,
+          0,
+          7,
+          0,
+          1,
+          null,
+          null,
+          null,
+          null,
+          null
+        ],
+        "ffp": [
+          4,
+          0,
+          0,
+          0,
+          7,
+          0,
+          0,
+          null,
+          null,
+          null,
+          null,
+          null
+        ],
+        "platelet": [
+          0,
+          0,
+          0,
+          0,
+          1,
+          0,
+          0,
+          null,
+          null,
+          null,
+          null,
+          null
+        ],
+        "cryo": [
+          null,
+          null,
+          null,
+          null,
+          12,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null
+        ]
+      }
+    }
+  };
+  Object.keys(MTP_DATA).forEach(function (y) {
+    if (BLOOD_IMMUNO_DATA[y]) BLOOD_IMMUNO_DATA[y].mtp = MTP_DATA[y];
+  });
+})();

@@ -1,0 +1,111 @@
+{
+ "2569": {
+  "เมษายน": {
+   "images": [
+    "reflab_assets/2569/04/reflab-slide-1.jpg",
+    "reflab_assets/2569/04/reflab-slide-2.jpg",
+    "reflab_assets/2569/04/reflab-slide-3.jpg",
+    "reflab_assets/2569/04/reflab-slide-4.jpg",
+    "reflab_assets/2569/04/reflab-slide-5.jpg",
+    "reflab_assets/2569/04/reflab-slide-6.jpg",
+    "reflab_assets/2569/04/reflab-slide-7.jpg",
+    "reflab_assets/2569/04/reflab-slide-8.jpg",
+    "reflab_assets/2569/04/reflab-slide-9.jpg"
+   ],
+   "count": 9,
+   "pdf": "reflab_assets/2569/04/reflab-04.pdf",
+   "titles": [
+    "Reference Laboratory — รายงานสถิติ ปี 2026",
+    "Monthly Weak D Testing Workload & Rh Variant Distribution in Patients",
+    "Reference Lab Testing Statistics & Workload (Ab Identification)",
+    "Antibody Identification Test — ผลการตรวจ",
+    "Unexpected Antibodies — เมษายน 2026",
+    "Unexpected Antibody — แผนภูมิ",
+    "Reference Lab Testing Statistics & Workload (Antigen Typing & Crossmatch)",
+    "Reference Lab Testing Statistics & Workload (ABO Discrepancy & DAT)",
+    "Special Immunohematology Techniques"
+   ],
+   "drive": ""
+  },
+  "พฤษภาคม": {
+   "images": [
+    "reflab_assets/2569/05/reflab-slide-1.jpg",
+    "reflab_assets/2569/05/reflab-slide-2.jpg",
+    "reflab_assets/2569/05/reflab-slide-3.jpg",
+    "reflab_assets/2569/05/reflab-slide-4.jpg",
+    "reflab_assets/2569/05/reflab-slide-5.jpg",
+    "reflab_assets/2569/05/reflab-slide-6.jpg",
+    "reflab_assets/2569/05/reflab-slide-7.jpg",
+    "reflab_assets/2569/05/reflab-slide-8.jpg",
+    "reflab_assets/2569/05/reflab-slide-9.jpg"
+   ],
+   "count": 9,
+   "titles": [
+    "Reference Laboratory — รายงานสถิติ ปี 2026",
+    "Monthly Weak D Testing Workload & Rh Variant Distribution in Patients",
+    "Reference Lab Testing Statistics & Workload (Ab Identification)",
+    "Antibody Identification Test — ผลการตรวจ",
+    "Unexpected Antibodies — พฤษภาคม 2026",
+    "Unexpected Antibody — แผนภูมิ",
+    "Reference Lab Testing Statistics & Workload (Antigen Typing & Crossmatch)",
+    "Reference Lab Testing Statistics & Workload (ABO Discrepancy & DAT)",
+    "Special Immunohematology Techniques"
+   ],
+   "drive": ""
+  },
+  "มิถุนายน": {
+   "images": [
+    "reflab_assets/2569/06/reflab-slide-1.jpg",
+    "reflab_assets/2569/06/reflab-slide-2.jpg",
+    "reflab_assets/2569/06/reflab-slide-3.jpg",
+    "reflab_assets/2569/06/reflab-slide-4.jpg",
+    "reflab_assets/2569/06/reflab-slide-5.jpg",
+    "reflab_assets/2569/06/reflab-slide-6.jpg",
+    "reflab_assets/2569/06/reflab-slide-7.jpg",
+    "reflab_assets/2569/06/reflab-slide-8.jpg",
+    "reflab_assets/2569/06/reflab-slide-9.jpg"
+   ],
+   "count": 9,
+   "pdf": "reflab_assets/2569/06/reflab-06.pdf",
+   "titles": [
+    "Reference Laboratory — รายงานสถิติ ปี 2026",
+    "Monthly Weak D Testing Workload & Rh Variant Distribution in Patients",
+    "Reference Lab Testing Statistics & Workload (Ab Identification)",
+    "Antibody Identification Test — ผลการตรวจ",
+    "Unexpected Antibodies — มิถุนายน 2026",
+    "Unexpected Antibody — แผนภูมิ",
+    "Reference Lab Testing Statistics & Workload (Antigen Typing & Crossmatch)",
+    "Reference Lab Testing Statistics & Workload (ABO Discrepancy & DAT)",
+    "Special Immunohematology Techniques"
+   ],
+   "drive": ""
+  },
+  "กรกฎาคม": {
+   "images": [
+    "reflab_assets/2569/07/reflab-slide-1.jpg",
+    "reflab_assets/2569/07/reflab-slide-2.jpg",
+    "reflab_assets/2569/07/reflab-slide-3.jpg",
+    "reflab_assets/2569/07/reflab-slide-4.jpg",
+    "reflab_assets/2569/07/reflab-slide-5.jpg",
+    "reflab_assets/2569/07/reflab-slide-6.jpg",
+    "reflab_assets/2569/07/reflab-slide-7.jpg",
+    "reflab_assets/2569/07/reflab-slide-8.jpg",
+    "reflab_assets/2569/07/reflab-slide-9.jpg"
+   ],
+   "count": 9,
+   "pdf": "reflab_assets/2569/07/reflab-07.pdf",
+   "titles": [
+    "Reference Laboratory — รายงานสถิติ ปี 2026",
+    "Monthly Weak D Testing Workload & Rh Variant Distribution in Patients",
+    "Reference Lab Testing Statistics & Workload (Ab Identification)",
+    "Antibody Identification Test — ผลการตรวจ",
+    "Unexpected Antibodies — กรกฎาคม 2026",
+    "Unexpected Antibody — แผนภูมิ",
+    "Reference Lab Testing Statistics & Workload (Antigen Typing & Crossmatch)",
+    "Reference Lab Testing Statistics & Workload (ABO Discrepancy & DAT)",
+    "Special Immunohematology Techniques"
+   ],
+   "drive": ""
+  }
+ }
+}

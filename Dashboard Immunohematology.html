@@ -707,6 +707,57 @@
       margin-left: 3px;
     }
 
+    /* ===== MTP SECTION ===== */
+    .mtp-section { margin-bottom: 32px; }
+    .mtp-cards {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 18px;
+      margin-bottom: 18px;
+    }
+    @media (max-width: 900px) { .mtp-cards { grid-template-columns: 1fr; } }
+    .mtp-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-top: 4px solid var(--mtp-color, #6366f1);
+      border-radius: 18px;
+      padding: 20px 22px;
+      box-shadow: 0 8px 32px -4px rgba(15,23,42,0.07), 0 2px 8px -1px rgba(15,23,42,0.04);
+    }
+    .mtp-card-head { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
+    .mtp-card-head h4 {
+      font-size: 14px; font-weight: 800; color: var(--text-1); letter-spacing: .2px;
+    }
+    .mtp-card-head .mtp-pill {
+      margin-left: auto; font-size: 10px; font-weight: 700;
+      padding: 3px 9px; border-radius: 999px;
+      background: var(--mtp-bg, #eef2ff); color: var(--mtp-color, #6366f1);
+    }
+    .mtp-big { font-size: 40px; font-weight: 800; line-height: 1; color: var(--mtp-color, #6366f1); font-variant-numeric: tabular-nums; }
+    .mtp-big-sub { font-size: 12px; color: var(--text-3); font-weight: 600; margin-top: 5px; }
+    .mtp-mini-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin-top: 16px; }
+    .mtp-mini {
+      background: var(--mtp-bg, #eef2ff);
+      border-radius: 10px; padding: 9px 10px; min-width: 0;
+    }
+    .mtp-mini-lbl { font-size: 9.5px; font-weight: 700; color: var(--text-3); text-transform: uppercase; letter-spacing: .3px; }
+    .mtp-mini-val { font-size: 16px; font-weight: 800; color: var(--mtp-color, #6366f1); font-variant-numeric: tabular-nums; margin-top: 2px; }
+
+    #mtpTable { width: 100%; border-collapse: collapse; font-size: 12px; }
+    #mtpTable th, #mtpTable td { padding: 8px 10px; text-align: center; white-space: nowrap; border-bottom: 1px solid var(--border); }
+    #mtpTable thead th {
+      background: #f8fafc; font-weight: 700; color: var(--text-2); font-size: 11px;
+      position: sticky; top: 0; z-index: 2;
+    }
+    #mtpTable th.mtp-g1, #mtpTable td.mtp-g1 { background: #eef2ff33; }
+    #mtpTable th.mtp-g2, #mtpTable td.mtp-g2 { background: #fef3c733; }
+    #mtpTable thead th.mtp-g1 { background: #eef2ff; color: #4338ca; }
+    #mtpTable thead th.mtp-g2 { background: #fef3c7; color: #b45309; }
+    #mtpTable td:first-child, #mtpTable th:first-child { text-align: left; font-weight: 700; position: sticky; left: 0; background: var(--surface); z-index: 1; }
+    #mtpTable tbody tr:hover td { background: #f8fafc; }
+    #mtpTable tr.mtp-total-row td { font-weight: 800; background: #f1f5f9; border-top: 2px solid var(--border-strong, #cbd5e1); }
+    #mtpTable tr.mtp-active-row td { box-shadow: inset 0 0 0 9999px rgba(99,102,241,0.06); }
+
     /* ===== CHARTS SECTION ===== */
     .charts-grid {
       display: grid;
@@ -1497,6 +1548,11 @@ document.addEventListener('click', function(e) {
       <span>การจ่ายส่วนประกอบโลหิต</span>
       <span class="tab-badge" id="tabBadgeDispense">KPI 4 รายการ</span>
     </button>
+    <button class="content-tab-btn" id="tabBtnMtp" onclick="switchContentTab('mtp')">
+      <span class="tab-icon">🚑</span>
+      <span>Massive Transfusion Protocol</span>
+      <span class="tab-badge" id="tabBadgeMtp">MTP · MTP-TE</span>
+    </button>
   </div>
 
   <!-- ============================= -->
@@ -1621,6 +1677,32 @@ document.addEventListener('click', function(e) {
         </div>
         <div class="chart-wrap">
           <canvas id="chartPltExpired" height="320"></canvas>
+        </div>
+      </div>
+    </div>
+
+    <!-- HTFDC / BOVINE THROMBIN ISSUE CHARTS -->
+    <div class="charts-grid" style="grid-template-columns: 1fr 1fr;" id="htfdcChartSection">
+      <div class="chart-card fade-up" style="animation-delay: 0.44s;">
+        <div class="chart-header">
+          <div class="chart-title">
+            <h3>🧊 HTFDC Issue รายเดือน</h3>
+            <p>Heat-treated freeze-dried cryoprecipitate ที่จ่ายออก (ยูนิท) · เทียบปีก่อนหน้า</p>
+          </div>
+        </div>
+        <div class="chart-wrap">
+          <canvas id="chartHtfdc" height="320"></canvas>
+        </div>
+      </div>
+      <div class="chart-card fade-up" style="animation-delay: 0.46s;">
+        <div class="chart-header">
+          <div class="chart-title">
+            <h3>🧪 Bovine Thrombin Issue รายเดือน</h3>
+            <p>Bovine thrombin ที่จ่ายออก (ยูนิท) · เทียบปีก่อนหน้า</p>
+          </div>
+        </div>
+        <div class="chart-wrap">
+          <canvas id="chartThrombin" height="320"></canvas>
         </div>
       </div>
     </div>
@@ -1781,6 +1863,61 @@ document.addEventListener('click', function(e) {
     </div>
 
   </div><!-- end tabPanelDispense -->
+
+  <!-- ============================= -->
+  <!-- TAB 3: Massive Transfusion Protocol -->
+  <!-- ============================= -->
+  <div class="content-tab-panel" id="tabPanelMtp">
+
+    <!-- ===== MASSIVE TRANSFUSION PROTOCOL (MTP) ===== -->
+    <div class="mtp-section fade-up" id="mtpSection" style="animation-delay: 0.48s;">
+      <div class="kpi-section-title" style="margin-top: 8px;">
+        <span>🩸 Massive Transfusion Protocol (MTP)</span>
+        <span style="font-size:12px; font-weight:normal; color:var(--text-3); margin-left:auto;" id="mtpPeriodNote"></span>
+      </div>
+
+      <div class="mtp-cards" id="mtpCards"><!-- rendered dynamically --></div>
+
+      <div class="charts-grid" style="grid-template-columns: 1fr 1fr;">
+        <div class="chart-card">
+          <div class="chart-header">
+            <div class="chart-title">
+              <h3>จำนวนผู้ป่วยที่ Activate MTP รายเดือน</h3>
+              <p>เปรียบเทียบ MTP (Non-TE) กับ MTP-TE (ราย)</p>
+            </div>
+          </div>
+          <div class="chart-wrap"><canvas id="chartMtpCases" height="300"></canvas></div>
+        </div>
+        <div class="chart-card">
+          <div class="chart-header">
+            <div class="chart-title">
+              <h3>ส่วนประกอบโลหิตที่ใช้ใน MTP รายเดือน</h3>
+              <p>RBCs · FFP · Platelet (Adult) · Cryo/HTFDC — รวม Non-TE + TE (ยูนิท)</p>
+            </div>
+          </div>
+          <div class="chart-wrap"><canvas id="chartMtpBlood" height="300"></canvas></div>
+        </div>
+      </div>
+
+      <div class="table-section" style="margin-top: 18px;">
+        <div class="table-header">
+          <div class="table-title">
+            <h3>ตารางสรุป MTP รายเดือน</h3>
+            <p>แยก MTP (Non-TE) และ MTP-TE · ที่มา: สถิติ XX.xlsx ชีต "MTP"</p>
+          </div>
+        </div>
+        <div class="table-wrap">
+          <table id="mtpTable"><!-- rendered dynamically --></table>
+        </div>
+      </div>
+    </div>
+
+
+    <div id="mtpEmptyNote" style="display:none; padding:40px 24px; text-align:center; color:var(--text-3); font-weight:600; background:var(--surface); border:1px solid var(--border); border-radius:20px;">
+      ยังไม่มีข้อมูล Massive Transfusion Protocol สำหรับปีที่เลือก
+    </div>
+
+  </div><!-- end tabPanelMtp -->
 
 
 </main>
@@ -2105,17 +2242,25 @@ function renderKPI() {
   const ffpValAll  = u && u.ffp  && u.ffp.unit  ? sum(u.ffp.unit,  avail) : 0;
 
   const pltExp = (c.plateletExpired && !Array.isArray(c.plateletExpired) && c.plateletExpired.total) ? c.plateletExpired : null;
-  // เก็บแบบปีปฏิทิน (index 0=ม.ค.) — เมื่อเลือกเดือน แสดงค่าเฉพาะเดือนนั้น, ไม่เลือก = รวมทั้งปี
-  const peSum = arr => selectedMonth !== null ? (arr[selectedMonth] || 0) : arr.reduce((t,v)=>t+(v||0),0);
+  // เก็บแบบปีปฏิทิน (index 0=ม.ค.) — ใช้ช่วงเดือนเดียวกับ KPI ใบอื่น (idxs)
+  // เดิมรวมทั้ง 12 ช่องเสมอ ทำให้ยอด "รวมทุกเดือน" ติดเดือนที่ชีตอื่นยังไม่มีข้อมูลเข้ามาด้วย
+  const peSum = arr => sum(arr, idxs);
   const pltExpiredVal  = pltExp ? peSum(pltExp.total)   : 0;
   const pltExpLdppc    = pltExp ? peSum(pltExp.ldppc)   : 0;
   const pltExpLdppcA   = pltExp ? peSum(pltExp.ldppcA)  : 0;
   const pltExpSdp      = pltExp ? peSum(pltExp.sdp)     : 0;
   const pltExpSdpA     = pltExp ? peSum(pltExp.sdpA)    : 0;
 
+  // HTFDC / Bovine Thrombin Issue (ที่มา: ชีต "HTFDC Issue")
+  const hi          = c.htfdcIssue || null;
+  const htfdcVal    = hi ? sum(hi.htfdc, idxs)    : 0;
+  const thrombinVal = hi ? sum(hi.thrombin, idxs) : 0;
+  const issueVal    = htfdcVal + thrombinVal;
+
   // Compare with previous year
   const p = prevData();
   let specDelta = null, cmDelta = null, ctDelta = null, safetyDelta = null, emergencyDelta = null, pltExpiredDelta = null;
+  let issueDelta = null;
   let receiveSpecDelta = null, dispenseSpecDelta = null;
   let rbcDelta = null, plateletDelta = null, cryoDelta = null, ffpDelta = null;
   if (p) {
@@ -2141,6 +2286,10 @@ function renderKPI() {
     emergencyDelta = delta(emergencyVal, emergPrev);
     const pltExpPrev = (p.plateletExpired && !Array.isArray(p.plateletExpired) && p.plateletExpired.total) ? peSum(p.plateletExpired.total) : 0;
     pltExpiredDelta = delta(pltExpiredVal, pltExpPrev);
+
+    const hiPrev = p.htfdcIssue || null;
+    const issuePrev = hiPrev ? (sum(hiPrev.htfdc, idxs) + sum(hiPrev.thrombin, idxs)) : 0;
+    issueDelta = issuePrev > 0 ? delta(issueVal, issuePrev) : null;
     const pu = p.bloodProductsUsage;
     rbcDelta      = delta(rbcVal,      pu && pu.rbc ? sum(pu.rbc, idxs) : 0);
     plateletDelta = delta(plateletVal, pu && pu.totalPlatelet && pu.totalPlatelet.unit ? sum(pu.totalPlatelet.unit, idxs) : 0);
@@ -2300,6 +2449,26 @@ function renderKPI() {
       </div>
     </div>
 
+    <!-- Card 7: HTFDC / Bovine Thrombin Issue -->
+    ${hi ? `
+    <div class="kpi-card" style="--kpi-color: var(--teal); --kpi-bg: var(--teal-lt);">
+      <div class="kpi-icon-wrap">🧊</div>
+      <div class="kpi-label">HTFDC / Bovine Thrombin (จ่ายออก)</div>
+      <div class="kpi-value" style="color: var(--teal);">${fmt(issueVal)}</div>
+      <div class="kpi-sub">รายการจ่ายออกรวม (ยูนิท)</div>
+      ${d2badge(issueDelta, selectedYear - 1)}
+      <div class="kpi-split-row">
+        <div class="kpi-split-col" style="min-width:calc(50% - 8px); flex: 0 1 calc(50% - 8px);">
+          <div class="kpi-split-label">HTFDC</div>
+          <div class="kpi-split-value">${fmt(htfdcVal)}<small>${pct(htfdcVal, issueVal)}%</small></div>
+        </div>
+        <div class="kpi-split-col" style="min-width:calc(50% - 8px); flex: 0 1 calc(50% - 8px);">
+          <div class="kpi-split-label">Bovine Thrombin</div>
+          <div class="kpi-split-value">${fmt(thrombinVal)}<small>${pct(thrombinVal, issueVal)}%</small></div>
+        </div>
+      </div>
+    </div>` : ''}
+
   `;
 
   // ── Dispense KPI Grid (Tab 2) ──
@@ -2410,6 +2579,10 @@ let chartEmergencyInst = null;
 let chartSafetyInst = null;
 let chartSpecimenRejection = null;
 let chartPltExpired = null;
+let chartHtfdc = null;
+let chartThrombin = null;
+let chartMtpCases = null;
+let chartMtpBlood = null;
 
 function buildCharts() {
   const idxs = getAvailableIdxs();
@@ -3044,7 +3217,9 @@ function buildCharts() {
   } else {
   if (pltExpSection) pltExpSection.style.display = '';
   // ข้อมูลเก็บแบบปีปฏิทิน (index 0=ม.ค.) — แสดงตั้งแต่ ม.ค. ถึงเดือนล่าสุดที่มีข้อมูล
-  const peLast = pe.total.reduce((m,v,i)=> (v ? i : m), -1);
+  const peAvail = getAvailableIdxs();
+  const peLastAvail = peAvail.length ? peAvail[peAvail.length-1] : 11;
+  const peLast = Math.min(pe.total.reduce((m,v,i)=> (v ? i : m), -1), peLastAvail);
   const peIdxs = pe.total.map((v,i)=>i).filter(i => i <= peLast);
   const peLabels = peIdxs.map(i => MONTHS_FY[i]);
   chartPltExpired = new Chart(ctxPltExp.getContext('2d'), {
@@ -3072,6 +3247,277 @@ function buildCharts() {
     }
   });
   } // end else hasValidPe
+
+  // Chart 6/7: HTFDC Issue & Bovine Thrombin Issue (แท่ง = ปีนี้, เส้นประ = ปีก่อน)
+  buildIssueCharts(idxs, monthsLabels, c, p);
+
+  // หัวข้อ Massive Transfusion Protocol
+  renderMtp();
+}
+
+function buildIssueCharts(idxs, monthsLabels, c, p) {
+  const section = document.getElementById('htfdcChartSection');
+  const hi = c && c.htfdcIssue ? c.htfdcIssue : null;
+  if (chartHtfdc)    { chartHtfdc.destroy();    chartHtfdc = null; }
+  if (chartThrombin) { chartThrombin.destroy(); chartThrombin = null; }
+  if (!hi) { if (section) section.style.display = 'none'; return; }
+  if (section) section.style.display = '';
+
+  const prevYear = selectedYear - 1;
+  const hiPrev = (p && p.htfdcIssue) ? p.htfdcIssue : null;
+
+  const prevLine = (data) => ({
+    type: 'line',
+    label: `ปี ${prevYear}`,
+    data,
+    borderColor: '#94a3b8',
+    backgroundColor: 'transparent',
+    borderWidth: 2,
+    borderDash: [5, 4],
+    pointBackgroundColor: '#64748b',
+    pointRadius: 3,
+    tension: 0.3,
+    order: 0
+  });
+
+  const opts = () => ({
+    responsive: true,
+    maintainAspectRatio: false,
+    plugins: {
+      legend: { display: true, position: 'top', labels: { font: { family: 'Sarabun' }, usePointStyle: true } },
+      barDatalabels: { enabled: true, font: '600 11px Sarabun, sans-serif', color: '#374151' }
+    },
+    scales: {
+      y: { beginAtZero: true, grace: '15%', ticks: { font: { family: 'Sarabun' }, precision: 0 } },
+      x: { ticks: { font: { family: 'Sarabun' } } }
+    }
+  });
+
+  const mk = (canvasId, key, label, bg, border) => {
+    const el = document.getElementById(canvasId);
+    if (!el || !hi[key]) return null;
+    const prevData = (hiPrev && hiPrev[key]) ? idxs.map(i => hiPrev[key][i] ?? null) : null;
+    return new Chart(el.getContext('2d'), {
+      type: 'bar',
+      data: {
+        labels: monthsLabels,
+        datasets: [
+          ...(prevData ? [prevLine(prevData)] : []),
+          {
+            label: `ปี ${selectedYear} — ${label}`,
+            data: idxs.map(i => hi[key][i] ?? 0),
+            backgroundColor: bg,
+            borderColor: border,
+            borderWidth: 1,
+            borderRadius: 6,
+            order: 1
+          }
+        ]
+      },
+      options: opts()
+    });
+  };
+
+  chartHtfdc    = mk('chartHtfdc',    'htfdc',    'HTFDC (ยูนิท)',           'rgba(20,184,166,0.75)', '#0f766e');
+  chartThrombin = mk('chartThrombin', 'thrombin', 'Bovine Thrombin (ยูนิท)', 'rgba(217,119,6,0.75)',  '#b45309');
+}
+
+// =====================================================
+//  MASSIVE TRANSFUSION PROTOCOL (MTP)
+// =====================================================
+const MTP_STYLE = {
+  nonTE: { color: '#6366f1', bg: '#eef2ff', bar: 'rgba(99,102,241,0.78)', label: 'MTP (Non-TE)' },
+  te:    { color: '#d97706', bg: '#fef3c7', bar: 'rgba(217,119,6,0.78)',  label: 'MTP-TE' }
+};
+
+function mtpSum(arr, idxs) {
+  if (!arr) return 0;
+  return idxs.reduce((a, i) => a + (arr[i] || 0), 0);
+}
+// เดือนที่มีข้อมูล MTP จริง (ไม่ใช่ null) ตัดเดือนที่ยังไม่บันทึกออก
+function mtpIdxs(m) {
+  if (!m) return [];
+  const out = [];
+  for (let i = 0; i < 12; i++) {
+    const a = m.nonTE && m.nonTE.cases ? m.nonTE.cases[i] : null;
+    const b = m.te    && m.te.cases    ? m.te.cases[i]    : null;
+    if (a !== null && a !== undefined) { out.push(i); continue; }
+    if (b !== null && b !== undefined) out.push(i);
+  }
+  return out;
+}
+
+function renderMtp() {
+  const section = document.getElementById('mtpSection');
+  const empty   = document.getElementById('mtpEmptyNote');
+  const panel   = document.getElementById('tabPanelMtp');
+  const c = currentData();
+  const m = c && c.mtp ? c.mtp : null;
+  if (chartMtpCases) { chartMtpCases.destroy(); chartMtpCases = null; }
+  if (chartMtpBlood) { chartMtpBlood.destroy(); chartMtpBlood = null; }
+  if (!m) {
+    if (section) section.style.display = 'none';
+    if (empty)   empty.style.display   = '';
+    return;
+  }
+  if (section) section.style.display = '';
+  if (empty)   empty.style.display   = 'none';
+  // แท็บยังไม่ถูกเปิด — canvas สูง 0 วาดไปก็เพี้ยน รอวาดตอน switchContentTab('mtp')
+  const visible = panel ? panel.classList.contains('active') : true;
+
+  const avail = mtpIdxs(m);
+  // เคารพเดือนที่ผู้ใช้เลือกจากแถบด้านบน
+  const idxs = (selectedMonth !== null && avail.includes(selectedMonth)) ? [selectedMonth] : avail;
+
+  const note = document.getElementById('mtpPeriodNote');
+  if (note) {
+    note.textContent = idxs.length
+      ? (idxs.length === 1
+          ? `ข้อมูลเดือน ${MONTHS_FULL_FY[idxs[0]]} ${selectedYear}`
+          : `รวม ${idxs.length} เดือน (${MONTHS_FY[idxs[0]]}–${MONTHS_FY[idxs[idxs.length-1]]} ${selectedYear})`)
+      : `ยังไม่มีข้อมูล MTP ปี ${selectedYear}`;
+  }
+
+  // ── การ์ดสรุป 2 ใบ ──
+  const p = prevData();
+  const mp = p && p.mtp ? p.mtp : null;
+  const cards = ['nonTE', 'te'].map(k => {
+    const st  = MTP_STYLE[k];
+    const b   = m[k] || {};
+    const cs  = mtpSum(b.cases, idxs);
+    const prevCs = (mp && mp[k]) ? mtpSum(mp[k].cases, idxs) : 0;
+    const d   = prevCs > 0 ? delta(cs, prevCs) : null;
+    return `
+      <div class="mtp-card" style="--mtp-color:${st.color}; --mtp-bg:${st.bg};">
+        <div class="mtp-card-head">
+          <h4>${st.label}</h4>
+          ${d !== null ? d2badge(d, selectedYear - 1) : `<span class="mtp-pill">ปี ${selectedYear}</span>`}
+        </div>
+        <div class="mtp-big">${fmt(cs)}</div>
+        <div class="mtp-big-sub">ผู้ป่วยที่ Activate ${st.label} (ราย)</div>
+        <div class="mtp-mini-row">
+          <div class="mtp-mini"><div class="mtp-mini-lbl">RBCs</div><div class="mtp-mini-val">${fmt(mtpSum(b.rbc, idxs))}</div></div>
+          <div class="mtp-mini"><div class="mtp-mini-lbl">FFP</div><div class="mtp-mini-val">${fmt(mtpSum(b.ffp, idxs))}</div></div>
+          <div class="mtp-mini"><div class="mtp-mini-lbl">Platelet</div><div class="mtp-mini-val">${fmt(mtpSum(b.platelet, idxs))}</div></div>
+          <div class="mtp-mini"><div class="mtp-mini-lbl">Cryo/HTFDC</div><div class="mtp-mini-val">${fmt(mtpSum(b.cryo, idxs))}</div></div>
+        </div>
+      </div>`;
+  }).join('');
+  document.getElementById('mtpCards').innerHTML = cards;
+
+  // ── กราฟ ──
+  const chartIdxs = avail;
+  const labels = chartIdxs.map(i => MONTHS_FY[i]);
+  const baseOpts = () => ({
+    responsive: true,
+    maintainAspectRatio: false,
+    plugins: {
+      legend: { display: true, position: 'top', labels: { font: { family: 'Sarabun' }, usePointStyle: true, boxWidth: 12 } },
+      barDatalabels: { enabled: true, font: '600 10px Sarabun, sans-serif', color: '#374151' }
+    },
+    scales: {
+      y: { beginAtZero: true, grace: '15%', ticks: { font: { family: 'Sarabun' }, precision: 0 } },
+      x: { ticks: { font: { family: 'Sarabun' } } }
+    }
+  });
+
+  const casesEl = document.getElementById('chartMtpCases');
+  if (visible && casesEl && chartIdxs.length) {
+    chartMtpCases = new Chart(casesEl.getContext('2d'), {
+      type: 'bar',
+      data: {
+        labels,
+        datasets: ['nonTE', 'te'].map(k => ({
+          label: MTP_STYLE[k].label + ' (ราย)',
+          data: chartIdxs.map(i => (m[k] && m[k].cases ? m[k].cases[i] : null) ?? 0),
+          backgroundColor: MTP_STYLE[k].bar,
+          borderColor: MTP_STYLE[k].color,
+          borderWidth: 1,
+          borderRadius: 5
+        }))
+      },
+      options: baseOpts()
+    });
+  }
+
+  const bloodEl = document.getElementById('chartMtpBlood');
+  if (visible && bloodEl && chartIdxs.length) {
+    const comp = [
+      { key: 'rbc',      label: 'RBCs',            bg: 'rgba(239,68,68,0.78)',  bd: '#dc2626' },
+      { key: 'ffp',      label: 'FFP',             bg: 'rgba(245,158,11,0.78)', bd: '#d97706' },
+      { key: 'platelet', label: 'Platelet (Adult)',bg: 'rgba(20,184,166,0.78)', bd: '#0f766e' },
+      { key: 'cryo',     label: 'Cryo/HTFDC',      bg: 'rgba(99,102,241,0.78)', bd: '#4f46e5' }
+    ];
+    chartMtpBlood = new Chart(bloodEl.getContext('2d'), {
+      type: 'bar',
+      data: {
+        labels,
+        datasets: comp.map(cp => ({
+          label: cp.label,
+          data: chartIdxs.map(i => ((m.nonTE && m.nonTE[cp.key] ? m.nonTE[cp.key][i] : 0) || 0)
+                                 + ((m.te    && m.te[cp.key]    ? m.te[cp.key][i]    : 0) || 0)),
+          backgroundColor: cp.bg,
+          borderColor: cp.bd,
+          borderWidth: 1,
+          borderRadius: 4
+        }))
+      },
+      options: baseOpts()
+    });
+  }
+
+  buildMtpTable(m, avail);
+}
+
+function buildMtpTable(m, idxs) {
+  const t = document.getElementById('mtpTable');
+  if (!t) return;
+  const groups = [
+    { k: 'nonTE', cls: 'mtp-g1', label: 'MTP (Non-TE)' },
+    { k: 'te',    cls: 'mtp-g2', label: 'MTP-TE' }
+  ];
+  const fields = [
+    { key: 'cases',    head: 'ราย' },
+    { key: 'rbc',      head: 'RBCs' },
+    { key: 'ffp',      head: 'FFP' },
+    { key: 'platelet', head: 'Plt' },
+    { key: 'cryo',     head: 'Cryo' }
+  ];
+
+  let h1 = '<tr><th rowspan="2">เดือน</th>';
+  groups.forEach(g => { h1 += `<th class="${g.cls}" colspan="${fields.length}">${g.label}</th>`; });
+  h1 += '<th rowspan="2">รวมผู้ป่วย (ราย)</th></tr>';
+
+  let h2 = '<tr>';
+  groups.forEach(g => fields.forEach(f => { h2 += `<th class="${g.cls}">${f.head}</th>`; }));
+  h2 += '</tr>';
+
+  const cell = v => (v === null || v === undefined) ? '–' : fmt(v);
+  let body = '';
+  idxs.forEach(i => {
+    const active = (selectedMonth === i) ? ' class="mtp-active-row"' : '';
+    let row = `<tr${active}><td>${MONTHS_FY[i]}</td>`;
+    groups.forEach(g => fields.forEach(f => {
+      const arr = m[g.k] ? m[g.k][f.key] : null;
+      row += `<td class="${g.cls}">${cell(arr ? arr[i] : null)}</td>`;
+    }));
+    const tot = ((m.nonTE && m.nonTE.cases ? m.nonTE.cases[i] : 0) || 0)
+              + ((m.te    && m.te.cases    ? m.te.cases[i]    : 0) || 0);
+    row += `<td>${fmt(tot)}</td></tr>`;
+    body += row;
+  });
+
+  let totRow = '<tr class="mtp-total-row"><td>รวม</td>';
+  let grand = 0;
+  groups.forEach(g => fields.forEach(f => {
+    const arr = m[g.k] ? m[g.k][f.key] : null;
+    const v = mtpSum(arr, idxs);
+    if (f.key === 'cases') grand += v;
+    totRow += `<td class="${g.cls}">${fmt(v)}</td>`;
+  }));
+  totRow += `<td>${fmt(grand)}</td></tr>`;
+
+  t.innerHTML = `<thead>${h1}${h2}</thead><tbody>${body}${totRow}</tbody>`;
 }
 
 // =====================================================
@@ -3159,6 +3605,14 @@ function buildTable() {
     { type: 'stat', label: 'ต้องการ Request (Stat)', key: 'total' },
     { type: 'emerg', label: 'ต้องการ Request (Emergency)', key: 'total' },
 
+    // แสดงเฉพาะปีที่มีข้อมูลจากชีต "HTFDC Issue"
+    ...(c.htfdcIssue ? [
+      { type: 'section', label: '5. การจ่าย HTFDC และ Bovine Thrombin (HTFDC / Bovine Thrombin Issue)' },
+      { type: 'htfdc', label: 'HTFDC (Heat-treated freeze-dried cryo) (ยูนิท)', key: 'htfdc' },
+      { type: 'htfdc', label: 'Bovine Thrombin (ยูนิท)', key: 'thrombin' },
+      { type: 'total-htfdc', label: 'รวมจ่ายออก HTFDC + Bovine Thrombin', key: 'both' },
+    ] : []),
+
   ];
 
   let bodyHtml = '';
@@ -3193,6 +3647,20 @@ function buildTable() {
       arr = getUsageRowArray(row.key);
     } else if (row.type === 'usage-split' || row.type === 'total-usage-split') {
       arr = getUsageRowArray(row.key, row.sub);
+    } else if (row.type === 'htfdc' || row.type === 'total-htfdc') {
+      const hiT = c.htfdcIssue || null;
+      if (!hiT) {
+        arr = Array(12).fill(null);
+      } else if (row.key === 'both') {
+        arr = Array.from({ length: 12 }, (_, i) => {
+          const a = hiT.htfdc ? hiT.htfdc[i] : null;
+          const b = hiT.thrombin ? hiT.thrombin[i] : null;
+          return (a === null || a === undefined) && (b === null || b === undefined)
+            ? null : (a || 0) + (b || 0);
+        });
+      } else {
+        arr = hiT[row.key] || Array(12).fill(null);
+      }
     }
 
     const rowClass = (row.type.indexOf('total') !== -1 || row.type === 'ratio') ? ' class="total-row"' : '';
@@ -3401,13 +3869,15 @@ function buildDispenseTable() {
 //  CONTENT TAB SWITCHING
 // =====================================================
 function switchContentTab(tab) {
-  ['Service', 'Dispense'].forEach(t => {
+  ['Service', 'Dispense', 'Mtp'].forEach(t => {
     const btn   = document.getElementById('tabBtn'   + t);
     const panel = document.getElementById('tabPanel' + t);
     const active = t.toLowerCase() === tab;
     if (btn)   btn.classList.toggle('active', active);
     if (panel) panel.classList.toggle('active', active);
   });
+  // Chart.js วาดในแท็บที่ซ่อนอยู่จะได้ขนาด 0 — วาดใหม่ตอนเปิดแท็บ MTP
+  if (tab === 'mtp' && typeof renderMtp === 'function') renderMtp();
 }
 
 // =====================================================

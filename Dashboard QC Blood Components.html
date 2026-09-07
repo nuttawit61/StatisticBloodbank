@@ -48,6 +48,15 @@
   .qc-empty h3{font-size:18px;color:var(--text);margin-bottom:6px}
   .qc-empty p{font-size:14px}
   .qc-empty code{background:var(--primary-lt);padding:2px 8px;border-radius:6px;color:var(--primary-dk);font-size:13px}
+  .qc-drive{background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:26px 28px;box-shadow:0 2px 10px rgba(0,0,0,.05)}
+  .qc-drive h3{font-size:17px;color:var(--text);margin-bottom:4px}
+  .qc-drive .sub{font-size:13.5px;color:var(--muted);margin-bottom:18px}
+  .qc-drive ol{margin:0 0 20px 20px;columns:2;column-gap:34px;font-size:13.5px;color:var(--text);line-height:1.95}
+  .qc-drive ol li{break-inside:avoid}
+  .qc-drive .go{display:inline-flex;align-items:center;gap:8px;background:var(--primary);color:#fff;padding:11px 22px;border-radius:24px;font-size:14.5px;font-weight:700;text-decoration:none}
+  .qc-drive .go:hover{background:var(--primary-dk)}
+  .qc-drive .none{color:#9a6b00;background:#fff5e6;border:1px solid #f0c987;padding:11px 15px;border-radius:10px;font-size:13.5px}
+  @media(max-width:760px){.qc-drive ol{columns:1}}
   /* lightbox */
   .qc-lb{position:fixed;inset:0;z-index:200;background:rgba(8,24,44,.92);display:none;align-items:center;justify-content:center;flex-direction:column}
   .qc-lb.open{display:flex}
@@ -120,9 +129,11 @@
         <a href="Dashboard HLA Laboratory.html">HLA Laboratory</a>
         <a href="Dashboard DNA Laboratory.html">DNA Laboratory</a>
         
+              <a href="drive_links.html" class="local-only" style="margin-top:6px;border-top:1px solid var(--border);padding-top:11px">🔗 จัดการลิงก์ Google Drive</a>
       </div>
     </div>
     <a href="index.html" class="qc-home">🏠 หน้าแรก</a>
+    <a href="drive_links.html" class="qc-home local-only" style="background:#f6c445;border-color:#e0ac1f;color:#4a3200" title="ผูกลิงก์ไฟล์รายงานบน Google Drive รายเดือน">🔗 ลิงก์ Drive</a>
       <span class="qc-pill"><span class="dot"></span>ปี 2569</span>
       <span class="qc-pill" id="pillCount">— หน้า</span>
       <button class="qc-export-btn" id="exportPdfBtn" onclick="exportPDF()" disabled title="เลือกเดือนก่อนเพื่อ Export PDF">
@@ -160,28 +171,36 @@
 
 <script>
   const YEAR = "2569";
+  // ---------- ซ่อนเครื่องมือตั้งค่าเมื่อเปิดจากเว็บสาธารณะ (GitHub Pages) ----------
+  // เปิดในเครื่อง (ดับเบิลคลิก / localhost) = แสดง · เปิดจากโดเมนอื่น = ซ่อนและตัดลิงก์ทิ้ง
+  const IS_LOCAL = (location.protocol === 'file:') ||
+                   ['localhost','127.0.0.1','::1',''].indexOf(location.hostname) !== -1;
+  if(!IS_LOCAL){
+    document.querySelectorAll('.local-only').forEach(function(e){ e.remove(); });
+  }
+
   const MONTHS = ["มกราคม","กุมภาพันธ์","มีนาคม","เมษายน","พฤษภาคม","มิถุนายน","กรกฎาคม","สิงหาคม","กันยายน","ตุลาคม","พฤศจิกายน","ธันวาคม"];
   const MONTHS_SHORT = ["ม.ค.","ก.พ.","มี.ค.","เม.ย.","พ.ค.","มิ.ย.","ก.ค.","ส.ค.","ก.ย.","ต.ค.","พ.ย.","ธ.ค."];
   const QC_MANIFEST_INLINE = {
  "2569": {
   "พฤษภาคม": {
-   "pdf": "สถิติห้องปฏิบัติการ QC/QC 2569/พฤษภาคม/Chart-QC.Data 05-MAY-69.pdf",
+   "pdf": "qc_assets/2569/05/chart-qc.pdf",
    "images": [
-    "qc_assets/2569/พฤษภาคม/qc-01.png",
-    "qc_assets/2569/พฤษภาคม/qc-02.png",
-    "qc_assets/2569/พฤษภาคม/qc-03.png",
-    "qc_assets/2569/พฤษภาคม/qc-04.png",
-    "qc_assets/2569/พฤษภาคม/qc-05.png",
-    "qc_assets/2569/พฤษภาคม/qc-06.png",
-    "qc_assets/2569/พฤษภาคม/qc-07.png",
-    "qc_assets/2569/พฤษภาคม/qc-08.png",
-    "qc_assets/2569/พฤษภาคม/qc-09.png",
-    "qc_assets/2569/พฤษภาคม/qc-10.png",
-    "qc_assets/2569/พฤษภาคม/qc-11.png",
-    "qc_assets/2569/พฤษภาคม/qc-12.png",
-    "qc_assets/2569/พฤษภาคม/qc-13.png",
-    "qc_assets/2569/พฤษภาคม/qc-14.png",
-    "qc_assets/2569/พฤษภาคม/qc-15.png"
+    "qc_assets/2569/05/qc-01.png",
+    "qc_assets/2569/05/qc-02.png",
+    "qc_assets/2569/05/qc-03.png",
+    "qc_assets/2569/05/qc-04.png",
+    "qc_assets/2569/05/qc-05.png",
+    "qc_assets/2569/05/qc-06.png",
+    "qc_assets/2569/05/qc-07.png",
+    "qc_assets/2569/05/qc-08.png",
+    "qc_assets/2569/05/qc-09.png",
+    "qc_assets/2569/05/qc-10.png",
+    "qc_assets/2569/05/qc-11.png",
+    "qc_assets/2569/05/qc-12.png",
+    "qc_assets/2569/05/qc-13.png",
+    "qc_assets/2569/05/qc-14.png",
+    "qc_assets/2569/05/qc-15.png"
    ],
    "count": 15,
    "titles": [
@@ -200,26 +219,27 @@
     "FFP MAY - 2569",
     "CRYO MAY- 2569",
     "Pooled Granulocyte"
-   ]
+   ],
+   "drive": "https://drive.google.com/file/d/1Q8RDZxJZ9fu-GqS9WOtWyhO-RC16DA-E/view"
   },
   "มิถุนายน": {
-   "pdf": "สถิติห้องปฏิบัติการ QC/QC 2569/มิถุนายน/Chart-QC.Data 06-JUN-69.pdf",
+   "pdf": "qc_assets/2569/06/chart-qc.pdf",
    "images": [
-    "qc_assets/2569/มิถุนายน/qc-01.png",
-    "qc_assets/2569/มิถุนายน/qc-02.png",
-    "qc_assets/2569/มิถุนายน/qc-03.png",
-    "qc_assets/2569/มิถุนายน/qc-04.png",
-    "qc_assets/2569/มิถุนายน/qc-05.png",
-    "qc_assets/2569/มิถุนายน/qc-06.png",
-    "qc_assets/2569/มิถุนายน/qc-07.png",
-    "qc_assets/2569/มิถุนายน/qc-08.png",
-    "qc_assets/2569/มิถุนายน/qc-09.png",
-    "qc_assets/2569/มิถุนายน/qc-10.png",
-    "qc_assets/2569/มิถุนายน/qc-11.png",
-    "qc_assets/2569/มิถุนายน/qc-12.png",
-    "qc_assets/2569/มิถุนายน/qc-13.png",
-    "qc_assets/2569/มิถุนายน/qc-14.png",
-    "qc_assets/2569/มิถุนายน/qc-15.png"
+    "qc_assets/2569/06/qc-01.png",
+    "qc_assets/2569/06/qc-02.png",
+    "qc_assets/2569/06/qc-03.png",
+    "qc_assets/2569/06/qc-04.png",
+    "qc_assets/2569/06/qc-05.png",
+    "qc_assets/2569/06/qc-06.png",
+    "qc_assets/2569/06/qc-07.png",
+    "qc_assets/2569/06/qc-08.png",
+    "qc_assets/2569/06/qc-09.png",
+    "qc_assets/2569/06/qc-10.png",
+    "qc_assets/2569/06/qc-11.png",
+    "qc_assets/2569/06/qc-12.png",
+    "qc_assets/2569/06/qc-13.png",
+    "qc_assets/2569/06/qc-14.png",
+    "qc_assets/2569/06/qc-15.png"
    ],
    "count": 15,
    "titles": [
@@ -238,26 +258,27 @@
     "FFP JUNE - 2569",
     "CRYO JUNE - 2569",
     "Pooled Granulocyte"
-   ]
+   ],
+   "drive": "https://drive.google.com/file/d/1Ie8uP3OfJ1CxK2QkqWA6jfKTtjyygS_C/view"
   },
   "กรกฎาคม": {
-   "pdf": "สถิติห้องปฏิบัติการ QC/QC 2569/กรกฎาคม/Chart-QC.Data 06-JULY-69.pdf",
+   "pdf": "qc_assets/2569/07/chart-qc.pdf",
    "images": [
-    "qc_assets/2569/กรกฎาคม/qc-01.png",
-    "qc_assets/2569/กรกฎาคม/qc-02.png",
-    "qc_assets/2569/กรกฎาคม/qc-03.png",
-    "qc_assets/2569/กรกฎาคม/qc-04.png",
-    "qc_assets/2569/กรกฎาคม/qc-05.png",
-    "qc_assets/2569/กรกฎาคม/qc-06.png",
-    "qc_assets/2569/กรกฎาคม/qc-07.png",
-    "qc_assets/2569/กรกฎาคม/qc-08.png",
-    "qc_assets/2569/กรกฎาคม/qc-09.png",
-    "qc_assets/2569/กรกฎาคม/qc-10.png",
-    "qc_assets/2569/กรกฎาคม/qc-11.png",
-    "qc_assets/2569/กรกฎาคม/qc-12.png",
-    "qc_assets/2569/กรกฎาคม/qc-13.png",
-    "qc_assets/2569/กรกฎาคม/qc-14.png",
-    "qc_assets/2569/กรกฎาคม/qc-15.png"
+    "qc_assets/2569/07/qc-01.png",
+    "qc_assets/2569/07/qc-02.png",
+    "qc_assets/2569/07/qc-03.png",
+    "qc_assets/2569/07/qc-04.png",
+    "qc_assets/2569/07/qc-05.png",
+    "qc_assets/2569/07/qc-06.png",
+    "qc_assets/2569/07/qc-07.png",
+    "qc_assets/2569/07/qc-08.png",
+    "qc_assets/2569/07/qc-09.png",
+    "qc_assets/2569/07/qc-10.png",
+    "qc_assets/2569/07/qc-11.png",
+    "qc_assets/2569/07/qc-12.png",
+    "qc_assets/2569/07/qc-13.png",
+    "qc_assets/2569/07/qc-14.png",
+    "qc_assets/2569/07/qc-15.png"
    ],
    "count": 15,
    "titles": [
@@ -276,7 +297,47 @@
     "FFP JULY - 2569",
     "CRYO JULY - 2569",
     "Pooled Granulocyte"
-   ]
+   ],
+   "drive": "https://drive.google.com/file/d/17PNGZs0AK__r8-SjitsaJ36PF9IG-Mzg/view"
+  },
+  "สิงหาคม": {
+   "pdf": "qc_assets/2569/08/chart-qc.pdf",
+   "images": [
+    "qc_assets/2569/08/qc-01.png",
+    "qc_assets/2569/08/qc-02.png",
+    "qc_assets/2569/08/qc-03.png",
+    "qc_assets/2569/08/qc-04.png",
+    "qc_assets/2569/08/qc-05.png",
+    "qc_assets/2569/08/qc-06.png",
+    "qc_assets/2569/08/qc-07.png",
+    "qc_assets/2569/08/qc-08.png",
+    "qc_assets/2569/08/qc-09.png",
+    "qc_assets/2569/08/qc-10.png",
+    "qc_assets/2569/08/qc-11.png",
+    "qc_assets/2569/08/qc-12.png",
+    "qc_assets/2569/08/qc-13.png",
+    "qc_assets/2569/08/qc-14.png",
+    "qc_assets/2569/08/qc-15.png"
+   ],
+   "count": 15,
+   "titles": [
+    "QC Blood Component",
+    "2569",
+    "% Pass in Blood Components: 2569",
+    "% Pass in Blood Components: August 69",
+    "% Pass in Red Cell Components: August 69",
+    "% Pass in Platelet Components: August 69",
+    "% Pass in Plasma Components : August 69",
+    "Whole blood - AUG 2569",
+    "LDRC: WB-450 mL – AUG 2569",
+    "LDRC: WB-Low /Over Volume AUG- 2569",
+    "LDPC AUG - 2569",
+    "SDP AUG-2569",
+    "FFP AUG- 2569",
+    "CRYO AUG - 2569",
+    "Pooled Granulocyte"
+   ],
+   "drive": "https://drive.google.com/file/d/1lPR8C-gnl6UTw_hJQDYVBaMNV4LSwjSJ/view"
   }
  }
 };
@@ -284,7 +345,25 @@
   let curMonth = null;
   let lbSrcs = [], lbCaps = [], lbIndex = 0;
 
+  // ---------- ลิงก์ Google Drive (ตั้งค่าที่หน้า drive_links.html) ----------
+  const DRIVE_KEY = 'qc_drive_links';
+  function mergeDriveLinks(){
+    let d = null;
+    try{ d = JSON.parse(localStorage.getItem(DRIVE_KEY) || 'null'); }catch(e){}
+    if(!d) return;
+    Object.keys(d).forEach(y=>{
+      MANIFEST[y] = MANIFEST[y] || {};
+      Object.keys(d[y]).forEach(mo=>{
+        const url = String(d[y][mo]||'').trim();
+        if(!url) return;
+        MANIFEST[y][mo] = MANIFEST[y][mo] || { images:[], titles:[], count:0 };
+        MANIFEST[y][mo].drive = url;
+      });
+    });
+  }
+
   function applyManifest(){
+    mergeDriveLinks();
     buildMonthBar();
     const avail = MONTHS.filter(m => MANIFEST[YEAR] && MANIFEST[YEAR][m]);
     selectMonth(avail.length ? avail[avail.length-1] : MONTHS[0]);
@@ -307,7 +386,7 @@
       const b = document.createElement('button');
       b.className = 'qc-month'+(has?'':' disabled');
       b.innerHTML = MONTHS_SHORT[MONTHS.indexOf(m)] + (has?'<span class="has"></span>':'');
-      b.title = has ? m+' ('+MANIFEST[YEAR][m].count+' หน้า)' : m+' — ยังไม่มีข้อมูล';
+      b.title = has ? m+' ('+(MANIFEST[YEAR][m].count ? MANIFEST[YEAR][m].count+' หน้า' : 'ลิงก์ Drive')+')' : m+' — ยังไม่มีข้อมูล';
       if(has) b.onclick = ()=>selectMonth(m);
       bar.appendChild(b);
     });
@@ -343,8 +422,12 @@
     exportBtn.disabled = false;
     exportBtn.title = 'Export PDF กราฟ QC เดือน'+m+' '+YEAR;
     const pdfBtn = document.getElementById('pdfOrigBtn');
-    if(info.pdf){ pdfBtn.href = info.pdf; pdfBtn.style.display = ''; }
+    const drv = (info.drive||'').trim();
+    if(drv){ pdfBtn.href = drv; pdfBtn.target='_blank'; pdfBtn.textContent='📂 เปิดรายงานใน Google Drive'; pdfBtn.style.display=''; }
+    else if(info.pdf){ pdfBtn.href = encodeURI(info.pdf); pdfBtn.textContent='📂 เปิด PDF ต้นฉบับ'; pdfBtn.style.display = ''; }
     else { pdfBtn.style.display = 'none'; }
+    // ไม่มีไฟล์รูป (เช่น บน GitHub ที่ไม่ได้อัปรูป) → ใช้ลิงก์ Google Drive แทน
+    if(!info.images || !info.images.length){ showDrivePanel(m, info); window.scrollTo({top:0,behavior:'smooth'}); return; }
     lbSrcs = info.images.slice();
     lbCaps = info.images.map((s,i)=> titles[i] || ('หน้า '+(i+1)));
     let html = '<div class="qc-grid">';
@@ -352,12 +435,31 @@
       const cap = titles[i] || ('หน้า '+(i+1));
       const n = String(i+1).padStart(2,'0');
       html += '<figure class="qc-card"><div class="qc-card-imgwrap" onclick="openLightbox('+i+')">'+
-        '<span class="qc-num">'+n+'</span><img loading="lazy" src="'+src+'" alt="'+cap.replace(/"/g,'&quot;')+'">'+
+        '<span class="qc-num">'+n+'</span><img id="qcimg-'+i+'" loading="lazy" src="'+encodeURI(src)+'" alt="'+cap.replace(/"/g,'&quot;')+'">'+
         '</div><figcaption>'+cap+'</figcaption></figure>';
     });
     html += '</div>';
     g.innerHTML = html;
     window.scrollTo({top:0,behavior:'smooth'});
+    // ถ้าไม่มีไฟล์รูปในเครื่อง/บนเซิร์ฟเวอร์ ให้แสดงแผงลิงก์ Google Drive แทน
+    const probe = g.querySelector('#qcimg-0');
+    if(probe) probe.addEventListener('error', ()=>showDrivePanel(m, info), {once:true});
+  }
+
+  function showDrivePanel(m, info){
+    const titles = info.titles || [];
+    const url = (info.drive || '').trim();
+    let html = '<div class="qc-drive">' +
+      '<h3>รายงาน QC Blood Components เดือน'+m+' '+YEAR+'</h3>' +
+      '<div class="sub">ไฟล์รายงานเก็บไว้บน Google Drive · มีทั้งหมด '+(info.count||titles.length)+' หน้า</div>';
+    if(titles.length){
+      html += '<ol>' + titles.map(t=>'<li>'+t.replace(/</g,'&lt;')+'</li>').join('') + '</ol>';
+    }
+    html += url
+      ? '<a class="go" href="'+url+'" target="_blank" rel="noopener">📂 เปิดรายงานใน Google Drive</a>'
+      : '<div class="none">⚠️ ยังไม่ได้ผูกลิงก์ Google Drive ของเดือนนี้' + (IS_LOCAL ? ' — ไปที่หน้า <a href="drive_links.html">จัดการลิงก์ Drive</a> เพื่อวางลิงก์' : '') + '</div>';
+    html += '</div>';
+    document.getElementById('gallery').innerHTML = html;
   }
 
   function openLightbox(i){ lbIndex=i; renderLb(); document.getElementById('lightbox').classList.add('open'); document.body.style.overflow='hidden'; }
@@ -368,7 +470,7 @@
   }
   function navLightbox(d){ lbIndex=(lbIndex+d+lbSrcs.length)%lbSrcs.length; renderLb(); }
   function renderLb(){
-    document.getElementById('lb-img').src=lbSrcs[lbIndex];
+    document.getElementById('lb-img').src=encodeURI(lbSrcs[lbIndex]);
     document.getElementById('lb-cap').textContent=lbCaps[lbIndex];
     document.getElementById('lb-counter').textContent=(lbIndex+1)+' / '+lbSrcs.length;
   }

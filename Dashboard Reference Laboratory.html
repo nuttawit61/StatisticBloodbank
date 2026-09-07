@@ -58,6 +58,15 @@
   .qc-empty h3{font-size:18px;color:var(--text);margin-bottom:6px}
   .qc-empty p{font-size:14px}
   .qc-empty code{background:var(--primary-lt);padding:2px 8px;border-radius:6px;color:var(--primary-dk);font-size:13px}
+  .qc-drive{background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:26px 28px;box-shadow:0 2px 10px rgba(0,0,0,.05)}
+  .qc-drive h3{font-size:17px;color:var(--text);margin-bottom:4px}
+  .qc-drive .sub{font-size:13.5px;color:var(--muted);margin-bottom:18px}
+  .qc-drive ol{margin:0 0 20px 20px;columns:2;column-gap:34px;font-size:13.5px;color:var(--text);line-height:1.95}
+  .qc-drive ol li{break-inside:avoid}
+  .qc-drive .go{display:inline-flex;align-items:center;gap:8px;background:var(--primary);color:#fff;padding:11px 22px;border-radius:24px;font-size:14.5px;font-weight:700;text-decoration:none}
+  .qc-drive .go:hover{background:var(--primary-dk)}
+  .qc-drive .none{color:#9a6b00;background:#fff5e6;border:1px solid #f0c987;padding:11px 15px;border-radius:10px;font-size:13.5px}
+  @media(max-width:760px){.qc-drive ol{columns:1}}
 
   /* LIGHTBOX */
   .qc-lb{position:fixed;inset:0;z-index:200;background:rgba(4,20,12,.92);display:none;align-items:center;justify-content:center;flex-direction:column}
@@ -132,9 +141,11 @@
         <a href="Dashboard Reference Laboratory.html" class="cur">Reference Laboratory</a>
         <a href="Dashboard HLA Laboratory.html">HLA Laboratory</a>
         <a href="Dashboard DNA Laboratory.html">DNA Laboratory</a>
+              <a href="drive_links.html" class="local-only" style="margin-top:6px;border-top:1px solid var(--border);padding-top:11px">🔗 จัดการลิงก์ Google Drive</a>
       </div>
     </div>
     <a href="index.html" class="qc-home">🏠 หน้าแรก</a>
+    <a href="drive_links.html" class="qc-home local-only" style="background:#f6c445;border-color:#e0ac1f;color:#4a3200" title="ผูกลิงก์ไฟล์รายงานบน Google Drive รายเดือน">🔗 ลิงก์ Drive</a>
     <span class="qc-pill"><span class="dot"></span>ปี 2569</span>
     <span class="qc-pill" id="pillCount">— หน้า</span>
     <button class="qc-export-btn" id="exportPdfBtn" onclick="exportPDF()" disabled title="เลือกเดือนก่อนเพื่อ Export PDF">
@@ -172,122 +183,169 @@
 
 <script>
 const YEAR = "2569";
+  // ---------- ซ่อนเครื่องมือตั้งค่าเมื่อเปิดจากเว็บสาธารณะ (GitHub Pages) ----------
+  // เปิดในเครื่อง (ดับเบิลคลิก / localhost) = แสดง · เปิดจากโดเมนอื่น = ซ่อนและตัดลิงก์ทิ้ง
+  const IS_LOCAL = (location.protocol === 'file:') ||
+                   ['localhost','127.0.0.1','::1',''].indexOf(location.hostname) !== -1;
+  if(!IS_LOCAL){
+    document.querySelectorAll('.local-only').forEach(function(e){ e.remove(); });
+  }
+
 const MONTHS = ["มกราคม","กุมภาพันธ์","มีนาคม","เมษายน","พฤษภาคม","มิถุนายน","กรกฎาคม","สิงหาคม","กันยายน","ตุลาคม","พฤศจิกายน","ธันวาคม"];
 const MONTHS_SHORT = ["ม.ค.","ก.พ.","มี.ค.","เม.ย.","พ.ค.","มิ.ย.","ก.ค.","ส.ค.","ก.ย.","ต.ค.","พ.ย.","ธ.ค."];
 
 const MANIFEST_INLINE = {
-  "2569": {
-    "เมษายน": {
-      "images": [
-        "reflab_assets/2569/เมษายน/reflab-slide-1.jpg",
-        "reflab_assets/2569/เมษายน/reflab-slide-2.jpg",
-        "reflab_assets/2569/เมษายน/reflab-slide-3.jpg",
-        "reflab_assets/2569/เมษายน/reflab-slide-4.jpg",
-        "reflab_assets/2569/เมษายน/reflab-slide-5.jpg",
-        "reflab_assets/2569/เมษายน/reflab-slide-6.jpg",
-        "reflab_assets/2569/เมษายน/reflab-slide-7.jpg",
-        "reflab_assets/2569/เมษายน/reflab-slide-8.jpg",
-        "reflab_assets/2569/เมษายน/reflab-slide-9.jpg"
-      ],
-      "count": 9,
-      "pdf": "reflab_assets/2569/เมษายน/reflab_เมษายน_2569.pdf",
-      "titles": [
-        "Reference Laboratory — รายงานสถิติ ปี 2026",
-        "Monthly Weak D Testing Workload & Rh Variant Distribution in Patients",
-        "Reference Lab Testing Statistics & Workload (Ab Identification)",
-        "Antibody Identification Test — ผลการตรวจ",
-        "Unexpected Antibodies — เมษายน 2026",
-        "Unexpected Antibody — แผนภูมิ",
-        "Reference Lab Testing Statistics & Workload (Antigen Typing & Crossmatch)",
-        "Reference Lab Testing Statistics & Workload (ABO Discrepancy & DAT)",
-        "Special Immunohematology Techniques"
-      ]
-    },
-    "พฤษภาคม": {
-      "images": [
-        "reflab_assets/2569/พฤษภาคม/reflab-slide-1.jpg",
-        "reflab_assets/2569/พฤษภาคม/reflab-slide-2.jpg",
-        "reflab_assets/2569/พฤษภาคม/reflab-slide-3.jpg",
-        "reflab_assets/2569/พฤษภาคม/reflab-slide-4.jpg",
-        "reflab_assets/2569/พฤษภาคม/reflab-slide-5.jpg",
-        "reflab_assets/2569/พฤษภาคม/reflab-slide-6.jpg",
-        "reflab_assets/2569/พฤษภาคม/reflab-slide-7.jpg",
-        "reflab_assets/2569/พฤษภาคม/reflab-slide-8.jpg",
-        "reflab_assets/2569/พฤษภาคม/reflab-slide-9.jpg"
-      ],
-      "count": 9,
-      "titles": [
-        "Reference Laboratory — รายงานสถิติ ปี 2026",
-        "Monthly Weak D Testing Workload & Rh Variant Distribution in Patients",
-        "Reference Lab Testing Statistics & Workload (Ab Identification)",
-        "Antibody Identification Test — ผลการตรวจ",
-        "Unexpected Antibodies — พฤษภาคม 2026",
-        "Unexpected Antibody — แผนภูมิ",
-        "Reference Lab Testing Statistics & Workload (Antigen Typing & Crossmatch)",
-        "Reference Lab Testing Statistics & Workload (ABO Discrepancy & DAT)",
-        "Special Immunohematology Techniques"
-      ]
-    },
-    "มิถุนายน": {
-      "images": [
-        "reflab_assets/2569/มิถุนายน/reflab-slide-1.jpg",
-        "reflab_assets/2569/มิถุนายน/reflab-slide-2.jpg",
-        "reflab_assets/2569/มิถุนายน/reflab-slide-3.jpg",
-        "reflab_assets/2569/มิถุนายน/reflab-slide-4.jpg",
-        "reflab_assets/2569/มิถุนายน/reflab-slide-5.jpg",
-        "reflab_assets/2569/มิถุนายน/reflab-slide-6.jpg",
-        "reflab_assets/2569/มิถุนายน/reflab-slide-7.jpg",
-        "reflab_assets/2569/มิถุนายน/reflab-slide-8.jpg",
-        "reflab_assets/2569/มิถุนายน/reflab-slide-9.jpg"
-      ],
-      "count": 9,
-      "pdf": "reflab_assets/2569/มิถุนายน/reflab_มิถุนายน_2569.pdf",
-      "titles": [
-        "Reference Laboratory — รายงานสถิติ ปี 2026",
-        "Monthly Weak D Testing Workload & Rh Variant Distribution in Patients",
-        "Reference Lab Testing Statistics & Workload (Ab Identification)",
-        "Antibody Identification Test — ผลการตรวจ",
-        "Unexpected Antibodies — มิถุนายน 2026",
-        "Unexpected Antibody — แผนภูมิ",
-        "Reference Lab Testing Statistics & Workload (Antigen Typing & Crossmatch)",
-        "Reference Lab Testing Statistics & Workload (ABO Discrepancy & DAT)",
-        "Special Immunohematology Techniques"
-      ]
-    },
-    "กรกฎาคม": {
-      "images": [
-        "reflab_assets/2569/กรกฎาคม/reflab-slide-1.jpg",
-        "reflab_assets/2569/กรกฎาคม/reflab-slide-2.jpg",
-        "reflab_assets/2569/กรกฎาคม/reflab-slide-3.jpg",
-        "reflab_assets/2569/กรกฎาคม/reflab-slide-4.jpg",
-        "reflab_assets/2569/กรกฎาคม/reflab-slide-5.jpg",
-        "reflab_assets/2569/กรกฎาคม/reflab-slide-6.jpg",
-        "reflab_assets/2569/กรกฎาคม/reflab-slide-7.jpg",
-        "reflab_assets/2569/กรกฎาคม/reflab-slide-8.jpg",
-        "reflab_assets/2569/กรกฎาคม/reflab-slide-9.jpg"
-      ],
-      "count": 9,
-      "pdf": "reflab_assets/2569/กรกฎาคม/reflab_กรกฎาคม_2569.pdf",
-      "titles": [
-        "Reference Laboratory — รายงานสถิติ ปี 2026",
-        "Monthly Weak D Testing Workload & Rh Variant Distribution in Patients",
-        "Reference Lab Testing Statistics & Workload (Ab Identification)",
-        "Antibody Identification Test — ผลการตรวจ",
-        "Unexpected Antibodies — กรกฎาคม 2026",
-        "Unexpected Antibody — แผนภูมิ",
-        "Reference Lab Testing Statistics & Workload (Antigen Typing & Crossmatch)",
-        "Reference Lab Testing Statistics & Workload (ABO Discrepancy & DAT)",
-        "Special Immunohematology Techniques"
-      ]
-    }
+ "2569": {
+  "เมษายน": {
+   "images": [
+    "reflab_assets/2569/04/reflab-slide-1.jpg",
+    "reflab_assets/2569/04/reflab-slide-2.jpg",
+    "reflab_assets/2569/04/reflab-slide-3.jpg",
+    "reflab_assets/2569/04/reflab-slide-4.jpg",
+    "reflab_assets/2569/04/reflab-slide-5.jpg",
+    "reflab_assets/2569/04/reflab-slide-6.jpg",
+    "reflab_assets/2569/04/reflab-slide-7.jpg",
+    "reflab_assets/2569/04/reflab-slide-8.jpg",
+    "reflab_assets/2569/04/reflab-slide-9.jpg"
+   ],
+   "count": 9,
+   "pdf": "reflab_assets/2569/04/reflab-04.pdf",
+   "titles": [
+    "Reference Laboratory — รายงานสถิติ ปี 2026",
+    "Monthly Weak D Testing Workload & Rh Variant Distribution in Patients",
+    "Reference Lab Testing Statistics & Workload (Ab Identification)",
+    "Antibody Identification Test — ผลการตรวจ",
+    "Unexpected Antibodies — เมษายน 2026",
+    "Unexpected Antibody — แผนภูมิ",
+    "Reference Lab Testing Statistics & Workload (Antigen Typing & Crossmatch)",
+    "Reference Lab Testing Statistics & Workload (ABO Discrepancy & DAT)",
+    "Special Immunohematology Techniques"
+   ],
+   "drive": ""
+  },
+  "พฤษภาคม": {
+   "images": [
+    "reflab_assets/2569/05/reflab-slide-1.jpg",
+    "reflab_assets/2569/05/reflab-slide-2.jpg",
+    "reflab_assets/2569/05/reflab-slide-3.jpg",
+    "reflab_assets/2569/05/reflab-slide-4.jpg",
+    "reflab_assets/2569/05/reflab-slide-5.jpg",
+    "reflab_assets/2569/05/reflab-slide-6.jpg",
+    "reflab_assets/2569/05/reflab-slide-7.jpg",
+    "reflab_assets/2569/05/reflab-slide-8.jpg",
+    "reflab_assets/2569/05/reflab-slide-9.jpg"
+   ],
+   "count": 9,
+   "titles": [
+    "Reference Laboratory — รายงานสถิติ ปี 2026",
+    "Monthly Weak D Testing Workload & Rh Variant Distribution in Patients",
+    "Reference Lab Testing Statistics & Workload (Ab Identification)",
+    "Antibody Identification Test — ผลการตรวจ",
+    "Unexpected Antibodies — พฤษภาคม 2026",
+    "Unexpected Antibody — แผนภูมิ",
+    "Reference Lab Testing Statistics & Workload (Antigen Typing & Crossmatch)",
+    "Reference Lab Testing Statistics & Workload (ABO Discrepancy & DAT)",
+    "Special Immunohematology Techniques"
+   ],
+   "drive": ""
+  },
+  "มิถุนายน": {
+   "images": [
+    "reflab_assets/2569/06/reflab-slide-1.jpg",
+    "reflab_assets/2569/06/reflab-slide-2.jpg",
+    "reflab_assets/2569/06/reflab-slide-3.jpg",
+    "reflab_assets/2569/06/reflab-slide-4.jpg",
+    "reflab_assets/2569/06/reflab-slide-5.jpg",
+    "reflab_assets/2569/06/reflab-slide-6.jpg",
+    "reflab_assets/2569/06/reflab-slide-7.jpg",
+    "reflab_assets/2569/06/reflab-slide-8.jpg",
+    "reflab_assets/2569/06/reflab-slide-9.jpg"
+   ],
+   "count": 9,
+   "pdf": "reflab_assets/2569/06/reflab-06.pdf",
+   "titles": [
+    "Reference Laboratory — รายงานสถิติ ปี 2026",
+    "Monthly Weak D Testing Workload & Rh Variant Distribution in Patients",
+    "Reference Lab Testing Statistics & Workload (Ab Identification)",
+    "Antibody Identification Test — ผลการตรวจ",
+    "Unexpected Antibodies — มิถุนายน 2026",
+    "Unexpected Antibody — แผนภูมิ",
+    "Reference Lab Testing Statistics & Workload (Antigen Typing & Crossmatch)",
+    "Reference Lab Testing Statistics & Workload (ABO Discrepancy & DAT)",
+    "Special Immunohematology Techniques"
+   ],
+   "drive": ""
+  },
+  "กรกฎาคม": {
+   "images": [
+    "reflab_assets/2569/07/reflab-slide-1.jpg",
+    "reflab_assets/2569/07/reflab-slide-2.jpg",
+    "reflab_assets/2569/07/reflab-slide-3.jpg",
+    "reflab_assets/2569/07/reflab-slide-4.jpg",
+    "reflab_assets/2569/07/reflab-slide-5.jpg",
+    "reflab_assets/2569/07/reflab-slide-6.jpg",
+    "reflab_assets/2569/07/reflab-slide-7.jpg",
+    "reflab_assets/2569/07/reflab-slide-8.jpg",
+    "reflab_assets/2569/07/reflab-slide-9.jpg"
+   ],
+   "count": 9,
+   "pdf": "reflab_assets/2569/07/reflab-07.pdf",
+   "titles": [
+    "Reference Laboratory — รายงานสถิติ ปี 2026",
+    "Monthly Weak D Testing Workload & Rh Variant Distribution in Patients",
+    "Reference Lab Testing Statistics & Workload (Ab Identification)",
+    "Antibody Identification Test — ผลการตรวจ",
+    "Unexpected Antibodies — กรกฎาคม 2026",
+    "Unexpected Antibody — แผนภูมิ",
+    "Reference Lab Testing Statistics & Workload (Antigen Typing & Crossmatch)",
+    "Reference Lab Testing Statistics & Workload (ABO Discrepancy & DAT)",
+    "Special Immunohematology Techniques"
+   ],
+   "drive": ""
   }
+ }
 };
 
 let MANIFEST = {};
 let curMonth = null;
 let lbSrcs = [], lbCaps = [], lbIndex = 0;
 
+  function showDrivePanel(m, info){
+    const titles = info.titles || [];
+    const url = String(info.drive || '').trim();
+    const n = info.count || titles.length || 0;
+    let html = '<div class="qc-drive">' +
+      '<h3>รายงาน Reference Laboratory เดือน'+m+' '+YEAR+'</h3>' +
+      '<div class="sub">ไฟล์รายงานเก็บไว้บน Google Drive' + (n ? ' · มีทั้งหมด '+n+' หน้า' : '') + '</div>';
+    if(titles.length){
+      html += '<ol>' + titles.map(t=>'<li>'+String(t).replace(/</g,'&lt;')+'</li>').join('') + '</ol>';
+    }
+    html += url
+      ? '<a class="go" href="'+url+'" target="_blank" rel="noopener">📂 เปิดรายงานใน Google Drive</a>'
+      : '<div class="none">⚠️ ยังไม่ได้ผูกลิงก์ Google Drive ของเดือนนี้' + (IS_LOCAL ? ' — ไปที่หน้า <a href="drive_links.html">จัดการลิงก์ Drive</a> เพื่อวางลิงก์' : '') + '</div>';
+    html += '</div>';
+    document.getElementById('gallery').innerHTML = html;
+  }
+
+  // ---------- ลิงก์ Google Drive (ตั้งค่าที่หน้า drive_links.html) ----------
+  const DRIVE_KEY = 'reflab_drive_links';
+  function mergeDriveLinks(){
+    let d = null;
+    try{ d = JSON.parse(localStorage.getItem(DRIVE_KEY) || 'null'); }catch(e){}
+    if(!d) return;
+    Object.keys(d).forEach(y=>{
+      MANIFEST[y] = MANIFEST[y] || {};
+      Object.keys(d[y]).forEach(mo=>{
+        const url = String(d[y][mo]||'').trim();
+        if(!url) return;
+        MANIFEST[y][mo] = MANIFEST[y][mo] || { images:[], titles:[], count:0 };
+        MANIFEST[y][mo].drive = url;
+      });
+    });
+  }
+
 function applyManifest(){
+    mergeDriveLinks();
   buildMonthBar();
   const avail = MONTHS.filter(m => MANIFEST[YEAR] && MANIFEST[YEAR][m]);
   selectMonth(avail.length ? avail[avail.length-1] : MONTHS[0]);
@@ -310,7 +368,7 @@ function buildMonthBar(){
     const b = document.createElement('button');
     b.className = 'qc-month'+(has?'':' disabled');
     b.innerHTML = MONTHS_SHORT[MONTHS.indexOf(m)] + (has?'<span class="has"></span>':'');
-    b.title = has ? m+' ('+MANIFEST[YEAR][m].count+' หน้า)' : m+' — ยังไม่มีข้อมูล';
+    b.title = has ? m+' ('+(MANIFEST[YEAR][m].count ? MANIFEST[YEAR][m].count+' หน้า' : 'ลิงก์ Drive')+')' : m+' — ยังไม่มีข้อมูล';
     if(has) b.onclick = ()=>selectMonth(m);
     bar.appendChild(b);
   });
@@ -348,7 +406,9 @@ function renderGallery(m){
   exportBtn.title = 'Export PDF เดือน'+m+' '+YEAR;
 
   const pdfBtn = document.getElementById('pdfOrigBtn');
-  if(info.pdf){ pdfBtn.href = info.pdf; pdfBtn.style.display = ''; }
+  const drv = String(info.drive||'').trim();
+  if(drv){ pdfBtn.href = drv; pdfBtn.target='_blank'; pdfBtn.textContent='📂 เปิดรายงานใน Google Drive'; pdfBtn.style.display=''; }
+  else if(info.pdf){ pdfBtn.href = encodeURI(info.pdf); pdfBtn.textContent='📂 เปิด PDF ต้นฉบับ'; pdfBtn.style.display = ''; }
   else { pdfBtn.style.display = 'none'; }
 
   // PDF-view mode: embed the original PDF inline instead of the image gallery
@@ -362,6 +422,8 @@ function renderGallery(m){
     return;
   }
 
+  // ไม่มีไฟล์รูป (เช่น บน GitHub ที่ไม่ได้อัปรูป) → ใช้ลิงก์ Google Drive แทน
+  if(!info.images || !info.images.length){ showDrivePanel(m, info); window.scrollTo({top:0,behavior:'smooth'}); return; }
   lbSrcs = info.images.slice();
   lbCaps = info.images.map((s,i)=> titles[i] || ('หน้า '+(i+1)));
 
@@ -371,12 +433,14 @@ function renderGallery(m){
     const n = String(i+1).padStart(2,'0');
     html += '<figure class="qc-card"><div class="qc-card-imgwrap" onclick="openLightbox('+i+')">'+
       '<span class="qc-num">'+n+'</span>'+
-      '<img loading="lazy" src="'+src+'" alt="'+cap.replace(/"/g,'&quot;')+'">'+
+      '<img id="rlimg-'+i+'" loading="lazy" src="'+encodeURI(src)+'" alt="'+cap.replace(/"/g,'&quot;')+'">'+
       '</div><figcaption>'+cap+'</figcaption></figure>';
   });
   html += '</div>';
   g.innerHTML = html;
   window.scrollTo({top:0,behavior:'smooth'});
+  const probe = g.querySelector('#rlimg-0');
+  if(probe) probe.addEventListener('error', ()=>showDrivePanel(m, info), {once:true});
 }
 
 function openLightbox(i){ lbIndex=i; renderLb(); document.getElementById('lightbox').classList.add('open'); document.body.style.overflow='hidden'; }

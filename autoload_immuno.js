@@ -284,6 +284,15 @@
     try { var pe = parsePlateletExpired(wb, H); if (pe) out.plateletExpired = pe; }
     catch (e) { /* ไม่มีชีต Platelet Exp. ก็ข้าม คงค่าเดิม */ }
 
+    // HTFDC Issue + Bovine Thrombin Issue — อ่านชีต "HTFDC Issue"
+    // ชีตนี้เก็บหลายปีในตารางเดียว จึงคืนเป็น map ปีพ.ศ. แล้วค่อยกระจายใน applyYear
+    try { var hi = parseHtfdcIssue(wb, H); if (hi) out.__htfdcByYear = hi; }
+    catch (e) { /* ไม่มีชีต HTFDC Issue ก็ข้าม คงค่าเดิม */ }
+
+    // Massive Transfusion Protocol — อ่านชีต "MTP" (แยก MTP (Non-TE) และ MTP-TE)
+    try { var mtp = parseMtp(wb, H); if (mtp) out.mtp = mtp; }
+    catch (e) { /* ไม่มีชีต MTP หรือรูปแบบต่างออกไป ก็ข้าม คงค่าเดิม */ }
+
     return out;
   }
 
@@ -328,19 +337,35 @@
     };
     function newArr12() { return [0,0,0,0,0,0,0,0,0,0,0,0]; }
 
-    var curIdx = -1, found = false;
+    // อ่านเป็น "บล็อก" ตามลำดับที่ปรากฏในชีตก่อน (ยังไม่ผูกกับเดือน)
+    // เหตุผล: เทมเพลตบางปีมีหัวเดือนหายไป (เช่น สถิติ 68/69 ไม่มีบล็อก March)
+    // ถ้าเชื่อชื่อหัวบล็อกตรง ๆ ข้อมูลตั้งแต่บล็อกที่ขาดเป็นต้นไปจะไปลงผิดเดือน
+    var blocks = [];   // [{ mi: ดัชนีเดือนจากชื่อหัว, vals: {ldppc:..} }]
+    var cur = null, found = false;
     for (var r = 0; r < g.length; r++) {
       var row = g[r] || [];
       var c0 = (row[0] != null) ? row[0] : "";
       var mi = monthIdx(c0);
-      if (mi >= 0) { curIdx = mi; continue; }
-      if (curIdx < 0) continue;
+      if (mi >= 0) { cur = { mi: mi, vals: {} }; blocks.push(cur); continue; }
+      if (!cur) continue;
       var tk = typeKey(c0);
       if (!tk) continue;
       var sum = 0;
       for (var c = 1; c <= 4; c++) { var v = tonumP(row[c]); if (v) sum += v; }
-      out[tk][curIdx] = sum;
+      cur.vals[tk] = sum;
       if (sum) found = true;
+    }
+
+    // เลือกวิธีจับบล็อก → เดือน
+    //  - ปกติ (หัวเดือนครบ/เรียงต่อเนื่องจาก ม.ค.) ทั้งสองวิธีให้ผลเท่ากัน
+    //  - ถ้าหัวเดือนขาดหาย ให้ยึด "ลำดับบล็อก" แทนชื่อหัว (บล็อกที่ k = เดือนที่ k)
+    //    เพราะผู้กรอกไล่กรอกลงบล็อกถัดไปเรื่อย ๆ ตามเดือนจริง
+    var usePosition = blocks.length > 0 && blocks.length <= 12 && blocks[0].mi === 0;
+    for (var b = 0; b < blocks.length; b++) {
+      var idx = usePosition ? b : blocks[b].mi;
+      if (idx < 0 || idx > 11) continue;
+      var vals = blocks[b].vals;
+      for (var key in vals) if (Object.prototype.hasOwnProperty.call(vals, key)) out[key][idx] = vals[key];
     }
     // อัปเดต total ต่อเดือน
     for (var k = 0; k < 12; k++) {
@@ -348,6 +373,152 @@
     }
     void found; // พบชีตแล้วคืนค่าเสมอ — ให้ข้อมูลต้นทางเป็นตัวตัดสิน
     return out;
+  }
+
+  /* ---------------------------------------------------------------------
+   *  HTFDC Issue (Heat-treated freeze-dried cryoprecipitate) และ
+   *  Bovine Thrombin Issue — ชีต "HTFDC Issue"
+   *  โครงสร้าง: 2 ตารางซ้อนกัน แต่ละตารางมีแถวหัว Jan..Dec แล้วตามด้วย
+   *  แถวข้อมูลปีละ 1 แถว โดยคอลัมน์แรกเป็น "ปี ค.ศ."
+   *  คืนค่าเป็น { "<ปีพ.ศ.>": { htfdc: [12], thrombin: [12] } }
+   * ------------------------------------------------------------------- */
+  function parseHtfdcIssue(wb, H) {
+    var g = H.sheetGrid(wb, "HTFDC Issue", window.XLSX);
+    if (!g || !g.length) return null;
+
+    var MON = ["jan","feb","mar","apr","may","jun","jul","aug","sep","oct","nov","dec"];
+    var out = {}, section = null, cols = null, any = false;
+
+    for (var r = 0; r < g.length; r++) {
+      var row = g[r] || [];
+      var c0  = String(row[0] == null ? "" : row[0]).trim();
+      var low = c0.toLowerCase();
+
+      // หัวตาราง — กำหนดว่ากำลังอ่าน section ไหน
+      if (low.indexOf("bovine") === 0) { section = "thrombin"; cols = null; continue; }
+      if (low.indexOf("htfdc")  === 0) { section = "htfdc";    cols = null; continue; }
+
+      // แถวหัวเดือน Jan..Dec — จำตำแหน่งคอลัมน์ของแต่ละเดือน
+      var found12 = 0, maybe = [];
+      for (var j = 1; j < row.length; j++) {
+        var sj = String(row[j] == null ? "" : row[j]).toLowerCase().replace(/[^a-z]/g, "").slice(0, 3);
+        var k  = MON.indexOf(sj);
+        if (k >= 0 && maybe[k] == null) { maybe[k] = j; found12++; }
+      }
+      if (found12 >= 12) { cols = maybe; continue; }
+
+      if (!section || !cols) continue;
+
+      // แถวข้อมูล: คอลัมน์แรกเป็นปี ค.ศ.
+      var ce = tonumP(c0);
+      if (ce === null || ce < 1900 || ce > 3000) continue;
+      var be = String(ce + 543);
+      if (!out[be]) out[be] = { htfdc: null, thrombin: null };
+      var arr = [];
+      for (var m = 0; m < 12; m++) arr.push(tonumP(row[cols[m]]));
+      out[be][section] = arr;
+      any = true;
+    }
+    return any ? out : null;
+  }
+
+  /* ---------------------------------------------------------------------
+   *  Massive Transfusion Protocol — ชีต "MTP"
+   *  ในชีตมี 3 บล็อก: "MTP (Non-TE)", "MTP-TE" และ "Massive Blood transfusions"
+   *  อ่านเฉพาะ 2 บล็อกแรก แต่ละบล็อกมีหัวตาราง 2 แถว (เดือน / Total (ราย) /
+   *  1..8 Set / จำนวนที่ใช้จริง → RBCs, FFP, Platelet (Adult), Cryo/HTFDC)
+   *  แล้วตามด้วยแถวเดือน ม.ค...ธ.ค. และแถว Total
+   *  คืนค่า { nonTE: {...}, te: {...} } โดยแต่ละชุดเป็น array 12 ช่อง (0=ม.ค.)
+   *  เดือนที่ยังไม่กรอกจะเป็น null (ไม่ใช่ 0) เพื่อไม่ให้กราฟลากเส้นเป็นศูนย์
+   * ------------------------------------------------------------------- */
+  function parseMtp(wb, H) {
+    var g = H.sheetGrid(wb, "MTP", window.XLSX);
+    if (!g || !g.length) return null;
+
+    var TH = ["ม.ค.","ก.พ.","มี.ค.","เม.ย.","พ.ค.","มิ.ย.","ก.ค.","ส.ค.","ก.ย.","ต.ค.","พ.ย.","ธ.ค."];
+    function monthIdxTH(v) {
+      var s = String(v == null ? "" : v).replace(/\s/g, "");
+      for (var i = 0; i < TH.length; i++) if (s === TH[i] || s === TH[i].replace(/\./g, "")) return i;
+      return -1;
+    }
+    function low(v) { return String(v == null ? "" : v).toLowerCase().replace(/\s+/g, " ").trim(); }
+    function blank(v) { return v === null || v === undefined || String(v).trim() === ""; }
+    function newSet() { var a = []; for (var i = 0; i < 12; i++) a.push(null); return a; }
+    // "CRYO 4=40" → 40 (จำนวนยูนิทที่ใช้จริงหลังเครื่องหมาย =)
+    function cryoUnits(v) {
+      if (blank(v)) return null;
+      var m = String(v).match(/=\s*(\d+)/);
+      if (m) return parseInt(m[1], 10);
+      return tonumP(v);
+    }
+
+    function emptyBlock(withSets) {
+      var o = { cases: newSet(), rbc: newSet(), ffp: newSet(), platelet: newSet(), cryo: newSet() };
+      if (withSets) { o.sets = {}; for (var k = 1; k <= 8; k++) o.sets["s" + k] = newSet(); }
+      return o;
+    }
+
+    var out = { nonTE: emptyBlock(true), te: emptyBlock(false) };
+    var block = null, cols = null, gotAny = false;
+
+    for (var r = 0; r < g.length; r++) {
+      var row = g[r] || [];
+      var c0  = row[0];
+      var l0  = low(c0);
+
+      // --- แถวชื่อบล็อก ---
+      if (!blank(c0) && monthIdxTH(c0) < 0 && l0 !== "total" && l0 !== "เดือน") {
+        if (l0.indexOf("mtp-te") === 0 || l0.indexOf("mtp -te") === 0) { block = "te"; cols = null; }
+        else if (l0.indexOf("mtp") === 0) { block = "nonTE"; cols = null; }
+        else { block = null; cols = null; }   // เช่น "Massive Blood transfusions" — ไม่อ่าน
+        continue;
+      }
+      if (!block) continue;
+
+      // --- แถวหัวตาราง (มี 2 แถว) : เก็บตำแหน่งคอลัมน์จากชื่อหัว ---
+      if (l0 === "เดือน" || (blank(c0) && cols && !cols.done)) {
+        if (l0 === "เดือน") cols = { sets: {}, done: false };
+        for (var j = 1; j < row.length; j++) {
+          var lb = low(row[j]);
+          if (!lb) continue;
+          if (lb.indexOf("total") === 0)            cols.cases = j;
+          else if (/^[1-8] set$/.test(lb))          cols.sets["s" + lb.charAt(0)] = j;
+          else if (lb.indexOf("rbc") === 0)         cols.rbc = j;
+          else if (lb.indexOf("ffp") === 0)         cols.ffp = j;
+          else if (lb.indexOf("platelet") === 0)    cols.platelet = j;
+          else if (lb.indexOf("cryo") === 0)        cols.cryo = j;
+        }
+        continue;
+      }
+
+      // --- แถวข้อมูลรายเดือน ---
+      var mi = monthIdxTH(c0);
+      if (mi < 0 || !cols) continue;
+
+      var tgt = out[block];
+      // เดือนนั้นถือว่า "มีข้อมูล" เมื่อจำนวนราย > 0 หรือมีช่องอื่นที่ไม่ว่าง
+      // (เทมเพลตเติมเลข 0 ไว้ล่วงหน้าในเดือนที่ยังไม่ถึง)
+      var others = false;
+      for (var cc = 1; cc < row.length; cc++) {
+        if (cc === cols.cases) continue;
+        if (!blank(row[cc])) { others = true; break; }
+      }
+      var nCase = tonumP(row[cols.cases]);
+      if (!others && !(nCase > 0)) continue;   // ยังไม่กรอก — คงค่า null
+
+      gotAny = true;
+      tgt.cases[mi]    = nCase === null ? 0 : nCase;
+      tgt.rbc[mi]      = cols.rbc      != null ? tonumP(row[cols.rbc])      : null;
+      tgt.ffp[mi]      = cols.ffp      != null ? tonumP(row[cols.ffp])      : null;
+      tgt.platelet[mi] = cols.platelet != null ? tonumP(row[cols.platelet]) : null;
+      tgt.cryo[mi]     = cols.cryo     != null ? cryoUnits(row[cols.cryo])  : null;
+      if (tgt.sets) {
+        for (var sk in cols.sets) if (Object.prototype.hasOwnProperty.call(cols.sets, sk)) {
+          tgt.sets[sk][mi] = tonumP(row[cols.sets[sk]]) || 0;
+        }
+      }
+    }
+    return gotAny ? out : null;
   }
 
   function matchYear(filename) {
@@ -376,6 +547,26 @@
     var prev = BLOOD_IMMUNO_DATA[key] || {};
     if (data.plateletExpired == null && prev.plateletExpired != null) {
       data.plateletExpired = prev.plateletExpired;
+    }
+
+    // --- HTFDC / Bovine Thrombin Issue: ชีตเดียวมีหลายปี กระจายลงทุกปีที่มีอยู่ ---
+    var hasVal = function (a) { return a && a.some(function (x) { return x !== null && x !== 0; }); };
+    if (data.__htfdcByYear) {
+      Object.keys(data.__htfdcByYear).forEach(function (yy) {
+        var src = data.__htfdcByYear[yy];
+        var tgt = (yy === key) ? data : BLOOD_IMMUNO_DATA[yy];
+        if (!tgt) return;
+        var cur = tgt.htfdcIssue || { htfdc: null, thrombin: null };
+        if (hasVal(src.htfdc))    cur.htfdc    = src.htfdc;
+        if (hasVal(src.thrombin)) cur.thrombin = src.thrombin;
+        if (cur.htfdc || cur.thrombin) tgt.htfdcIssue = cur;
+      });
+    }
+    if (data.htfdcIssue == null && prev.htfdcIssue != null) {
+      data.htfdcIssue = prev.htfdcIssue;
+    }
+    if (data.mtp == null && prev.mtp != null) {
+      data.mtp = prev.mtp;
     }
     if (prev.antibodyId && prev.antibodyId.patient &&
         data.antibodyId && data.antibodyId.patient &&
