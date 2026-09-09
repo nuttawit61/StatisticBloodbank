@@ -106,6 +106,33 @@
     "Special Immunohematology Techniques"
    ],
    "drive": ""
+  },
+  "สิงหาคม": {
+   "images": [
+    "reflab_assets/2569/08/reflab-slide-1.jpg",
+    "reflab_assets/2569/08/reflab-slide-2.jpg",
+    "reflab_assets/2569/08/reflab-slide-3.jpg",
+    "reflab_assets/2569/08/reflab-slide-4.jpg",
+    "reflab_assets/2569/08/reflab-slide-5.jpg",
+    "reflab_assets/2569/08/reflab-slide-6.jpg",
+    "reflab_assets/2569/08/reflab-slide-7.jpg",
+    "reflab_assets/2569/08/reflab-slide-8.jpg",
+    "reflab_assets/2569/08/reflab-slide-9.jpg"
+   ],
+   "count": 9,
+   "pdf": "reflab_assets/2569/08/reflab-08.pdf",
+   "titles": [
+    "Reference Laboratory — รายงานสถิติ ปี 2026",
+    "Monthly Weak D Testing Workload & Rh Variant Distribution in Patients",
+    "Reference Lab Testing Statistics & Workload (Ab Identification)",
+    "Antibody Identification Test — ผลการตรวจ",
+    "Unexpected Antibodies — สิงหาคม 2026",
+    "Unexpected Antibody — แผนภูมิ",
+    "Reference Lab Testing Statistics & Workload (Antigen Typing & Crossmatch)",
+    "Reference Lab Testing Statistics & Workload (ABO Discrepancy & DAT)",
+    "Special Immunohematology Techniques"
+   ],
+   "drive": ""
   }
  }
 }
