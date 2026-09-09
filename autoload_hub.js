@@ -17,6 +17,13 @@
   });
 
   function wire() {
+    // เปิดผ่านเว็บ (GitHub Pages) -> ซ่อนปุ่มเชื่อมโฟลเดอร์ทั้งแถว
+    if (!DashboardAutoload.isLocal) {
+      var row = document.getElementById("connectAllRow");
+      if (row) row.style.display = "none";
+      return;
+    }
+
     var btn = document.getElementById("connectAllBtn");
     var status = document.getElementById("connectAllStatus");
     if (!btn) return;

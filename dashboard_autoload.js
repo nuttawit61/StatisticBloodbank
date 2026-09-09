@@ -99,9 +99,23 @@
       .catch(function () { /* ไม่มีสิทธิ์เขียน — ยังมี localStorage สำรองอยู่ */ });
   }
 
+  // ---------- ตรวจว่าเปิดจาก "เครื่องตัวเอง" หรือ "เว็บ (GitHub Pages)" ----------
+  // เปิดที่เครื่อง (file:// หรือ localhost / วง LAN) -> แสดงแถบเชื่อมโฟลเดอร์ตามปกติ
+  // เปิดผ่านเว็บ เช่น GitHub Pages       -> ซ่อนทั้งหมด (อ่านข้อมูลจากไฟล์ live_*.js อย่างเดียว)
+  var LOCAL_MODE = (function () {
+    try {
+      if (location.protocol === "file:") return true;
+      var h = (location.hostname || "").toLowerCase();
+      return h === "" || h === "localhost" || h === "127.0.0.1" || h === "::1" || h === "[::1]" ||
+             /\.local$/.test(h) || /^192\.168\./.test(h) || /^10\./.test(h) ||
+             /^172\.(1[6-9]|2\d|3[01])\./.test(h);
+    } catch (e) { return false; }
+  })();
+
   // ---------- UI ----------
   var bar, statusEl, btnEl, hintEl;
   function buildUI(cfg) {
+    if (!LOCAL_MODE) return;            // เปิดผ่านเว็บ: ไม่สร้างแถบเชื่อมข้อมูล
     bar = document.createElement("div");
     bar.id = "autoload-bar";
     bar.innerHTML =
@@ -323,12 +337,17 @@
     helpers: H,
     register: function (cfg) {
       cfgRef = cfg;
-      function go() { buildUI(cfg); applyOfflineSnapshot(cfg); tryRestore(cfg); }
+      function go() {
+        if (LOCAL_MODE) buildUI(cfg);
+        applyOfflineSnapshot(cfg);
+        if (LOCAL_MODE) tryRestore(cfg);
+      }
       if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", go);
       else go();
     },
     // ให้หน้ารวมเรียกเปิดตัวเลือกโฟลเดอร์ได้ (เชื่อมครั้งเดียวใช้ทุก Dashboard)
-    connect: function () { if (cfgRef) onConnectClick(cfgRef); },
+    isLocal: LOCAL_MODE,
+    connect: function () { if (LOCAL_MODE && cfgRef) onConnectClick(cfgRef); },
     isConnected: function () { return !!(dirHandleRef || fileHandleRef); }
   };
 })();
