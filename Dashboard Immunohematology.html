@@ -2622,7 +2622,14 @@ function buildCharts() {
     const ai = getAvailableIdx(y);
     return sum(d.request.totalCrossmatch, ai);
   });
-  const yearLabelsAnnotated = allYears.map(y => y === 2569 ? '2569*' : String(y));
+  // ปีล่าสุดที่ข้อมูลยังไม่ครบ 12 เดือน — คำนวณจากข้อมูลจริง (ไม่ฮาร์ดโค้ด)
+  const partialYears = allYears.filter(y => { const n = getAvailableIdx(y).length; return n > 0 && n < 12; });
+  const lastMonthLabel = (y) => {
+    const ai = getAvailableIdx(y);
+    if (!ai.length) return '';
+    return MONTHS_FY[ai[ai.length - 1]] + ' ' + String(y).slice(-2);
+  };
+  const yearLabelsAnnotated = allYears.map(y => partialYears.includes(y) ? y + '*' : String(y));
   chartSpecimens = new Chart(ctxSpec, {
     type: 'line',
     data: {
@@ -2670,8 +2677,22 @@ function buildCharts() {
             afterTitle: ctx => {
               const y = parseInt(ctx[0].label);
               const ai = getAvailableIdx(y);
-              if (ai.length < 12) return `(ข้อมูล ${ai.length} เดือน — ถึง พ.ค. 69)`;
+              if (ai.length > 0 && ai.length < 12) return `(ข้อมูล ${ai.length} เดือน — ถึง ${lastMonthLabel(y)})`;
               return '';
+            },
+            afterBody: ctx => {
+              // เทียบช่วงเดียวกันกับปีล่าสุดที่ข้อมูลไม่ครบปี
+              const y = parseInt(ctx[0].label);
+              const py = partialYears[partialYears.length - 1];
+              if (!py || y === py) return '';
+              const d = getYearData(y);
+              if (!d) return '';
+              const n = getAvailableIdx(py);
+              return [
+                `ช่วงเดียวกัน (${MONTHS_FY[n[0]]}–${MONTHS_FY[n[n.length - 1]]}):`,
+                `  Request ${fmt(sum(d.request.totalSpecimens, n))} ราย`,
+                `  Crossmatch ${fmt(sum(d.request.totalCrossmatch, n))} ครั้ง`
+              ];
             }
           }
         }
@@ -2707,7 +2728,10 @@ function buildCharts() {
         ctx.fillStyle = '#9ca3af';
         ctx.textAlign = 'left';
         ctx.textBaseline = 'bottom';
-        ctx.fillText('* ข้อมูลปี 2569 ถึงเดือน พ.ค. 69 เท่านั้น', area.left + 2, area.bottom - 4);
+        if (partialYears.length) {
+          const py = partialYears[partialYears.length - 1];
+          ctx.fillText(`* ข้อมูลปี ${py} ถึงเดือน ${lastMonthLabel(py)} เท่านั้น (${getAvailableIdx(py).length} เดือน)`, area.left + 2, area.bottom - 4);
+        }
         ctx.restore();
       }
     }]

@@ -404,8 +404,8 @@ if (sessionStorage.getItem('auth') !== 'ok') { /* location.replace('login.html')
       <div class="chart-header"><div class="chart-title"><h3>สัดส่วนวิธีตรวจ (Method)</h3><p>NGS / SSO / SSP / RT-PCR ของช่วงที่เลือก</p></div></div>
       <div class="chart-wrap">
         <canvas id="chartMethod"></canvas>
-        <img src="file:///C:/Users/Tam/.gemini/antigravity/brain/4151c06c-b2c9-46a1-aa3a-dc1190c0c833/dna_method_icon_1782667388616.png" 
-             style="position: absolute; top: 42%; left: 50%; transform: translate(-50%, -50%); width: 140px; height: 140px; pointer-events: none; mix-blend-mode: multiply; opacity: 0.9;" alt="DNA Method Icon" />
+        <img src="dna_method_icon.png"
+             style="position: absolute; top: 42%; left: 50%; transform: translate(-50%, -50%); width: 120px; height: 120px; pointer-events: none;" alt="" />
       </div>
     </div>
   </div>
@@ -416,7 +416,7 @@ if (sessionStorage.getItem('auth') !== 'ok') { /* location.replace('login.html')
       <div class="chart-wrap"><canvas id="chartMethodTrend"></canvas></div>
     </div>
     <div class="chart-card fade-up" style="animation-delay:0.33s;">
-      <div class="chart-header"><div class="chart-title"><h3>HLA for ADR / Disease Association รายเดือน</h3><p>B*15:02 / B*58:01 / B*57:01 / B*51 (ราย)</p></div></div>
+      <div class="chart-header"><div class="chart-title"><h3>HLA for ADR / Disease Association รายเดือน</h3><p>B*15:02 / B*58:01 / B*57:01 (ราย)</p></div></div>
       <div class="chart-wrap"><canvas id="chartADR"></canvas></div>
     </div>
   </div>
@@ -610,7 +610,7 @@ function renderMonthPanel(){
   const dnaTotal=gv('dna_total');
   const ngs=gv('dna_m_ngs');
   const sso=gv('dna_m_sso');
-  const adr=gv('dna_adr_b1502')+gv('dna_adr_b5801')+gv('dna_adr_b5701')+gv('dna_adr_b51');
+  const adr=gv('dna_adr_b1502')+gv('dna_adr_b5801')+gv('dna_adr_b5701');
   p.innerHTML=`
     <div class="mdp-month-badge"><div class="mdp-month-name">${MONTHS_FULL[i]}</div><div class="mdp-month-year">${selectedYear}</div></div>
     <div class="mdp-divider"></div>
@@ -743,8 +743,8 @@ function renderKPI2(){
 function renderADR(){
   const pi=getCurrentIdxs();
   const b1502=sumOf('dna_adr_b1502',pi), b5801=sumOf('dna_adr_b5801',pi),
-        b5701=sumOf('dna_adr_b5701',pi), b51=sumOf('dna_adr_b51',pi);
-  const total=b1502+b5801+b5701+b51;
+        b5701=sumOf('dna_adr_b5701',pi);
+  const total=b1502+b5801+b5701;
   const sh=v=>total>0?pct(v,total):0;
 
   const items=[
@@ -856,8 +856,7 @@ function renderTable(){
     ${row('5.1','B*15:02','dna_adr_b1502')}
     ${row('5.2','B*58:01','dna_adr_b5801')}
     ${row('5.3','B*57:01','dna_adr_b5701')}
-    ${row('5.4','B*51','dna_adr_b51')}
-    ${totalRowCalc('TOTAL (HLA for ADR)',['dna_adr_b1502','dna_adr_b5801','dna_adr_b5701','dna_adr_b51'])}
+    ${totalRowCalc('TOTAL (HLA for ADR)',['dna_adr_b1502','dna_adr_b5801','dna_adr_b5701'])}
 
     ${grp('6. KPI — NGS Quality')}
     ${row('6.1','First Pass Success (ราย)','dna_kpi_firstpass')}
@@ -939,7 +938,6 @@ function buildCharts(){
     {label:'B*15:02',data:ga('dna_adr_b1502'),backgroundColor:PAL.indigo,borderRadius:4},
     {label:'B*58:01',data:ga('dna_adr_b5801'),backgroundColor:PAL.v2,borderRadius:4},
     {label:'B*57:01',data:ga('dna_adr_b5701'),backgroundColor:PAL.v4,borderRadius:4},
-    {label:'B*51',data:ga('dna_adr_b51'),backgroundColor:PAL.amber,borderRadius:4},
   ]},options:baseOpts(true)});
 }
 
