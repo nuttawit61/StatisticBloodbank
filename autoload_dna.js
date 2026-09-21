@@ -2,7 +2,7 @@
  *  autoload_dna.js — ตัวเชื่อมข้อมูลเฉพาะห้อง DNA Laboratory
  *  อ่าน 2 ชีต:
  *    "DNA"     — ตารางแบบใหม่ (กลุ่ม BMT/Solid Organ/Post KT + Method summary
- *                + ADR + KPI) -> คีย์ dna_* ของ DNA2569
+ *                + ADR + KPI + NGS TAT Min/Max/Average) -> คีย์ dna_* ของ DNA2569
  *    "Luminex" — เดือนละ 3 คอลัมน์ (Service ศิริราช + ร.พ.อื่น ๆ + EQAS)
  *                -> คีย์ lum_* + lum_eqas
  *  อัพเดทเฉพาะปีปัจจุบัน (2569) — ปีเก่าโครงสร้างต่างกัน คงข้อมูลเดิมไว้
@@ -47,7 +47,7 @@
           var row = g[r] || [];
           return mcols.map(function (c) { return c < row.length ? tonum(row[c]) : null; });
         };
-        var curGroup = null, pastMethod = false, adrStarted = false;
+        var curGroup = null, pastMethod = false, adrStarted = false, tatStarted = false;
         for (var r = 0; r < g.length; r++) {
           var rw = g[r] || [];
           var A = rw.length > 0 ? rw[0] : null;
@@ -68,6 +68,14 @@
           // KPI (จับจากคอลัมน์ A — ป้ายไม่ซ้ำ)
           if (an.indexOf("firstpass") >= 0) out.dna_kpi_firstpass = vals(r);
           else if (an.indexOf("repeat") >= 0) out.dna_kpi_repeat = vals(r);
+
+          // NGS Turnaround Time — หัวตาราง "NGS TAT (28 days)" แล้วตามด้วยแถว Min / Max / Average (หน่วย: วัน)
+          if (an.indexOf("ngstat") >= 0 || an.indexOf("turnaround") >= 0) { tatStarted = true; continue; }
+          if (tatStarted) {
+            if (an === "min") { out.dna_tat_min = vals(r); continue; }
+            if (an === "max") { out.dna_tat_max = vals(r); continue; }
+            if (an === "average" || an === "avg" || an === "mean" || an === "เฉลี่ย") { out.dna_tat_avg = vals(r); continue; }
+          }
 
           // ADR / HLA disease association (จับจากคอลัมน์ C — ป้ายไม่ซ้ำ)
           var key = cn.replace(/[^a-z0-9]/g, "");

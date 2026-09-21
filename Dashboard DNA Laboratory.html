@@ -395,6 +395,12 @@ if (sessionStorage.getItem('auth') !== 'ok') { /* location.replace('login.html')
   </div>
   <div class="kpi-grid" id="kpiGridADR" style="margin-bottom:32px;"></div>
 
+  <div class="kpi-section-title fade-up" style="animation-delay:0.24s;">
+    <span>⏱️ NGS Turnaround Time (TAT) — เป้าหมาย ≤ 28 วัน</span>
+    <span style="font-size:12px; font-weight:normal; color:var(--text-3); margin-left:auto;" id="tatPeriodNote"></span>
+  </div>
+  <div class="kpi-grid" id="kpiGridTAT" style="margin-bottom:32px;"></div>
+
   <div class="charts-grid">
     <div class="chart-card fade-up" style="animation-delay:0.25s;">
       <div class="chart-header"><div class="chart-title"><h3>HLA-DNA Typing รายเดือน — แยกตามกลุ่มงาน</h3><p>BMT / Solid Organ / Post-KT (ราย)</p></div></div>
@@ -418,6 +424,13 @@ if (sessionStorage.getItem('auth') !== 'ok') { /* location.replace('login.html')
     <div class="chart-card fade-up" style="animation-delay:0.33s;">
       <div class="chart-header"><div class="chart-title"><h3>HLA for ADR / Disease Association รายเดือน</h3><p>B*15:02 / B*58:01 / B*57:01 (ราย)</p></div></div>
       <div class="chart-wrap"><canvas id="chartADR"></canvas></div>
+    </div>
+  </div>
+
+  <div class="charts-grid">
+    <div class="chart-card fade-up" style="animation-delay:0.36s; grid-column:1 / -1;">
+      <div class="chart-header"><div class="chart-title"><h3>NGS Turnaround Time รายเดือน</h3><p>Min / Average / Max (วัน) เทียบเป้าหมาย 28 วัน</p></div></div>
+      <div class="chart-wrap"><canvas id="chartTAT"></canvas></div>
     </div>
   </div>
 
@@ -522,6 +535,10 @@ const DNA2569 = {
   // --- KPI (NGS) ---
   dna_kpi_firstpass: [0,0,22,47,44, null,null,null,null,null,null,null],
   dna_kpi_repeat:    [0,0,0,0,0, null,null,null,null,null,null,null],
+  // --- NGS Turnaround Time (วัน) — เป้าหมาย ≤ 28 วัน ---
+  dna_tat_min:       [null,null,9,13,9,10,10,11, null,null,null,null],
+  dna_tat_max:       [null,null,26,27,27,27,28,23, null,null,null,null],
+  dna_tat_avg:       [null,null,16,18,18,17,20,17, null,null,null,null],
 
   // ===== Luminex (Service = ศิริราช + ร.พ.อื่น ๆ) — 3 months =====
   lum_screening:   [47,71,47, null,null,null,null,null,null,null,null,null],
@@ -765,6 +782,49 @@ function renderADR(){
   document.getElementById('kpiGridADR').innerHTML = kpis.map(renderKpiCard).join('');
 }
 
+// =====================================================
+//  KPI GRID — NGS Turnaround Time (เป้าหมาย ≤ 28 วัน)
+// =====================================================
+const TAT_TARGET = 28;
+function tatStats(idxs){
+  const d=currentData();
+  const pick=k=>idxs.map(i=>(d[k]&&d[k][i]!=null)?d[k][i]:null).filter(v=>v!=null);
+  const mins=pick('dna_tat_min'), maxs=pick('dna_tat_max'), avgs=pick('dna_tat_avg');
+  const mean=a=>a.length?a.reduce((x,y)=>x+y,0)/a.length:null;
+  const monthsWith=idxs.filter(i=>d.dna_tat_max&&d.dna_tat_max[i]!=null);
+  const pass=monthsWith.filter(i=>d.dna_tat_max[i]<=TAT_TARGET);
+  return { min:mins.length?Math.min(...mins):null, max:maxs.length?Math.max(...maxs):null,
+           avg:mean(avgs), n:monthsWith.length, pass:pass.length, monthsWith };
+}
+function renderTAT(){
+  const pi=getCurrentIdxs(), t=tatStats(pi);
+  const single=selectedMonth!==null;
+  const note=document.getElementById('tatPeriodNote');
+  if(note) note.textContent = single ? `${MONTHS_FULL[selectedMonth]} ${selectedYear}` : (t.n?`${t.n} เดือนที่มีข้อมูล (${MONTHS_FY[t.monthsWith[0]]}–${MONTHS_FY[t.monthsWith[t.n-1]]})`:'');
+  const dec=v=>(v!=null&&!Number.isInteger(v))?1:0;
+  const dv=v=>v==null?'–':fmt(v,dec(v));
+  const badge=v=>v==null?'<span class="kpi-badge same">ไม่มีข้อมูล</span>'
+    : (v<=TAT_TARGET?`<span class="kpi-badge up">✓ ภายใน ${TAT_TARGET} วัน</span>`:`<span class="kpi-badge down">✗ เกิน ${TAT_TARGET} วัน</span>`);
+  const gap=v=>v==null?'–':(v===TAT_TARGET?'เท่ากับเป้าหมายพอดี':v<TAT_TARGET?`เหลือ ${fmt(TAT_TARGET-v,dec(v))} วันก่อนถึงเป้า`:`เกินเป้า ${fmt(v-TAT_TARGET,dec(v))} วัน`);
+  const passPct=t.n?Math.round(t.pass/t.n*100):null;
+  const kpis=[
+    { icon:'⏱️', label:'TAT เฉลี่ย (Average)', val:t.avg==null?'–':`${dv(t.avg)} <span style="font-size:14px;font-weight:600;">วัน</span>`,
+      sub: single?'ค่าเฉลี่ยของเดือนที่เลือก':'ค่าเฉลี่ยของ Average รายเดือน', color:'var(--indigo)', bg:'var(--indigo-lt)', badge:badge(t.avg),
+      splits:[{label:'เทียบเป้าหมาย 28 วัน', wide:true, val:gap(t.avg)}] },
+    { icon:'⚡', label:'TAT เร็วที่สุด (Min)', val:t.min==null?'–':`${dv(t.min)} <span style="font-size:14px;font-weight:600;">วัน</span>`,
+      sub: single?'ค่าต่ำสุดของเดือนที่เลือก':'ค่าต่ำสุดของทุกเดือน', color:'var(--teal)', bg:'var(--teal-lt)', badge:badge(t.min),
+      splits:[{label:'เทียบเป้าหมาย 28 วัน', wide:true, val:gap(t.min)}] },
+    { icon:'🐢', label:'TAT นานที่สุด (Max)', val:t.max==null?'–':`${dv(t.max)} <span style="font-size:14px;font-weight:600;">วัน</span>`,
+      sub: single?'ค่าสูงสุดของเดือนที่เลือก':'ค่าสูงสุดของทุกเดือน', color:'var(--amber)', bg:'var(--amber-lt)', badge:badge(t.max),
+      splits:[{label:'เทียบเป้าหมาย 28 วัน', wide:true, val:gap(t.max)}] },
+    { icon:'🎯', label:'ผ่านเกณฑ์ ≤ 28 วัน', val:t.n?`${t.pass}/${t.n} <span style="font-size:14px;font-weight:600;">เดือน</span>`:'–',
+      sub:'เดือนที่ TAT สูงสุด (Max) ไม่เกิน 28 วัน', color:'var(--green)', bg:'var(--green-lt)',
+      badge: passPct==null?'<span class="kpi-badge same">ไม่มีข้อมูล</span>':`<span class="kpi-badge ${passPct===100?'up':'down'}">${passPct}%</span>`,
+      splits:[{label:'สถานะ', wide:true, val: t.n? (t.pass===t.n?'ทุกเดือนอยู่ในเกณฑ์':`ไม่ผ่าน ${t.n-t.pass} เดือน`) : '–'}] },
+  ];
+  document.getElementById('kpiGridTAT').innerHTML = kpis.map(renderKpiCard).join('');
+}
+
 function renderKpiCard(k){
   return `<div class="kpi-card fade-up" style="--kpi-color:${k.color}; --kpi-bg:${k.bg};">
     <div style="display:flex; justify-content:space-between; align-items:flex-start;">
@@ -820,6 +880,17 @@ function renderTable(){
     return `<tr class="tr-total"><td class="text-left sticky-col-1"></td><td class="text-left sticky-col-2">${name}</td>${cells}<td class="col-total">${arr?fmt(sum(arr,tIdxs)):'–'}</td></tr>`;
   };
 
+  // แถว TAT (หน่วยวัน) — คอลัมน์รวมใช้ค่าเฉลี่ยแทนผลรวม (ตรงกับ Excel =AVERAGE)
+  const tatRow=(num,name,key)=>{
+    const arr=currentData()[key];
+    const cells=tIdxs.map(i=>{const ac=active.has(i)?'active-month-col':'';const v=arr?arr[i]:null;
+      const over=(v!=null&&v>TAT_TARGET)?' style="color:var(--red);font-weight:700;"':'';
+      return `<td class="${ac}"${over}>${v!=null?fmt(v):'–'}</td>`;}).join('');
+    const vs=arr?tIdxs.map(i=>arr[i]).filter(v=>v!=null):[];
+    const avg=vs.length?vs.reduce((a,b)=>a+b,0)/vs.length:null;
+    return `<tr><td class="text-left sticky-col-1">${num}</td><td class="text-left sticky-col-2">${name}</td>${cells}<td class="col-total">${avg!=null?fmt(avg,1):'–'}</td></tr>`;
+  };
+
   const tbody=`<tbody>
     ${grp('1. BMT — HLA-DNA Typing (ราย)')}
     ${row('1.1','PT.BMT — NGS','dna_bmt_pt_ngs')}
@@ -861,6 +932,11 @@ function renderTable(){
     ${grp('6. KPI — NGS Quality')}
     ${row('6.1','First Pass Success (ราย)','dna_kpi_firstpass')}
     ${row('6.2','Repeat (ราย)','dna_kpi_repeat')}
+
+    ${grp('7. NGS Turnaround Time (วัน) — เป้าหมาย ≤ 28 วัน · คอลัมน์รวม = ค่าเฉลี่ย')}
+    ${tatRow('7.1','TAT Min','dna_tat_min')}
+    ${tatRow('7.2','TAT Max','dna_tat_max')}
+    ${tatRow('7.3','TAT Average','dna_tat_avg')}
   </tbody>`;
   document.getElementById('dataTable').innerHTML=thead+tbody;
 }
@@ -868,8 +944,8 @@ function renderTable(){
 // =====================================================
 //  CHARTS
 // =====================================================
-let cGroup,cMethod,cMethodTrend,cADR;
-function destroyCharts(){ [cGroup,cMethod,cMethodTrend,cADR].forEach(c=>c&&c.destroy()); }
+let cGroup,cMethod,cMethodTrend,cADR,cTAT;
+function destroyCharts(){ [cGroup,cMethod,cMethodTrend,cADR,cTAT].forEach(c=>c&&c.destroy()); }
 
 function buildCharts(){
   destroyCharts();
@@ -939,12 +1015,30 @@ function buildCharts(){
     {label:'B*58:01',data:ga('dna_adr_b5801'),backgroundColor:PAL.v2,borderRadius:4},
     {label:'B*57:01',data:ga('dna_adr_b5701'),backgroundColor:PAL.v4,borderRadius:4},
   ]},options:baseOpts(true)});
+
+  // 5. NGS Turnaround Time — Min / Average / Max + เส้นเป้าหมาย 28 วัน
+  const gn=key=>idxs.map(i=>(d[key]&&d[key][i]!=null)?d[key][i]:null);
+  const hl=(base)=>idxs.map(i=>(selectedMonth!==null&&i===selectedMonth)?7:(selectedMonth!==null?3:4));
+  const tatMaxVal=Math.max(TAT_TARGET, ...gn('dna_tat_max').filter(v=>v!=null));
+  cTAT=new Chart(document.getElementById('chartTAT'),{type:'line',plugins,data:{labels:lbl,datasets:[
+    {label:'Max',data:gn('dna_tat_max'),borderColor:PAL.orange,backgroundColor:PAL.orange,pointRadius:hl(),tension:0.3,spanGaps:true,
+      datalabels:{align:'top',anchor:'end',color:PAL.orange,font:{size:10,weight:'800'},formatter:v=>v!=null?v:''}},
+    {label:'Average',data:gn('dna_tat_avg'),borderColor:PAL.indigo,backgroundColor:'rgba(124,58,237,0.08)',borderWidth:3,pointRadius:hl(),tension:0.3,spanGaps:true,fill:false,
+      datalabels:{align:'top',anchor:'end',color:PAL.indigo,font:{size:11,weight:'800'},formatter:v=>v!=null?v:''}},
+    {label:'Min',data:gn('dna_tat_min'),borderColor:PAL.teal,backgroundColor:PAL.teal,pointRadius:hl(),tension:0.3,spanGaps:true,
+      datalabels:{align:'bottom',anchor:'start',color:PAL.teal,font:{size:10,weight:'800'},formatter:v=>v!=null?v:''}},
+    {label:`เป้าหมาย ${TAT_TARGET} วัน`,data:idxs.map(()=>TAT_TARGET),borderColor:PAL.red,borderDash:[6,5],borderWidth:2,pointRadius:0,fill:false,
+      datalabels:{display:false}},
+  ]},options:{responsive:true,maintainAspectRatio:false,layout:{padding:{top:22,bottom:6}},
+    plugins:{legend:{display:true,position:'top',labels:{boxWidth:12,font:{size:11}}},
+      tooltip:{callbacks:{label:c=>`${c.dataset.label}: ${c.parsed.y!=null?c.parsed.y+' วัน':'–'}`}}},
+    scales:{x:{grid:{display:false}},y:{beginAtZero:true,suggestedMax:Math.ceil((tatMaxVal+4)/5)*5,title:{display:true,text:'วัน'}}}}});
 }
 
 // =====================================================
 //  REFRESH
 // =====================================================
-function refresh(){ buildYearTabs(); buildMonthTabs(); renderMonthPanel(); renderKPI(); renderKPI2(); renderADR(); renderTable(); buildCharts(); }
+function refresh(){ buildYearTabs(); buildMonthTabs(); renderMonthPanel(); renderKPI(); renderKPI2(); renderADR(); renderTAT(); renderTable(); buildCharts(); }
 window.addEventListener('DOMContentLoaded', ()=>{ refresh(); });
 function exportToPDF(){ window.print(); }
 function triggerSoftRefresh(){ const b=document.getElementById('btnRefresh'); if(b)b.classList.add('spinning'); refresh(); setTimeout(()=>{if(b)b.classList.remove('spinning');},400); }
