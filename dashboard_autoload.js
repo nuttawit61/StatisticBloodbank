@@ -125,6 +125,7 @@
       'padding:10px 16px;border-radius:30px;box-shadow:0 8px 28px rgba(0,0,0,.35);' +
       'font-family:"Sarabun","Segoe UI",sans-serif;font-size:14px;backdrop-filter:blur(8px);' +
       'border:1px solid rgba(255,255,255,.12);max-width:94vw}' +
+      '@media print{#autoload-bar{display:none!important}}' +
       '#autoload-bar .al-dot{width:9px;height:9px;border-radius:50%;background:#9aa3b2;flex:0 0 auto}' +
       '#autoload-bar.live .al-dot{background:#28d17c;animation:alPulse 2s infinite}' +
       '@keyframes alPulse{0%{box-shadow:0 0 0 0 rgba(40,209,124,.55)}70%{box-shadow:0 0 0 9px rgba(40,209,124,0)}100%{box-shadow:0 0 0 0 rgba(40,209,124,0)}}' +

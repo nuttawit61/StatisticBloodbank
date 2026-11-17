@@ -195,6 +195,82 @@
       .chart-wrap { height: 170px !important; }
       .table-section { break-before: page !important; }
     }
+
+    /* ===== PRINT FIT (A4 landscape, 3 pages: KPI | Charts | Table+Analysis) ===== */
+    @media print {
+      body { margin: 0 !important; }
+      .header { padding: 4px 0 6px !important; height: auto !important; }
+      .header-inner { max-width: 100% !important; height: auto !important; padding: 0 !important; }
+      .logo-info h1 { font-size: 13px !important; }
+      .logo-info p  { font-size: 9px !important; }
+      .main { width: 100% !important; }
+      .fade-up { animation: none !important; opacity: 1 !important; transform: none !important; }
+      #autoload-bar { display: none !important; }
+
+      /* Hero: slim banner */
+      .hero-banner { padding: 10px 16px !important; margin: 6px 0 8px !important; border-radius: 10px !important; box-shadow: none !important; }
+      .hero-banner h1, .hero-banner h2 { font-size: 16px !important; margin: 0 !important; }
+      .hero-banner p { font-size: 9px !important; margin: 2px 0 0 !important; }
+      .hero-banner img, .hero-banner svg { max-height: 34px !important; width: auto !important; }
+
+      /* KPI: page 1 */
+      .kpi-section-title { padding: 5px 10px !important; margin: 0 0 6px !important; font-size: 10px !important; box-shadow: none !important; break-after: avoid !important; }
+      .kpi-section-icon { width: 18px !important; height: 18px !important; font-size: 11px !important; }
+      #kpiGrid  { grid-template-columns: repeat(3, 1fr) !important; gap: 6px !important; margin-bottom: 8px !important; }
+      #kpiGrid2 { grid-template-columns: repeat(5, 1fr) !important; gap: 6px !important; margin-bottom: 0 !important; }
+      .kpi-card { padding: 7px 9px !important; border-radius: 8px !important; }
+      .kpi-card::before { display: none !important; }
+      .kpi-icon-wrap { width: 22px !important; height: 22px !important; font-size: 12px !important; margin-bottom: 4px !important; border-radius: 6px !important; }
+      .kpi-value { font-size: 17px !important; }
+      .kpi-label, .kpi-sub, .kpi-split-label, .kpi-badge { font-size: 7.5px !important; }
+      .kpi-split-value { font-size: 9px !important; }
+      .kpi-split-row { gap: 4px 8px !important; padding-top: 5px !important; }
+
+      /* Charts: page 2 (2 cols x 4 rows) */
+      .charts-grid { break-inside: avoid !important; gap: 8px !important; margin: 0 0 8px !important; }
+      #kpiGrid2 { break-after: page !important; }
+      .chart-card { padding: 8px 10px !important; border-radius: 8px !important; }
+      .chart-header { margin-bottom: 4px !important; }
+      .chart-title h3 { font-size: 10px !important; }
+      .chart-title p  { font-size: 8px !important; }
+      .chart-wrap { height: 265px !important; max-height: 265px !important; }
+      .charts-grid { gap: 10px !important; margin: 0 0 10px !important; }
+      .charts-grid.print-page-break { break-before: page !important; }
+      .chart-wrap { position: relative !important; overflow: hidden !important; }
+      .chart-wrap canvas { width: 100% !important; height: 100% !important; }
+      .chart-title h3 { font-size: 12px !important; }
+      .chart-title p  { font-size: 9px !important; }
+
+      /* Table: page 3, always fits page width */
+      .table-section { break-before: page !important; break-inside: avoid !important; overflow: visible !important; box-shadow: none !important; margin-bottom: 8px !important; border-radius: 8px !important; }
+      .table-header { padding: 6px 10px !important; }
+      .table-title h3 { font-size: 13px !important; }
+      .table-title p  { font-size: 9.5px !important; }
+      .table-wrap { overflow: visible !important; }
+      #dataTable { width: 100% !important; table-layout: auto !important; font-size: 10.5px !important; }
+      #dataTable th { white-space: normal !important; padding: 6px 3px !important; font-size: 10.5px !important; line-height: 1.2 !important; }
+      #dataTable td { padding: 5px 3px !important; line-height: 1.25 !important; }
+      #dataTable tr.section-header td { padding: 4px 6px !important; font-size: 9.5px !important; }
+      #dataTable .sticky-col-1, #dataTable .sticky-col-2 { position: static !important; min-width: 0 !important; max-width: none !important; }
+      #dataTable .sticky-col-1 { width: 26px !important; }
+      #dataTable .sticky-col-2 { width: 20% !important; }
+      #dataTable thead { display: table-header-group !important; }
+      #dataTable tr { break-inside: avoid !important; }
+
+      /* Analysis: same page as table */
+      .analysis-section { break-inside: avoid !important; margin: 0 !important; box-shadow: none !important; border-radius: 8px !important; }
+      .analysis-header { padding: 6px 10px !important; }
+      .analysis-header h3 { font-size: 12px !important; }
+      .analysis-header p  { font-size: 8px !important; }
+      .analysis-card { padding: 8px 12px !important; font-size: 10px !important; }
+      .analysis-card h4 { font-size: 11px !important; margin-bottom: 3px !important; }
+      .analysis-card li, .analysis-card p { font-size: 10px !important; line-height: 1.35 !important; margin-bottom: 2px !important; }
+    }
+    /* Applied just before printing so Chart.js redraws charts at A4-landscape size (277mm ≈ 1047px) */
+    body.print-prep .main { width: 1047px !important; max-width: 1047px !important; padding: 0 !important; margin: 0 !important; }
+    body.print-prep .charts-grid { grid-template-columns: 1fr 1fr !important; gap: 10px !important; }
+    body.print-prep .chart-card { padding: 8px 10px !important; }
+    body.print-prep .chart-wrap { height: 265px !important; max-height: 265px !important; }
   </style>
 </head>
 <body>
@@ -321,7 +397,7 @@
     </div>
   </div>
   
-  <div class="charts-grid">
+  <div class="charts-grid print-page-break">
     <div class="chart-card fade-up" style="animation-delay:0.32s;">
       <div class="chart-header"><div class="chart-title"><h3>🏢 HLA Antibody Screening</h3><p>ศิริราช vs ร.พ.อื่นๆ (ราย)</p></div></div>
       <div class="chart-wrap"><canvas id="chartScreening"></canvas></div>
@@ -693,7 +769,19 @@ function buildCharts(){
 
 function refresh(){ LUM = LUM_DATA[selectedYear] || LUM; AVAIL = availOf(LUM); buildYearTabs(); buildMonthTabs(); renderMonthPanel(); renderKPI(); renderKPI2(); renderTable(); buildCharts(); }
 window.addEventListener('DOMContentLoaded', ()=>{ refresh(); });
-function exportToPDF(){ window.print(); }
+// Before printing, switch to the A4 layout on screen and redraw every chart at that size,
+// so charts fit their print boxes (Chrome does not resize canvases by itself when printing).
+function setChartsForPrint(isPrint){
+  document.body.classList.toggle('print-prep', !!isPrint);
+  if(!window.Chart||!Chart.getChart) return;
+  document.querySelectorAll('canvas').forEach(function(cv){
+    var ch=Chart.getChart(cv); if(!ch) return;
+    ch.resize(); ch.update('none');
+  });
+}
+window.addEventListener('beforeprint', function(){ setChartsForPrint(true); });
+window.addEventListener('afterprint',  function(){ setChartsForPrint(false); });
+function exportToPDF(){ setChartsForPrint(true); setTimeout(function(){ window.print(); }, 400); }
 function triggerSoftRefresh(){ const b=document.getElementById('btnRefresh'); if(b)b.classList.add('spinning'); refresh(); setTimeout(()=>{if(b)b.classList.remove('spinning');},400); }
 function toggleNavDropdown(e){ e.preventDefault(); e.stopPropagation(); const dd=e.currentTarget.nextElementSibling; if(dd)dd.classList.toggle('show'); }
 document.addEventListener('click', function(e){ document.querySelectorAll('.nav-dropdown-content').forEach(d=>{ if(!e.target.closest('.nav-item-dropdown')) d.classList.remove('show'); }); });

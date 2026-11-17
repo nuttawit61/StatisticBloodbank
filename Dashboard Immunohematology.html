@@ -1219,7 +1219,7 @@
       .btn-export, .btn-refresh, .btn-action, .btn-action-secondary,
       #btnMusic, #btnRefresh, #btn-export-pdf,
       .nav-menu, .nav-item-dropdown, .header-meta, .header-divider,
-      .month-bar, #monthDetailPanel, .mdp, .footer, .live-dot { display: none !important; }
+      .month-bar, #monthDetailPanel, .mdp, .footer, .live-dot, #autoload-bar { display: none !important; }
 
       /* ── Header compact ── */
       .header { position: relative !important; box-shadow: none !important;
@@ -1420,6 +1420,26 @@
 <body class="rose-theme">
 <script>
 if (sessionStorage.getItem('auth') !== 'ok') { location.replace('login.html'); }
+</script>
+
+<script>
+// ===== EXPORT TO PDF =====
+// Redraw Chart.js canvases at the print layout size so charts aren't cropped/distorted.
+function setChartsForPrint() {
+  if (!window.Chart || !Chart.getChart) return;
+  document.querySelectorAll('canvas').forEach(function(cv) {
+    var ch = Chart.getChart(cv);
+    if (ch) { ch.resize(); ch.update('none'); }
+  });
+}
+window.addEventListener('beforeprint', setChartsForPrint);
+window.addEventListener('afterprint',  setChartsForPrint);
+
+function exportToPDF() {
+  setChartsForPrint();
+  // Let print CSS + resize apply before opening the print dialog (choose "Save as PDF").
+  setTimeout(function() { setChartsForPrint(); window.print(); }, 300);
+}
 </script>
 
 <script>

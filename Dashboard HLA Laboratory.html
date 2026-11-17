@@ -998,9 +998,88 @@
       .recommendations-box h5 { font-size: 10px !important; }
       .recommendations-box li { font-size: 8.5px !important; }
     }
+
+    /* ===== PRINT FIT (A4 landscape): KPI | charts 4/page | table + analysis ===== */
+    @media print {
+      .fade-up { animation: none !important; opacity: 1 !important; transform: none !important; }
+      #autoload-bar { display: none !important; }
+      .header { padding: 4px 0 6px !important; }
+      .header-inner { padding: 0 !important; }
+
+      /* KPI: page 1 */
+      .kpi-section-title { padding: 6px 10px !important; margin: 6px 0 6px !important; box-shadow: none !important; }
+      #kpiGrid { grid-template-columns: repeat(6, 1fr) !important; gap: 6px !important; margin-bottom: 0 !important; break-inside: auto !important; }
+      #kpiGrid2:empty { display: none !important; }
+      .kpi-card { padding: 6px 8px !important; border-radius: 8px !important; }
+      .kpi-card::before { display: none !important; }
+      .kpi-icon-wrap { width: 20px !important; height: 20px !important; font-size: 11px !important; margin-bottom: 3px !important; }
+      .kpi-value { font-size: 16px !important; }
+      .kpi-label, .kpi-sub, .kpi-split-label, .kpi-badge { font-size: 7.5px !important; }
+      .kpi-split-value { font-size: 9px !important; }
+      .kpi-split-row { gap: 3px 6px !important; padding-top: 4px !important; }
+      .kpi-split-col { padding: 2px 5px !important; }
+
+      /* Charts: 2 rows x 2 cols per page */
+      .kpi-section-title-2 { break-before: page !important; }
+      .charts-grid { grid-template-columns: 1fr 1fr !important; gap: 10px !important; margin: 0 0 10px !important; break-inside: avoid !important; }
+      .charts-grid.print-page-break { break-before: page !important; }
+      .chart-card { padding: 8px 10px !important; border-radius: 8px !important; }
+      .chart-header { margin-bottom: 4px !important; }
+      .chart-title h3 { font-size: 12px !important; }
+      .chart-title p  { font-size: 9px !important; }
+      .chart-wrap { height: 255px !important; max-height: 255px !important; position: relative !important; overflow: hidden !important; }
+      .chart-wrap canvas { width: 100% !important; height: 100% !important; }
+
+      /* Table: continues after last charts, splits cleanly with repeated header */
+      .table-section { break-before: auto !important; overflow: visible !important; margin-bottom: 10px !important; border-radius: 8px !important; }
+      .table-header { padding: 6px 10px !important; break-after: avoid !important; }
+      .table-title h3 { font-size: 12px !important; }
+      .table-wrap { overflow: visible !important; }
+      #dataTable { width: 100% !important; table-layout: auto !important; font-size: 9.5px !important; }
+      #dataTable th { white-space: normal !important; padding: 5px 3px !important; font-size: 9.5px !important; line-height: 1.2 !important; }
+      #dataTable td { padding: 3px 3px !important; line-height: 1.25 !important; }
+      #dataTable tr.section-header td { padding: 3px 6px !important; font-size: 9px !important; }
+      #dataTable .sticky-col-1, #dataTable .sticky-col-2 { position: static !important; min-width: 0 !important; max-width: none !important; }
+      #dataTable .sticky-col-1 { width: 28px !important; }
+      #dataTable .sticky-col-2 { width: 24% !important; }
+      #dataTable thead { display: table-header-group !important; }
+      #dataTable tr { break-inside: avoid !important; }
+
+      /* Analysis: follows table, kept in one piece */
+      .analysis-section { break-before: auto !important; break-inside: avoid !important; margin: 0 !important; border-radius: 8px !important; }
+      .analysis-card { padding: 8px 12px !important; }
+      .analysis-card h4 { font-size: 11px !important; }
+      .analysis-card li, .recommendations-box li { font-size: 9.5px !important; line-height: 1.4 !important; }
+      .recommendations-box { padding: 8px 12px !important; }
+    }
+    /* Applied just before printing so Chart.js redraws charts at A4-landscape size (277mm ≈ 1047px) */
+    body.print-prep .main { width: 1047px !important; max-width: 1047px !important; padding: 0 !important; margin: 0 !important; }
+    body.print-prep .charts-grid { grid-template-columns: 1fr 1fr !important; gap: 10px !important; }
+    body.print-prep .chart-card { padding: 8px 10px !important; }
+    body.print-prep .chart-wrap { height: 255px !important; max-height: 255px !important; }
   </style>
 </head>
 <body>
+<script>
+// ===== EXPORT TO PDF =====
+// Before printing, switch to the A4 layout on screen and redraw every chart at that size,
+// so charts fit their print boxes (Chrome does not resize canvases by itself when printing).
+function setChartsForPrint(isPrint) {
+  document.body.classList.toggle('print-prep', !!isPrint);
+  if (!window.Chart || !Chart.getChart) return;
+  document.querySelectorAll('canvas').forEach(function(cv) {
+    var ch = Chart.getChart(cv);
+    if (ch) { ch.resize(); ch.update('none'); }
+  });
+}
+window.addEventListener('beforeprint', function() { setChartsForPrint(true); });
+window.addEventListener('afterprint',  function() { setChartsForPrint(false); });
+
+function exportToPDF() {
+  setChartsForPrint(true);
+  setTimeout(function() { window.print(); }, 400);
+}
+</script>
 <script>
 if (sessionStorage.getItem('auth') !== 'ok') { location.replace('login.html'); }
 </script>
@@ -1169,7 +1248,7 @@ if (sessionStorage.getItem('auth') !== 'ok') { location.replace('login.html'); }
   </div>
 
   <!-- ===== CHARTS ROW 3: KPI #5 FCXM / KPI #6 Platelet Antibody ===== -->
-  <div class="charts-grid">
+  <div class="charts-grid print-page-break">
     <div class="chart-card fade-up" style="animation-delay:0.33s;">
       <div class="chart-header">
         <div class="chart-title">
@@ -1221,7 +1300,7 @@ if (sessionStorage.getItem('auth') !== 'ok') { location.replace('login.html'); }
   </div>
 
   <!-- ===== CHARTS ROW 5: KPI #8 Serum Source / KPI #10 RBC-Ag Kell ===== -->
-  <div class="charts-grid" style="grid-template-columns:0.7fr 1.3fr;">
+  <div class="charts-grid print-page-break" style="grid-template-columns:0.7fr 1.3fr;">
     <div class="chart-card fade-up" style="animation-delay:0.41s;">
       <div class="chart-header">
         <div class="chart-title">
@@ -1275,7 +1354,7 @@ if (sessionStorage.getItem('auth') !== 'ok') { location.replace('login.html'); }
   </div>
 
   <!-- ===== CHARTS ROW 7: KPI #11-12 QC — ปฏิเสธสิ่งส่งตรวจ & รายงานค่าวิกฤต ===== -->
-  <div class="charts-grid">
+  <div class="charts-grid print-page-break">
     <div class="chart-card fade-up" style="animation-delay:0.45s;">
       <div class="chart-header">
         <div class="chart-title">
