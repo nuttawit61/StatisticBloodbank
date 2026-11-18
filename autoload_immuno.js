@@ -270,6 +270,10 @@
     U.granulocyte    = pairAt(["Granulocyte"]);
     U.dli            = pairAt(["DLI"]);
     U.bovineThrombin = pairAt(["Bovine Thrombin"]);
+    // คอลัมน์ที่เพิ่มในชีต Immunohematology2 (ปี 2569 เป็นต้นไป) — ปีที่ไม่มีหัวคอลัมน์จะได้ค่า null
+    U.pildppc        = pairAt(["PILDPPC", "PI-LDPPC", "PI LDPPC"]);
+    U.htfdc          = pairAt(["HTFDC"]);
+    U.pbsc           = pairAt(["PBSC"]);
 
     var totalCol = colByHeader(["รวม"]);
     U.totalPlatelet = { patient: colVals(totalCol), unit: totalCol >= 0 ? colVals(totalCol + 1) : newArr() };
@@ -564,6 +568,17 @@
     }
     if (data.htfdcIssue == null && prev.htfdcIssue != null) {
       data.htfdcIssue = prev.htfdcIssue;
+    }
+    // HTFDC Issue: เดือนที่ชีต "HTFDC Issue" ยังว่าง ใช้ยอดจากชีต Immunohematology2 คอลัมน์ HTFDC (Bottle)
+    // (ตรวจแล้วเดือนที่มีทั้งสองชีต ตัวเลขตรงกัน) — Bovine Thrombin ไม่เติม เพราะนิยามสองชีตต่างกัน
+    var usH = data.bloodProductsUsage && data.bloodProductsUsage.htfdc && data.bloodProductsUsage.htfdc.unit;
+    if (usH && usH.some(function (x) { return x !== null && x !== undefined; })) {
+      var hiT = data.htfdcIssue || { htfdc: null, thrombin: null };
+      var hArr = (hiT.htfdc || newArr()).slice();
+      for (var mm = 0; mm < 12; mm++) {
+        if ((hArr[mm] === null || hArr[mm] === undefined) && usH[mm] !== null && usH[mm] !== undefined) hArr[mm] = usH[mm];
+      }
+      hiT.htfdc = hArr; data.htfdcIssue = hiT;
     }
     if (data.mtp == null && prev.mtp != null) {
       data.mtp = prev.mtp;

@@ -1707,7 +1707,7 @@ document.addEventListener('click', function(e) {
         <div class="chart-header">
           <div class="chart-title">
             <h3>🧊 HTFDC Issue รายเดือน</h3>
-            <p>Heat-treated freeze-dried cryoprecipitate ที่จ่ายออก (ยูนิท) · เทียบปีก่อนหน้า</p>
+            <p>Heat-treated freeze-dried cryoprecipitate ที่จ่ายออก (ยูนิท) · เทียบปีก่อนหน้า · เดือนที่ชีต HTFDC Issue ยังว่างใช้ยอดจากชีต Immunohematology2</p>
           </div>
         </div>
         <div class="chart-wrap">
@@ -1834,7 +1834,7 @@ document.addEventListener('click', function(e) {
         <div class="chart-header">
           <div class="chart-title">
             <h3>การจ่าย Platelet รายเดือน (ยูนิท)</h3>
-            <p>PC + LPPC/LDPPC + SDP</p>
+            <p>PC + LPPC/LDPPC + PILDPPC + SDP</p>
           </div>
         </div>
         <div class="chart-wrap">
@@ -1865,6 +1865,32 @@ document.addEventListener('click', function(e) {
         </div>
         <div class="chart-wrap">
           <canvas id="chartUsageCryo" height="320"></canvas>
+        </div>
+      </div>
+    </div>
+
+    <!-- Chart 3e/3f: Platelet แยกชนิด + ผลิตภัณฑ์พิเศษ (ชีต Immunohematology2) -->
+    <div class="charts-grid" style="grid-template-columns: 1fr 1fr;" id="usageExtraSection">
+      <div class="chart-card fade-up" style="animation-delay: 0.4s;" id="cardPltType">
+        <div class="chart-header">
+          <div class="chart-title">
+            <h3>การจ่าย Platelet แยกตามชนิด (ยูนิท)</h3>
+            <p>LPPC/LDPPC · PILDPPC · SDP (PC) · ตัวเลขบนแท่ง = รวมทุกชนิด</p>
+          </div>
+        </div>
+        <div class="chart-wrap">
+          <canvas id="chartPltType" height="320"></canvas>
+        </div>
+      </div>
+      <div class="chart-card fade-up" style="animation-delay: 0.42s;" id="cardSpecial">
+        <div class="chart-header">
+          <div class="chart-title">
+            <h3>การจ่ายผลิตภัณฑ์พิเศษรายเดือน (ครั้ง)</h3>
+            <p>HTFDC · Granulocyte · DLI · PBSC</p>
+          </div>
+        </div>
+        <div class="chart-wrap">
+          <canvas id="chartSpecial" height="320"></canvas>
         </div>
       </div>
     </div>
@@ -2255,6 +2281,18 @@ function renderKPI() {
   const plateletPc   = u && u.pc   && u.pc.unit   ? sum(u.pc.unit,   idxs) : 0;
   const plateletLppc = u && u.lppc && u.lppc.unit ? sum(u.lppc.unit, idxs) : 0;
   const plateletSdp  = u && u.sdp  && u.sdp.unit  ? sum(u.sdp.unit,  idxs) : 0;
+  // คอลัมน์ที่เพิ่มในชีต Immunohematology2 (ปี 2569 เป็นต้นไป)
+  const hasArr = (a) => !!a && a.some(v => v !== null && v !== undefined);
+  const hasPi      = !!(u && u.pildppc && hasArr(u.pildppc.unit));
+  const plateletPi = hasPi ? sum(u.pildppc.unit, idxs) : 0;
+  const spItems = [
+    { key: 'htfdc',       label: 'HTFDC',       unitLbl: 'bottle' },
+    { key: 'granulocyte', label: 'Granulocyte', unitLbl: 'unit' },
+    { key: 'dli',         label: 'DLI',         unitLbl: 'unit' },
+    { key: 'pbsc',        label: 'PBSC',        unitLbl: 'unit' },
+  ].filter(it => u && u[it.key] && hasArr(u[it.key].patient))
+   .map(it => ({ ...it, times: sum(u[it.key].patient, idxs), units: sum(u[it.key].unit, idxs) }));
+  const spTimes = spItems.reduce((a, it) => a + it.times, 0);
   const cryoVal    = u && u.cryo && u.cryo.unit ? sum(u.cryo.unit, idxs) : 0;
   const ffpVal     = u && u.ffp && u.ffp.unit ? sum(u.ffp.unit, idxs) : 0;
   // ยอดรวม unit ทุกเดือนที่มีข้อมูล (ใช้หารเฉลี่ย/เดือนเสมอ ไม่ขึ้นกับเดือนที่เลือก)
@@ -2544,6 +2582,11 @@ function renderKPI() {
           <div class="kpi-split-label">LPPC/LDPPC</div>
           <div class="kpi-split-value">${fmt(plateletLppc)}</div>
         </div>
+        ${hasPi ? `
+        <div class="kpi-split-col">
+          <div class="kpi-split-label">PILDPPC</div>
+          <div class="kpi-split-value">${fmt(plateletPi)}</div>
+        </div>` : ''}
         <div class="kpi-split-col">
           <div class="kpi-split-label">SDP</div>
           <div class="kpi-split-value">${fmt(plateletSdp)}</div>
@@ -2580,6 +2623,22 @@ function renderKPI() {
         </div>
       </div>
     </div>
+
+    <!-- Card 11: ผลิตภัณฑ์พิเศษ (ชีต Immunohematology2) -->
+    ${spItems.length ? `
+    <div class="kpi-card" style="--kpi-color: #0e7490; --kpi-bg: #ecfeff;">
+      <div class="kpi-icon-wrap">🧬</div>
+      <div class="kpi-label">จ่ายผลิตภัณฑ์พิเศษ</div>
+      <div class="kpi-value" style="color:#0e7490;">${fmt(spTimes)}</div>
+      <div class="kpi-sub">จำนวนครั้งรวม ${spItems.map(it => it.label).join(' + ')}</div>
+      <div class="kpi-split-row">
+        ${spItems.map(it => `
+        <div class="kpi-split-col" style="min-width:calc(50% - 8px); flex: 0 1 calc(50% - 8px);">
+          <div class="kpi-split-label">${it.label}</div>
+          <div class="kpi-split-value">${fmt(it.times)}<small>ครั้ง · ${fmt(it.units)} ${it.unitLbl}</small></div>
+        </div>`).join('')}
+      </div>
+    </div>` : ''}
   `;
 }
 
@@ -2594,6 +2653,8 @@ let chartUsageRbc = null;
 let chartUsagePlt = null;
 let chartUsageFFP = null;
 let chartUsageCryo = null;
+let chartPltType = null;
+let chartSpecial = null;
 let chartAntibody = null;
 let chartEmergencyInst = null;
 let chartSafetyInst = null;
@@ -3053,6 +3114,9 @@ function buildCharts() {
     }
   });
 
+  // Chart 3e/3f: Platelet แยกชนิด + ผลิตภัณฑ์พิเศษ (ชีต Immunohematology2)
+  buildUsageExtraCharts(idxs, monthsLabels, c);
+
   // Chart: Specimen Rejection
   const ctxRej = document.getElementById('chartSpecimenRejection').getContext('2d');
   if (chartSpecimenRejection) chartSpecimenRejection.destroy();
@@ -3297,6 +3361,85 @@ function buildCharts() {
 
   // หัวข้อ Massive Transfusion Protocol
   renderMtp();
+}
+
+function buildUsageExtraCharts(idxs, monthsLabels, c) {
+  if (chartPltType) { chartPltType.destroy(); chartPltType = null; }
+  if (chartSpecial) { chartSpecial.destroy(); chartSpecial = null; }
+  const u = c && c.bloodProductsUsage;
+  const section = document.getElementById('usageExtraSection');
+  if (!u) { if (section) section.style.display = 'none'; return; }
+  const has = (a) => !!a && idxs.some(i => a[i] !== null && a[i] !== undefined && a[i] !== 0);
+  const font = { family: 'Sarabun' };
+  const legend = { display: true, position: 'top', labels: { boxWidth: 12, font, usePointStyle: true } };
+
+  // --- Platelet แยกชนิด (stacked, unit) ---
+  const pltSeries = [
+    { key: 'pc',      label: 'PC',         bg: 'rgba(148,163,184,0.85)' },
+    { key: 'lppc',    label: 'LPPC/LDPPC', bg: 'rgba(124,58,237,0.75)' },
+    { key: 'pildppc', label: 'PILDPPC',    bg: 'rgba(236,72,153,0.85)' },
+    { key: 'sdp',     label: 'SDP',        bg: 'rgba(13,148,136,0.75)' },
+  ].filter(s => u[s.key] && has(u[s.key].unit));
+  const pltTotals = idxs.map(i => pltSeries.reduce((a, s) => a + (u[s.key].unit[i] || 0), 0));
+  const totalLabel = {
+    id: 'stackTotal',
+    afterDatasetsDraw(chart) {
+      const { ctx } = chart; const last = chart.getDatasetMeta(chart.data.datasets.length - 1);
+      ctx.save(); ctx.font = '600 11px Sarabun, sans-serif'; ctx.fillStyle = '#374151';
+      ctx.textAlign = 'center'; ctx.textBaseline = 'bottom';
+      const yScale = chart.scales.y;
+      pltTotals.forEach((t, k) => { const bar = last.data[k]; if (bar && t) ctx.fillText(Number(t).toLocaleString('th-TH'), bar.x, yScale.getPixelForValue(t) - 3); });
+      ctx.restore();
+    }
+  };
+  const elP = document.getElementById('chartPltType');
+  const cardP = document.getElementById('cardPltType');
+  if (cardP) cardP.style.display = pltSeries.length ? '' : 'none';
+  if (elP && pltSeries.length) {
+    chartPltType = new Chart(elP.getContext('2d'), {
+      type: 'bar',
+      data: { labels: monthsLabels, datasets: pltSeries.map(s => ({
+        label: s.label, data: idxs.map(i => u[s.key].unit[i] ?? 0),
+        backgroundColor: s.bg, borderWidth: 0, borderRadius: 3, stack: 'plt'
+      })) },
+      options: {
+        responsive: true, maintainAspectRatio: false,
+        plugins: { legend, barDatalabels: { enabled: false },
+          tooltip: { mode: 'index', intersect: false, callbacks: { footer: (items) => 'รวม ' + Number(pltTotals[items[0].dataIndex]).toLocaleString('th-TH') + ' ยูนิท' } } },
+        scales: { x: { stacked: true, ticks: { font } }, y: { stacked: true, beginAtZero: true, grace: '8%', ticks: { font } } }
+      },
+      plugins: [totalLabel]
+    });
+  }
+
+  // --- ผลิตภัณฑ์พิเศษ (grouped, ครั้ง) ---
+  const spSeries = [
+    { key: 'htfdc',       label: 'HTFDC',       bg: 'rgba(20,184,166,0.8)',  unitLbl: 'bottle' },
+    { key: 'granulocyte', label: 'Granulocyte', bg: 'rgba(245,158,11,0.8)',  unitLbl: 'unit' },
+    { key: 'dli',         label: 'DLI',         bg: 'rgba(99,102,241,0.8)',  unitLbl: 'unit' },
+    { key: 'pbsc',        label: 'PBSC',        bg: 'rgba(219,39,119,0.8)',  unitLbl: 'unit' },
+  ].filter(s => u[s.key] && has(u[s.key].patient));
+  const elS = document.getElementById('chartSpecial');
+  const cardS = document.getElementById('cardSpecial');
+  if (cardS) cardS.style.display = spSeries.length ? '' : 'none';
+  if (elS && spSeries.length) {
+    chartSpecial = new Chart(elS.getContext('2d'), {
+      type: 'bar',
+      data: { labels: monthsLabels, datasets: spSeries.map(s => ({
+        label: s.label, data: idxs.map(i => u[s.key].patient[i] || null), // 0 = ไม่แสดงแท่ง/ตัวเลข
+        backgroundColor: s.bg, borderWidth: 0, borderRadius: 4
+      })) },
+      options: {
+        responsive: true, maintainAspectRatio: false,
+        plugins: { legend, barDatalabels: { enabled: true, font: '600 10px Sarabun, sans-serif', color: '#374151' },
+          tooltip: { callbacks: { label: (it) => {
+            const s = spSeries[it.datasetIndex]; const uv = u[s.key].unit[idxs[it.dataIndex]];
+            return `${s.label}: ${it.raw ?? 0} ครั้ง · ${uv ?? 0} ${s.unitLbl}`; } } } },
+        scales: { y: { beginAtZero: true, grace: '15%', ticks: { font, precision: 0 } }, x: { ticks: { font } } }
+      }
+    });
+  }
+  if (section) section.style.display = (pltSeries.length || spSeries.length) ? '' : 'none';
 }
 
 function buildIssueCharts(idxs, monthsLabels, c, p) {
@@ -3835,34 +3978,37 @@ function buildDispenseTable() {
   };
   const sumArr = (arr) => arr ? idxs.reduce((s, i) => s + (arr[i] || 0), 0) : 0;
 
-  const cols = [
+  // ลำดับคอลัมน์ตามชีต Immunohematology2 — คอลัมน์คู่: ซ้าย = ครั้ง (patient), ขวา = unit
+  // opt:true = ซ่อนทั้งกลุ่มถ้าปีนั้นไม่มีข้อมูล (คอลัมน์ที่เพิ่มใหม่ปี 2569)
+  const pair = (key, grp, uLabel, opt, hl) => ([
+    { key:key+'P', grp:grp,  sub:'ครั้ง', arr: getSub(key,'patient'), hl: !!hl, pair: true, opt: !!opt, grpKey:key },
+    { key:key+'U', grp:null, sub:uLabel || 'unit', arr: getSub(key,'unit'), hl: !!hl, opt: !!opt, grpKey:key },
+  ]);
+  let cols = [
     { key:'wb',    grp:'WB',              sub:'unit',  arr: getArr('wb'),               hl: false },
     { key:'prc',   grp:'PRC',             sub:'unit',  arr: getArr('prc'),              hl: false },
     { key:'lpb',   grp:'LPB',             sub:'unit',  arr: getArr('lpb'),              hl: false },
     { key:'pfb',   grp:'PFB',             sub:'unit',  arr: getArr('pfb'),              hl: false },
     { key:'rbc',   grp:'รวม RBC',         sub:'unit',  arr: getArr('rbc'),              hl: true  },
-    { key:'pcU',   grp:'PC',              sub:'unit',  arr: getSub('pc','patient'),     hl: false, pair: true },
-    { key:'pcP',   grp:null,              sub:'ครั้ง', arr: getSub('pc','unit'),        hl: false },
-    { key:'lppcU', grp:'LPPC/LDPPC',     sub:'unit',  arr: getSub('lppc','patient'),   hl: false, pair: true },
-    { key:'lppcP', grp:null,              sub:'ครั้ง', arr: getSub('lppc','unit'),      hl: false },
-    { key:'sdpU',  grp:'SDP',             sub:'unit',  arr: getSub('sdp','patient'),    hl: false, pair: true },
-    { key:'sdpP',  grp:null,              sub:'ครั้ง', arr: getSub('sdp','unit'),       hl: false },
-    { key:'tpU',   grp:'รวม Platelet',   sub:'unit',  arr: getSub('totalPlatelet','patient'), hl: true, pair: true },
-    { key:'tpP',   grp:null,              sub:'ครั้ง', arr: getSub('totalPlatelet','unit'),    hl: true },
-    { key:'ffpU',  grp:'FFP',             sub:'unit',  arr: getSub('ffp','patient'),    hl: false, pair: true },
-    { key:'ffpP',  grp:null,              sub:'ครั้ง', arr: getSub('ffp','unit'),       hl: false },
-    { key:'crpU',  grp:'CRP',             sub:'unit',  arr: getSub('crp','patient'),    hl: false, pair: true },
-    { key:'crpP',  grp:null,              sub:'ครั้ง', arr: getSub('crp','unit'),       hl: false },
-    { key:'cryU',  grp:'Cryo',            sub:'unit',  arr: getSub('cryo','patient'),   hl: false, pair: true },
-    { key:'cryP',  grp:null,              sub:'ครั้ง', arr: getSub('cryo','unit'),      hl: false },
-    { key:'btU',   grp:'Bovine Thrombin', sub:'unit',  arr: getSub('bovineThrombin','patient'), hl: false, pair: true },
-    { key:'btP',   grp:null,              sub:'ครั้ง', arr: getSub('bovineThrombin','unit'),    hl: false },
-    { key:'grU',   grp:'Granulocyte',     sub:'unit',  arr: getSub('granulocyte','patient'),    hl: false, pair: true },
-    { key:'grP',   grp:null,              sub:'ครั้ง', arr: getSub('granulocyte','unit'),       hl: false },
-    { key:'dliU',  grp:'DLI',             sub:'unit',  arr: getSub('dli','patient'),    hl: false, pair: true },
-    { key:'dliP',  grp:null,              sub:'ครั้ง', arr: getSub('dli','unit'),       hl: false },
+    ...pair('pc',             'PC'),
+    ...pair('lppc',           'LPPC/LDPPC'),
+    ...pair('pildppc',        'PILDPPC', null, true),
+    ...pair('sdp',            'SDP'),
+    ...pair('totalPlatelet',  'รวม Platelet', null, false, true),
+    ...pair('ffp',            'FFP'),
+    ...pair('crp',            'CRP'),
+    ...pair('cryo',           'Cryo'),
+    ...pair('htfdc',          'HTFDC', 'Bottle', true),
+    ...pair('bovineThrombin', 'Bovine Thrombin'),
+    ...pair('granulocyte',    'Granulocyte'),
+    ...pair('dli',            'DLI'),
+    ...pair('pbsc',           'PBSC', null, true),
     { key:'tr',    grp:'T.R.',            sub:'ราย',   arr: getArr('transfusionReactionCases'), hl: false },
   ];
+  const hasData = (arr) => !!arr && idxs.some(i => arr[i] !== null && arr[i] !== undefined);
+  const emptyGrp = new Set(cols.filter(c => c.opt).map(c => c.grpKey)
+    .filter(k => !cols.some(c => c.grpKey === k && hasData(c.arr))));
+  cols = cols.filter(c => !(c.opt && emptyGrp.has(c.grpKey)));
 
   // Header row 1 (group names)
   let grpHtml = '<tr class="dt2-grp-row"><th rowspan="2" style="min-width:56px;position:sticky;left:0;z-index:3;">เดือน</th>';
