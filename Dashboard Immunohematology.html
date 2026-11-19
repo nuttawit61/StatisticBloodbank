@@ -3171,13 +3171,17 @@ function buildCharts() {
     chartAntibody = null;
   }
 
-  const hasAbData = c.antibodyId && c.antibodyId.total && c.antibodyId.total[0] !== null;
+  const hasAbData = !!(c.antibodyId && c.antibodyId.total && c.antibodyId.total.some(v => v !== null && v !== undefined));
+  // เดือนที่มีข้อมูล Antibody (ปี 2569 เริ่มเก็บตั้งแต่ มิ.ย.)
+  const abMonths = hasAbData ? c.antibodyId.total.map((v, i) => (v !== null && v !== undefined) ? i : -1).filter(i => i >= 0 && getAvailableIdxs().includes(i)) : [];
   const header = document.getElementById('chart4Header');
   
   if (hasAbData) {
     header.innerHTML = `
       <h3>ผลการจำแนกชนิดของสารภูมิคุ้มกัน (Antibody Identification Profile)</h3>
-      <p>จำนวนสิ่งส่งตรวจสะสมที่ตรวจพบและจำแนกแอนติบอดีผิดปกติทางภูมิคุ้มกันวิทยา</p>
+      <p>จำนวนสิ่งส่งตรวจสะสมที่ตรวจพบและจำแนกแอนติบอดีผิดปกติทางภูมิคุ้มกันวิทยา${
+        (abMonths.length && abMonths.length < getAvailableIdxs().length)
+          ? ` <span style="color:var(--amber);">(มีข้อมูลเดือน ${MONTHS_FY[abMonths[0]]}–${MONTHS_FY[abMonths[abMonths.length-1]]})</span>` : ''}</p>
     `;
     
     chartAntibody = new Chart(ctxAb, {
@@ -3201,14 +3205,16 @@ function buildCharts() {
         maintainAspectRatio: false,
         plugins: { legend: { display: false } },
         scales: {
-          y: { beginAtZero: true, ticks: { font: { family: 'Sarabun' } } },
+          y: { beginAtZero: true, grace: '8%', ticks: { font: { family: 'Sarabun' } } },
           x: { ticks: { font: { family: 'Sarabun' } } }
         }
       }
     });
-  } else {
-    // ปีที่ไม่มี antibodyId: ซ่อนกราฟ Antibody และแสดง Emergency + Safety แยกกัน
-    document.getElementById('chartAntibodyCard').style.display = 'none';
+  }
+  // กราฟ Emergency + Safety: แสดงในปีที่ไม่มี antibodyId และปี 2569 เป็นต้นไป (แม้มี antibodyId)
+  const showES = !hasAbData || selectedYear >= 2569;
+  if (showES) {
+    if (!hasAbData) document.getElementById('chartAntibodyCard').style.display = 'none';
     const grid = document.getElementById('row2bGrid');
     if (grid) grid.style.gridTemplateColumns = '1fr 1fr';
 
@@ -3303,15 +3309,26 @@ function buildCharts() {
     }
   }
 
-  // Reset เมื่อมี antibody data (ซ่อน emergency/safety cards)
-  if (hasAbData) {
-    document.getElementById('chartAntibodyCard').style.display = '';
+  // จัด layout แถว Antibody / Emergency / Safety
+  {
+    const abCard = document.getElementById('chartAntibodyCard');
     const eCard = document.getElementById('chartEmergencyCard');
     const sCard = document.getElementById('chartSafetyCard');
     const grid2 = document.getElementById('row2bGrid');
-    if (eCard) eCard.style.display = 'none';
-    if (sCard) sCard.style.display = 'none';
-    if (grid2) grid2.style.gridTemplateColumns = '1fr';
+    if (hasAbData) abCard.style.display = '';
+    if (hasAbData && showES) {
+      // Antibody เต็มแถวด้านบน + Emergency / Safety คู่กันด้านล่าง
+      abCard.style.gridColumn = '1 / -1';
+      if (grid2) grid2.style.gridTemplateColumns = '1fr 1fr';
+    } else if (hasAbData) {
+      // ปีเก่าที่มี antibodyId: แสดงเฉพาะ Antibody เหมือนเดิม
+      abCard.style.gridColumn = '';
+      if (eCard) eCard.style.display = 'none';
+      if (sCard) sCard.style.display = 'none';
+      if (grid2) grid2.style.gridTemplateColumns = '1fr';
+    } else {
+      abCard.style.gridColumn = '';
+    }
   }
 
   // Chart 5: Platelet Expired by type
@@ -3755,46 +3772,54 @@ function buildTable() {
 
   // Rows configuration
   const rows = [
-    { type: 'section', label: '1. สถิติการตรวจคัดเตรียมเลือด (Immunohematology Requests)' },
-    { type: 'data', label: 'ในเวลา (สิ่งส่งตรวจ)', sec: 'request', key: 'receiveSpecimens' },
-    { type: 'data', label: 'CM (Crossmatch สำหรับในเวลา)', sec: 'request', key: 'receiveCrossmatch' },
-    { type: 'data', label: 'นอกเวลา (สิ่งส่งตรวจ)', sec: 'request', key: 'dispenseSpecimens' },
-    { type: 'data', label: 'CM (Crossmatch สำหรับนอกเวลา)', sec: 'request', key: 'dispenseCrossmatch' },
-    { type: 'total', label: 'ในเวลา+นอกเวลา รวมสิ่งส่งตรวจ', sec: 'request', key: 'totalSpecimens' },
-    { type: 'total', label: 'CM รวม (ยอด Crossmatch ทั้งสิ้น)', sec: 'request', key: 'totalCrossmatch' },
-    { type: 'data', label: 'transfusion Rbc. (ยอดเบิกใช้จริง)', sec: 'request', key: 'transfusionRbc' },
-    { type: 'ratio', label: 'C:T Ratio (สัดส่วนจองเทียบใช้จริง)' },
+    { type: 'section', label: '1. Request' },
+    { type: 'data', label: 'ในเวลา (ครั้ง)', sec: 'request', key: 'receiveSpecimens' },
+    { type: 'data', label: '   CM', sec: 'request', key: 'receiveCrossmatch' },
+    { type: 'data', label: 'นอกเวลา (ครั้ง)', sec: 'request', key: 'dispenseSpecimens' },
+    { type: 'data', label: '   CM', sec: 'request', key: 'dispenseCrossmatch' },
+    { type: 'total', label: 'รวมในเวลา+นอกเวลา', sec: 'request', key: 'totalSpecimens' },
+    { type: 'total', label: 'CM รวม', sec: 'request', key: 'totalCrossmatch' },
+    { type: 'data', label: 'transfusion Rbc.', sec: 'request', key: 'transfusionRbc' },
+    { type: 'ratio', label: 'C:T' },
 
-    { type: 'section', label: '2. การจ่ายผลิตภัณฑ์โลหิตแยกตามพื้นที่รับผิดชอบ (จ่าย Blood Product)' },
-    { type: 'sub-section', label: 'ในเวลา' },
+    { type: 'section', label: '2. จ่าย Blood Product' },
+    { type: 'total2', label: 'ในเวลา (ครั้ง)', key1: 'receive', key2: 'count' },
     { type: 'data2', label: '   Plt.concentrate(ครั้ง)', key1: 'receive', key2: 'pltConcPat' },
     { type: 'data2', label: '   Plt.concentrate(ยูนิท)', key1: 'receive', key2: 'pltConcDon' },
-    { type: 'total2', label: '   รวม plt. เข้มข้นสะสม', key1: 'receive', key2: 'totalPltConc' },
+    { type: 'data2', label: '   รวม plt. ทุกระบบ (ยูนิต)', key1: 'receive', key2: 'totalPltConc' },
     { type: 'data2', label: '   FFP (unit)', key1: 'receive', key2: 'ffp' },
     { type: 'data2', label: '   Cryo (pool)', key1: 'receive', key2: 'cryoPool' },
     { type: 'data2', label: '   Cryo (unit)', key1: 'receive', key2: 'cryoUnit' },
-    { type: 'sub-section', label: 'นอกเวลา' },
+    { type: 'total2', label: 'นอกเวลา (ครั้ง)', key1: 'dispense', key2: 'count' },
     { type: 'data2', label: '   Plt.concentrate(ครั้ง)', key1: 'dispense', key2: 'pltConcPat' },
     { type: 'data2', label: '   Plt.concentrate(ยูนิท)', key1: 'dispense', key2: 'pltConcDon' },
-    { type: 'total2', label: '   รวม plt. เข้มข้นสะสม', key1: 'dispense', key2: 'totalPltConc' },
+    { type: 'data2', label: '   รวม plt. ทุกระบบ (ยูนิต)', key1: 'dispense', key2: 'totalPltConc' },
     { type: 'data2', label: '   FFP (unit)', key1: 'dispense', key2: 'ffp' },
     { type: 'data2', label: '   Cryo (pool)', key1: 'dispense', key2: 'cryoPool' },
     { type: 'data2', label: '   Cryo (unit)', key1: 'dispense', key2: 'cryoUnit' },
 
-    { type: 'section', label: '3. รายงานอุบัติการณ์ความปลอดภัย (Occurrence)' },
-    { type: 'occur', label: 'ปฏิกิริยาการถ่ายเลือดรุนแรง ผู้ป่วย ปรับปรุง', key: 'transfusionReaction' },
+    { type: 'section', label: '3. Occurrence' },
+    { type: 'occur', label: 'การจ่ายเลือดผิดหมู่ ผิดคน ผิดประเภท', key: 'transfusionReaction' },
     { type: 'occur', label: 'Wrong Blood in tube', key: 'wrongBloodInTube' },
-    { type: 'occur', label: 'สิ่งส่งตรวจไม่เหมาะสม (1)', key: 'inappropriateSpecimen' },
-    { type: 'total-occur', label: 'TOTAL Occurrence', key: 'total' },
+    { type: 'occur', label: 'ปฏิเสธสิ่งส่งตรวจ (1)', key: 'inappropriateSpecimen' },
+    { type: 'total-occur', label: 'TOTAL', key: 'total' },
 
+    { type: 'section', label: '4. Antibody Identification — Patient (ราย)' },
+    { type: 'ab', label: 'Unidentified Ab.', key: 'unidentified' },
+    { type: 'ab', label: 'Non specific Ab.', key: 'nonSpecific' },
+    { type: 'ab', label: 'Auto Ab.', key: 'autoAb' },
+    { type: 'ab', label: 'Unexpected Ab.', key: 'unexpectedAb' },
+    { type: 'total-ab', label: 'TOTAL', key: 'total' },
 
-    { type: 'section', label: '4. การขอตรวจเตรียมโลหิตด่วนและฉุกเฉิน (Stat & Emergency Request)' },
-    { type: 'stat', label: 'ต้องการ Request (Stat)', key: 'total' },
-    { type: 'emerg', label: 'ต้องการ Request (Emergency)', key: 'total' },
+    { type: 'section', label: '5. Request (Stat)' },
+    { type: 'stat', label: 'จำนวนใบ Request', key: 'total' },
+
+    { type: 'section', label: '6. Request (Emergency)' },
+    { type: 'emerg', label: 'จำนวนใบ Request', key: 'total' },
 
     // แสดงเฉพาะปีที่มีข้อมูลจากชีต "HTFDC Issue"
     ...(c.htfdcIssue ? [
-      { type: 'section', label: '5. การจ่าย HTFDC และ Bovine Thrombin (HTFDC / Bovine Thrombin Issue)' },
+      { type: 'section', label: '7. HTFDC / Bovine Thrombin Issue' },
       { type: 'htfdc', label: 'HTFDC (Heat-treated freeze-dried cryo) (ยูนิท)', key: 'htfdc' },
       { type: 'htfdc', label: 'Bovine Thrombin (ยูนิท)', key: 'thrombin' },
       { type: 'total-htfdc', label: 'รวมจ่ายออก HTFDC + Bovine Thrombin', key: 'both' },
@@ -3803,7 +3828,12 @@ function buildTable() {
   ];
 
   let bodyHtml = '';
+  const fmtN = v => fmt(v, Number.isInteger(Number(v)) ? 0 : 1);
   rows.forEach(row => {
+    if (row.type === 'total2' && row.key2 === 'count') {
+      const ca = getPaidRowArray(row.key1, row.key2);
+      if (!idxs.some(i => ca[i] !== null && ca[i] !== undefined)) return;
+    }
     if (row.type === 'section') {
       const colSpan = idxs.length + 4;
       bodyHtml += `<tr class="section-header"><td colspan="${colSpan}">${row.label}</td></tr>`;
@@ -3889,9 +3919,9 @@ function buildTable() {
         const activeClass = selectedMonth === i ? ' class="active-month-col"' : '';
         if (val !== null && val !== undefined) {
           if ((row.type === 'occur' || row.type === 'total-occur') && val > 0) {
-            rowHtml += `<td${activeClass} class="occur-cell-alert">${fmt(val)}</td>`;
+            rowHtml += `<td${activeClass} class="occur-cell-alert">${fmtN(val)}</td>`;
           } else {
-            rowHtml += `<td${activeClass}>${fmt(val)}</td>`;
+            rowHtml += `<td${activeClass}>${fmtN(val)}</td>`;
           }
           sumVal += val;
         } else {
@@ -3918,9 +3948,9 @@ function buildTable() {
       }
     } else {
       if ((row.type === 'occur' || row.type === 'total-occur') && fullYearSum > 0) {
-        rowHtml += `<td class="col-year-total occur-cell-alert">${fmt(fullYearSum)}</td>`;
+        rowHtml += `<td class="col-year-total occur-cell-alert">${fmtN(fullYearSum)}</td>`;
       } else {
-        rowHtml += `<td class="col-year-total">${fmt(fullYearSum)}</td>`;
+        rowHtml += `<td class="col-year-total">${fmtN(fullYearSum)}</td>`;
       }
     }
 

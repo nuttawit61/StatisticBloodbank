@@ -194,6 +194,9 @@
     }
     payBlock(inPay  >= 0 ? inPay  : sPay, outPay >= 0 ? outPay : ePay, out.bloodProductsPaid.receive);
     payBlock(outPay >= 0 ? outPay : sPay, ePay, out.bloodProductsPaid.dispense);
+    // จำนวนครั้งจ่าย (แถว "ในเวลา (ครั้ง)" / "นอกเวลา (ครั้ง)" ของหัวข้อ 2)
+    out.bloodProductsPaid.receive.count  = inPay  >= 0 ? vals1(inPay)  : newArr();
+    out.bloodProductsPaid.dispense.count = outPay >= 0 ? vals1(outPay) : newArr();
 
     // ----- 3.Occurrence -----
     out.occurrence.transfusionReaction   = vals1In(sOcc, eOcc, C("ผิดหมู่"));
